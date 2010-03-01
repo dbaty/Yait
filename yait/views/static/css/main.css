@@ -1,0 +1,248 @@
+/*******************************************************************
+** Reset CSS
+************/
+body, h1, h2,
+p, div, ul, ol, li,
+form, fieldset, label, input, textarea, select,
+img {
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2 {
+    font-size: 100%;
+    font-weight: normal;
+}
+/***********************************************************/
+
+
+
+/***********************************************************
+** Default and general settings
+*******************************/
+* {
+    font-family: "Lucida Grande", arial, sans-serif;
+}
+
+body {
+    background-color: white;
+    color: black;
+    font-size: 100%; /* 16px */
+}
+
+img {
+    border: 0;
+}
+
+h1 {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 0.714em; /* 1 / font-size */
+}
+
+h2 {
+    font-weight: bold;
+    padding-bottom: 0.2em;
+    border-bottom: 1px solid #CCCCCC;
+    margin-bottom: 0.5em;
+}
+
+p {
+    margin-bottom: 1em;
+}
+
+.hidden {
+    display: none;
+}
+
+#content {
+    float: left;
+    width: 50em;
+}
+/***********************************************************/
+
+
+
+/***********************************************************
+** Header
+*********/
+#header {
+    font-size: 1.6em;
+    background-color: #144578;
+    color: white;
+    padding: 0.625em 0.625em; /* 1 / font-size */
+    margin-bottom: 0.5em;
+}
+
+#header a {
+    color: white;
+    text-decoration: none;
+}
+
+#header a:hover {
+    border-bottom: 0.05em solid white;
+}
+/***********************************************************/
+
+
+
+/***********************************************************
+** Properties panel
+***********************************************************/
+#properties {
+    float: left;
+    width: 18em;
+    margin: 0 1em 0 1em;
+    border: 0.1em solid #144578;
+    list-style-type: none;
+    font-size: 0.8em;
+}
+
+#properties li {
+    padding: 0.3em 0.5em;
+}
+
+#properties #issueStatus {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2em;
+    border-bottom: 0.05em solid #144578;
+    color: black;
+    padding: 0.5em;
+}
+
+#properties #issueUnassigned {
+    /* FIXME */
+}
+
+#properties abbr {
+    border-bottom: 1px dotted #CCCCCC;
+}
+/***********************************************************/
+
+
+
+/***********************************************************
+** Error and status messages
+****************************/
+div.statusMessage, div.errorMessage, div.formError {
+    border-width: 1px 1px 1px 0.5em;
+    border-style: solid;
+    font-weight: bold;
+    color: black;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+div.statusMessage { /* FIXME: is this used? */
+    border-color: #007D39;
+    background-color: #F4FFFA;
+}
+
+div.errorMessage, div.formError {
+    color: #CC0000;
+    border-color: #CC0000;
+    background-color: #FFEEEE;
+}
+/***********************************************************/
+
+
+/***********************************************************
+** Forms
+********/
+form {
+    width: 50em;
+    margin: 0 auto;
+}
+
+fieldset {
+    border: 1px solid #CCCCCC;
+    padding: 1em;
+    margin-bottom: 1em;
+}
+
+div.floatableFormPanel {
+    width: 29%;
+    float: left;
+    border-right: 1px solid #CCCCCC;
+    padding-right: 1em;
+    margin-right: 1em;
+}
+
+div.lastFloatableFormPanel {
+    border: 0;
+}
+
+div.formRow {
+    padding-bottom: 0.5em;
+}
+
+div.formRow label {
+    font-weight: bold;
+    display: block;
+}
+
+input, textarea, select {
+    font-size: 1em;
+    padding: 0.2em;
+    margin-top: 0.3em;
+}
+
+textarea {
+    width: 46em;
+}
+
+label.required {
+    /* FIXME */
+}
+
+div.formDescription {
+    font-size: 0.8em;
+    color: black;
+}
+
+div.formError {
+    font-size: 0.8em;
+    margin-top: 0.3em;
+    /* FIXME */
+}
+/***********************************************************/
+
+
+
+/***********************************************************
+** Issue view
+*************/
+#changes {
+    list-style-type: none;
+}
+
+.change, #previewPane {
+    border: 0.05em solid #CCCCCC;
+    padding: 1em 1em 0 1em;
+    margin-bottom: 1em;
+    background-color: #EEEEEE;
+}
+
+#previewPane {
+    width: 44em;
+}
+
+.changeText {
+    margin: 0;
+    padding: 0;
+}
+
+#previewButton {
+    /* FIXME */
+    float: right;
+}
+/***********************************************************/
+
+/***********************************************************
+** Search widget
+****************/
+#search {
+    /* FIXME */
+}
+/***********************************************************/

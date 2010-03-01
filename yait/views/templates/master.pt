@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">	
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:define-macro="master">
+<head>
+  <title>
+    <span tal:replace="api.html_title_prefix"/>
+    <metal:title metal:define-slot="title"></metal:title>
+  </title>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+  <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"/>
+  <link rel="stylesheet" type="text/css" href="/static/css/main.css"/>
+  <link rel="stylesheet" type="text/css" href="/static/css/buttons.css"/>
+  <script type="text/javascript" src="/static/js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="/static/js/utils.js"></script>
+</head>
+<body>
+
+  <div id="header">
+    <a tal:attributes="href api.urlOf('/')" tal:content="api.header_prefix"/>
+    <metal:header metal:define-slot="header"></metal:header>
+  </div>
+
+  <metal:content metal:define-slot="content"></metal:content>
+
+</body>
+</html>

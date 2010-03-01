@@ -1,0 +1,97 @@
+<layout metal:use-macro="api.layout.macros['master']">
+<metal:title metal:fill-slot="title">
+  &mdash; <span tal:replace="project.title"/>
+  &mdash; #<span tal:replace="issue.ref"/>: <span tal:replace="issue.title"/>
+</metal:title>
+<metal:header metal:fill-slot="header">
+  &mdash;
+  <a tal:attributes="href api.urlOf(project.name)" tal:content="project.title"/>
+</metal:header>
+
+<metal:content metal:fill-slot="content">
+
+<ul id="properties">
+  <li id="issueStatus" tal:content="issue.status"></li>
+  <li>Kind: <span tal:replace="issue.getKind()"/></li>
+  <li>Reported by <span tal:replace="issue.reporter"/></li>
+  <li>
+    Reported on
+    <abbr tal:content="issue.date_created.strftime('%d %b %Y')"
+          tal:attributes="title issue.date_created.strftime('%H:%M')"/>
+  </li>
+  <li tal:condition="issue.date_edited != issue.date_created">
+    Updated on
+    <abbr tal:content="issue.date_edited.strftime('%d %b %Y')"
+          tal:attributes="title issue.date_edited.strftime('%H:%M')"/>
+  </li>
+  <li tal:condition="issue.assignee">
+    Assigned to <span tal:replace="issue.assignee"/>
+  </li>
+  <li tal:condition="not issue.assignee"
+      id="issueUnassigned">
+    Unassigned
+  </li>
+  <li>Priority: <span tal:replace="issue.getPriority()"/></li>
+  <li>Deadline: <span tal:replace="issue.deadline or 'none'"/></li>
+  <li>Parent issue: FIXME</li>
+  <li>Child issue(s): FIXME</li>
+</ul>
+
+<div id="content">
+  <h1>
+    #<span tal:replace="issue.ref"/> &mdash;
+    <span tal:replace="issue.title"/>
+  </h1>
+
+  <div class="change" tal:content="structure changes[0].getRenderedText()"/>
+
+  <ol id="changes"
+      tal:condition="changes[1:]">
+    <li tal:repeat="change changes[1:]"
+        class="change">
+      <h2>
+        Update by <span tal:replace="change.author"/>
+        on <span tal:replace="change.date.strftime('%d %B %Y at %H:%M')"/>
+      </h2>
+      <div class="changeText"
+           tal:content="structure change.getRenderedText()">
+      </div>
+    </li>
+  </ol>
+
+  <form method="post"
+        tal:attributes="action api.urlOf(
+                            '%s/%s/update' % (project.name, issue.ref))">
+    <fieldset>
+      <legend>Comment or update issue</legend>
+
+      <div class="formRow">
+        <div class="formError"
+             tal:condition="form.errors.get('text')"
+             tal:content="form.errors.get('text')"></div>
+        <a id="previewButton"
+           title="preview comment"
+           tal:attributes="href 'javascript: togglePreviewPane(\'%s\')' % 
+                                        api.urlOf('ajax_renderReST')"
+           ><img tal:attributes="src api.urlOf('static/img/preview.png')"
+                 height="16" width="16" alt="preview comment"/></a>
+        <div id="previewPane" class="hidden"></div>
+        <textarea id="text" name="text" cols="60" rows="10"
+                  tal:content="form.values['text']"/>
+      </div>
+    </fieldset>
+
+    <!-- FIXME: add extra fieldset -->
+
+    <div class="buttons">
+      <button type="submit" class="positive">
+        <img tal:attributes="src api.urlOf('static/img/tick.png')" alt=""/>
+        Update
+      </button>
+    </div>
+  </form>
+
+</div>
+
+</metal:content>
+</layout>

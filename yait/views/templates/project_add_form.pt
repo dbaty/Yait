@@ -1,0 +1,41 @@
+<layout metal:use-macro="api.layout.macros['master']">
+<metal:content metal:fill-slot="content">
+
+<form method="post"
+      tal:attributes="action api.urlOf('addProject')">
+
+  <fieldset>
+    <legend>Add a new project</legend>
+
+    <div class="formRow">
+      <label for="name" class="required">Name</label>
+      <div class="formDescription">
+        Should be short, will be part of the URL
+      </div>
+      <div class="formError"
+           tal:condition="form.errors.get('name')"
+           tal:content="form.errors.get('name')"></div>
+      <input id="name" name="name" type="text" size="15"
+             tal:attributes="value form.values['name']"/>
+    </div>
+
+    <div class="formRow">
+      <label for="title" class="required">Title</label>
+      <div class="formError"
+           tal:condition="form.errors.get('title')"
+           tal:content="form.errors.get('title')"></div>
+      <input id="title" name="title" type="text" size="30"
+             tal:attributes="value form.values['title']"/>
+    </div>
+
+    <div class="buttons">
+      <button type="submit" class="positive">
+        <img tal:attributes="src api.urlOf('static/img/tick.png')" alt=""/>
+        Add project
+      </button>
+    </div>
+  </fieldset>
+</form>
+
+</metal:content>
+</layout>

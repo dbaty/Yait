@@ -1,0 +1,17 @@
+<layout metal:use-macro="api.layout.macros['master']">
+<metal:content metal:fill-slot="content">
+
+FIXME
+
+<ul>
+  <li tal:repeat="project projects">
+    <a tal:content="project.title"
+       tal:attributes="href api.urlOf(project.name)">
+    </a>
+  </li>
+</ul>
+
+<a tal:attributes="href api.urlOf('add_project_form')">add a new project</a>
+
+</metal:content>
+</layout>

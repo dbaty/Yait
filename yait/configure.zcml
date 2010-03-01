@@ -1,0 +1,46 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg.includes" />
+
+  <static
+     name="static"
+     path="views/static"
+     />
+
+  <!-- General views -->
+  <route path=""
+         name="yait_index"
+         view=".views.general.yait_index"/>
+
+  <!-- AJAX views -->
+  <route path="ajax_renderReST"
+         name="ajax_renderReST"
+         view=".views.ajax.ajax_renderReST"
+         renderer="json"/>
+
+  <!-- Project views -->
+  <route path="add_project_form"
+         name="project_add_form"
+         view=".views.project.project_add_form"/>
+  <route path="addProject"
+         name="project_add"
+         view=".views.project.addProject"/>
+  <route path=":project_name"
+         name="project_view"
+         view=".views.project.project_view"/>
+
+  <!-- Issue views -->
+  <route path=":project_name/add_issue_form"
+         name="issue_add_form"
+         view=".views.issue.issue_add_form"/>
+  <route path=":project_name/addIssue"
+         name="issue_add"
+         view=".views.issue.addIssue"/>
+  <route path=":project_name/:issue_ref"
+         name="issue_view"
+         view=".views.issue.issue_view"/>
+  <route path=":project_name/:issue_ref/update"
+         name="issue_update"
+         view=".views.issue.issue_update"/>
+
+</configure>

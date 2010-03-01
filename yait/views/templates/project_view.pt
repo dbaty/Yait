@@ -1,0 +1,23 @@
+<layout metal:use-macro="api.layout.macros['master']">
+<metal:title metal:fill-slot="title">
+  &mdash; <span tal:replace="project.title"/>
+</metal:title>
+<metal:header metal:fill-slot="header">
+  &mdash;
+  <a tal:attributes="href api.urlOf(project.name)" tal:content="project.title"/>
+</metal:header>
+
+<metal:content metal:fill-slot="content">
+
+<ul>
+  <li tal:repeat="issue issues">
+    <a tal:content="'%d: %s' % (issue.ref, issue.title)"
+       tal:attributes="href api.urlOf('%s/%d' % (project.name, issue.ref))">
+    </a>
+  </li>
+</ul>
+
+<a tal:attributes="href api.urlOf('%s/add_issue_form' % project.name)">add a new issue</a>
+
+</metal:content>
+</layout>
