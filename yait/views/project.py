@@ -8,7 +8,7 @@ from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
-from yait.forms import ProjectAddForm
+from yait.forms import AddProject
 from yait.models import _getStore
 from yait.models import Issue
 from yait.models import Project
@@ -22,7 +22,7 @@ def project_add_form(context, request, form=None):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
     if form is None:
-        form = ProjectAddForm()
+        form = AddProject()
     return render_template_to_response(
         'templates/project_add_form.pt', api=api, form=form)
 
@@ -30,15 +30,12 @@ def project_add_form(context, request, form=None):
 def addProject(context, request):
     if not hasPermission(request, PERM_ADMIN_YAIT):
         return HTTPUnauthorized()
-    form = ProjectAddForm(request.params)
+    form = AddProject(request.POST)
     if not form.validate():
         return project_add_form(context, request, form)
 
-    form.convertValues()
-    project = Project(
-        name=form.values['name'],
-        title=form.values['title'],
-        is_public=form.values['is_public'])
+    project = Project()
+    form.populate_obj(project)
     store = _getStore()
     store.add(project)
     url = '%s/%s' % (request.application_url, project.name)

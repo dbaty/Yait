@@ -1,3 +1,10 @@
+from wtforms.form import Form
+from wtforms.fields import BooleanField
+from wtforms.fields import TextField
+from wtforms.validators import required
+from wtforms.validators import ValidationError
+from wtforms.widgets import CheckboxInput
+
 from yait.models import _getStore
 from yait.models import DEFAULT_ISSUE_KIND
 from yait.models import DEFAULT_ISSUE_PRIORITY
@@ -10,6 +17,34 @@ from yait.models import ISSUE_STATUS_VALUES
 from yait.models import Project
 from yait.utils import strToTime
 from yait.utils import strToDate
+
+
+class BaseForm(Form):
+    """A base class for all forms in Yait."""
+    pass
+
+
+class AddProject(BaseForm):
+    name = TextField(label=u'Name',
+                     description=u'Should be short, will be part of the URL ',
+                     validators=[required()]
+                     )
+    title = TextField(label=u'Title', validators=[required()])
+    is_public = BooleanField(
+        label=u'Check this box to make this project public, i.e. '
+        'accessible to anonymous users. ',
+        widget=CheckboxInput)
+
+    def validate_name(self, field):
+        """Make sure that the name is not already taken."""
+        store = _getStore()
+        if store.find(Project, name=field.data).one():
+            raise ValidationError(u'This name is not available.')
+        
+
+
+## FIXME: remove everything below once we're done with the integration
+## of WTForms.
 
 ## FIXME: do we want to use an existing form lib? Do we really need
 ## this module at all?

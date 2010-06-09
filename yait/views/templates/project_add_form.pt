@@ -13,24 +13,24 @@
         Should be short, will be part of the URL
       </div>
       <div class="formError"
-           tal:condition="form.errors.get('name')"
-           tal:content="form.errors.get('name')"></div>
+           tal:condition="'name' in form.errors"
+           tal:content="form.errors.name[0]"></div>
       <input id="name" name="name" type="text" size="15"
-             tal:attributes="value form.values['name']"/>
+             tal:attributes="value form.name.data"/>
     </div>
 
     <div class="formRow">
       <label for="title" class="required">Title</label>
       <div class="formError"
-           tal:condition="form.errors.get('title')"
-           tal:content="form.errors.get('title')"></div>
+           tal:condition="'title' in form.errors"
+           tal:content="form.errors.title[0]"></div>
       <input id="title" name="title" type="text" size="30"
-             tal:attributes="value form.values['title']"/>
+             tal:attributes="value form.title.data"/>
     </div>
 
     <div class="formRow">
       <input id="is_public" name="is_public" type="checkbox" value="1"
-             tal:attributes="checked form.values['is_public']"/>
+             tal:attributes="checked form.is_public.data"/>
       <label for="is_public" style="display: inline">
         Check this box to make this project public, i.e. accessible to
         anonymous users.
