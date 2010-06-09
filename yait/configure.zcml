@@ -1,22 +1,30 @@
 <configure xmlns="http://namespaces.repoze.org/bfg">
 
-  <include package="repoze.bfg.includes" />
+  <include package="repoze.bfg.includes"/>
 
   <static
      name="static"
      path="views/static"
      />
 
+  <!-- Authentication -->
+  <remoteuserauthenticationpolicy
+     environ_key="REMOTE_USER"/>
+  <route
+     path="login_form"
+     name="login_form"
+     view=".views.login.login_form"
+     />
+  <route
+     path="post_login"
+     name="post_login"
+     view=".views.login.post_login"
+     />
+
   <!-- General views -->
   <route path=""
          name="yait_index"
          view=".views.general.yait_index"/>
-
-  <!-- AJAX views -->
-  <route path="ajax_renderReST"
-         name="ajax_renderReST"
-         view=".views.ajax.ajax_renderReST"
-         renderer="json"/>
 
   <!-- Project views -->
   <route path="add_project_form"
@@ -28,6 +36,10 @@
   <route path=":project_name"
          name="project_view"
          view=".views.project.project_view"/>
+  <route path="ajax_renderReST"
+         name="ajax_renderReST"
+         view=".views.ajax.renderReST"
+         renderer="json"/>
 
   <!-- Issue views -->
   <route path=":project_name/add_issue_form"

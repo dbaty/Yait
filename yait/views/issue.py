@@ -6,6 +6,7 @@ $Id$
 from datetime import datetime
 
 from webob.exc import HTTPFound
+from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
@@ -17,13 +18,21 @@ from yait.models import _getStore
 from yait.models import Change
 from yait.models import Issue
 from yait.models import Project
+from yait.utils import renderReST
+from yait.utils import timeToStr
+from yait.views.utils import hasPermission
+from yait.views.utils import PERM_ADMIN_PROJECT
+from yait.views.utils import PERM_PARTICIPATE_IN_PROJECT
+from yait.views.utils import PERM_VIEW_PROJECT
+from yait.views.utils import PERM_SEE_PRIVATE_TIMING_INFO
 from yait.views.utils import TemplateAPI
 
 
 def issue_add_form(context, request, form=None):
-    ## FIXME: check authorization
     store = _getStore()
     project = store.find(Project, name=context.project_name).one()
+    if not hasPermission(request, PERM_PARTICIPATE_IN_PROJECT, project):
+        return HTTPUnauthorized()
     api = TemplateAPI(context, request)
     if form is None:
         form = IssueAddForm()
@@ -32,8 +41,8 @@ def issue_add_form(context, request, form=None):
                                        project=project,
                                        form=form)
 
+
 def addIssue(context, request):
-    ## FIXME: restrict this view to POST requests (in ZCML?)
     ## FIXME: check authorization
     form = IssueAddForm(request.params)
     if not form.validate():
@@ -84,10 +93,6 @@ def addIssue(context, request):
 
 
 def issue_view(context, request, form=None):
-    ## information about issue (title, creation date, status,
-    ## assignee) and list of comments. On each comment, text of the
-    ## comment, plus list of changes.
-    ## FIXME: check authorization
     project_name = context.project_name
     issue_ref = int(context.issue_ref)
     store = _getStore()
@@ -96,7 +101,17 @@ def issue_view(context, request, form=None):
         Issue, project_id=project.id, ref=issue_ref).one()
     changes = store.find(Change, issue_id=issue.id).order_by(Change.id)
     if form is None:
-        form = ChangeAddForm()
+        defaults = dict(
+            assignee=issue.assignee,
+            children=issue.getChildren(),
+            deadline=issue.deadline, ## FIXME: must be converted back to str
+            kind=issue.kind,
+            parent=issue.getParent(),
+            priority=issue.priority,
+            status=issue.status,
+            time_estimated=timeToStr(issue.time_estimated),
+            title=issue.title)
+        form = ChangeAddForm(defaults)
     api = TemplateAPI(context, request)
     return render_template_to_response('templates/issue_view.pt',
                                        api=api,
@@ -119,12 +134,44 @@ def issue_update(context, request):
     if not form.validate():
         return issue_view(context, request, form)
 
+    form.convertValues()
     now = datetime.now()
-    comment = form.apply(issue_id=issue.id,
-                         author=userid,
-                         date_created=now,
-                         date_edited=now)
-    comment.id = AutoReload
+    changes = {}
+    for attr in (
+        'status', 'assignee', 'time_estimated', 'time_billed',
+        'deadline', 'priority', 'kind'):
+        old_v = getattr(issue, attr)
+        new_v = form.values[attr]
+        if old_v != new_v:
+            changes[attr] = (old_v, new_v)
+            setattr(issue, attr, new_v)
+
+    ## FIXME: to be implemented
+#     current_parent = issue.getParent()
+#     new_parent = form.values['parent']
+#     if current_parent != new_parent:
+#         changes['parent'] = (current_parent, new_parent)
+#         issue.setParent(new_parent)
+#     current_children = issue.getChidrenIds()
+#     new_children = sorted(form.values['children'])
+#     if current_children != new_children:
+#         changes['children'] = (current_children, new_children)
+#         issue.setChildren(new_children)
+
+    change = Change(issue_id=issue.id,
+                    author=userid,
+                    date=now,
+                    text=form.values['text'], 
+                    time_spent=form.values['time_spent'],
+                    changes=changes)
+    store.add(change)
+    change.id = AutoReload
     url = '%s/%s/%d#%d' % (
-        request.application_url, project.name, issue.ref, comment.id)
+        request.application_url, project.name, issue.ref, change.id)
     return HTTPFound(location=url)
+
+
+def ajax_renderReST(context, request):
+    """Render reStructuredText (called via AJAX)."""
+    text = request.params.get('text', '')
+    return dict(rendered=renderReST(text))

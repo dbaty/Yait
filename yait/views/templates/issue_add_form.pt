@@ -29,6 +29,13 @@
       <div class="formError"
            tal:condition="form.errors.get('text')"
            tal:content="form.errors.get('text')"></div>
+        <a id="previewButton"
+           title="preview comment"
+           tal:attributes="href 'javascript: togglePreviewPane(\'%s\')' % 
+                                        api.urlOf('ajax_renderReST')"
+           ><img tal:attributes="src api.urlOf('static/img/preview.png')"
+                 height="16" width="16" alt="preview comment"/></a>
+      <div id="previewPane" class="hidden"></div>
       <textarea id="text" name="text" cols="80" rows="10"
                 tal:content="form.values['text']"/>
     </div>

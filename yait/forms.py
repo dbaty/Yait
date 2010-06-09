@@ -9,6 +9,7 @@ from yait.models import ISSUE_PRIORITY_VALUES
 from yait.models import ISSUE_STATUS_VALUES
 from yait.models import Project
 from yait.utils import strToTime
+from yait.utils import strToDate
 
 ## FIXME: do we want to use an existing form lib? Do we really need
 ## this module at all?
@@ -44,8 +45,10 @@ class AddForm(Form):
 
 class ProjectAddForm(AddForm):
     default = dict(name='',
-                   title='')
+                   title='',
+                   is_public=False)
     required = ('name', 'title')
+    convert = (('is_public', bool), )
 
     def validate(self):
         if self.values['name']:
@@ -74,7 +77,8 @@ class IssueAddForm(AddForm):
                ('priority', int),
                ('time_estimated', strToTime),
                ('time_billed', strToTime),
-               ('time_spent', strToTime))
+               ('time_spent', strToTime),
+               ('deadline', strToDate))
     vocab = dict(
         kind=zip(ISSUE_KIND_VALUES, ISSUE_KIND_LABELS),
         priority=zip(ISSUE_PRIORITY_VALUES, ISSUE_PRIORITY_LABELS),
@@ -89,9 +93,8 @@ class IssueAddForm(AddForm):
         return AddForm.validate(self)
 
 
-class ChangeAddForm(AddForm):
-    default = dict(text='')
-    required = ('text', )
-    convert = ()
-
-    ## FIXME
+class ChangeAddForm(IssueAddForm):
+    ## FIXME: the only differences with IssueAddForm are:
+    ## - it has no 'title' field
+    ## - 'text' field is not required
+    required = ('status', )

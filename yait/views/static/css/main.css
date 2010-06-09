@@ -51,26 +51,31 @@ p {
     margin-bottom: 1em;
 }
 
+a {
+    color: #144578;
+}
+
 .hidden {
     display: none;
 }
 
 #content {
     float: left;
-    width: 50em;
+    width: 45em;
 }
 /***********************************************************/
 
 
 
 /***********************************************************
-** Header
-*********/
+** Header & footer
+******************/
 #header {
     font-size: 1.6em;
     background-color: #144578;
     color: white;
     padding: 0.625em 0.625em; /* 1 / font-size */
+    border-bottom: 0.1em solid #CCCCCC;
     margin-bottom: 0.5em;
 }
 
@@ -79,11 +84,37 @@ p {
     text-decoration: none;
 }
 
-#header a:hover {
+#header a:hover, #footer a:hover {
     border-bottom: 0.05em solid white;
 }
-/***********************************************************/
 
+#footer {
+    margin-top: 1.25em; /* 1 / font-size */
+    padding: 1em; /* font-size */
+    font-size: 1em;
+    border-top: 0.1em solid #CCCCCC;
+    background-color: white;
+    color: black;
+}
+
+#footerActions {
+    width: 50em;
+    margin: 0 auto;
+    list-style-type: none;
+    text-align: center;
+}
+
+#footerActions li {
+    display: inline;
+    margin: 0;
+    padding: 0 0.5em 0 0.5em;
+}
+
+#poweredBy {
+    font-size: 0.8em;
+    float: right;
+}
+/***********************************************************/
 
 
 /***********************************************************
@@ -91,7 +122,7 @@ p {
 ***********************************************************/
 #properties {
     float: left;
-    width: 18em;
+    width: 15em;
     margin: 0 1em 0 1em;
     border: 0.1em solid #144578;
     list-style-type: none;
@@ -219,18 +250,31 @@ div.formError {
 
 .change, #previewPane {
     border: 0.05em solid #CCCCCC;
-    padding: 1em 1em 0 1em;
+    padding: 0;
     margin-bottom: 1em;
     background-color: #EEEEEE;
 }
 
 #previewPane {
     width: 44em;
+    padding: 1em;
+}
+
+h2 {
+    margin: 1em;
 }
 
 .changeText {
-    margin: 0;
+    margin: 1em 1em 0 1em;
     padding: 0;
+}
+
+.changeDetails {
+    border-top: 0.05em solid #CCCCCC;
+    margin: 0;
+    padding: 1em;
+    list-style-type: none;
+    color: #555555;
 }
 
 #previewButton {

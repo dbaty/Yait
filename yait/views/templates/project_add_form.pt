@@ -28,6 +28,15 @@
              tal:attributes="value form.values['title']"/>
     </div>
 
+    <div class="formRow">
+      <input id="is_public" name="is_public" type="checkbox" value="1"
+             tal:attributes="checked form.values['is_public']"/>
+      <label for="is_public" style="display: inline">
+        Check this box to make this project public, i.e. accessible to
+        anonymous users.
+      </label>
+    </div>
+
     <div class="buttons">
       <button type="submit" class="positive">
         <img tal:attributes="src api.urlOf('static/img/tick.png')" alt=""/>

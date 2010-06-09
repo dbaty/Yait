@@ -4,6 +4,7 @@ $Id$
 """
 
 from webob.exc import HTTPFound
+from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
@@ -11,11 +12,14 @@ from yait.forms import ProjectAddForm
 from yait.models import _getStore
 from yait.models import Issue
 from yait.models import Project
+from yait.views.utils import hasPermission
+from yait.views.utils import PERM_ADMIN_YAIT
+from yait.views.utils import PERM_VIEW_PROJECT
 from yait.views.utils import TemplateAPI
 
-
 def project_add_form(context, request, form=None):
-    ## FIXME: check authorization
+    if not hasPermission(request, PERM_ADMIN_YAIT):
+        return HTTPUnauthorized()
     api = TemplateAPI(context, request)
     if form is None:
         form = ProjectAddForm()
@@ -24,14 +28,17 @@ def project_add_form(context, request, form=None):
 
 
 def addProject(context, request):
-    ## FIXME: restrict this view to POST requests (in ZCML?)
-    ## FIXME: check authorization
+    if not hasPermission(request, PERM_ADMIN_YAIT):
+        return HTTPUnauthorized()
     form = ProjectAddForm(request.params)
     if not form.validate():
         return project_add_form(context, request, form)
 
+    form.convertValues()
     project = Project(
-        name=form.values['name'], title=form.values['title'])
+        name=form.values['name'],
+        title=form.values['title'],
+        is_public=form.values['is_public'])
     store = _getStore()
     store.add(project)
     url = '%s/%s' % (request.application_url, project.name)
@@ -39,7 +46,6 @@ def addProject(context, request):
 
 
 def project_view(context, request):
-    ## FIXME: check authorization
     ## FIXME:
     ## - list of issues assigned to the current user
     ## - list of top master issues (issues without any parent)
@@ -49,6 +55,8 @@ def project_view(context, request):
     project_name = context.project_name
     store = _getStore()
     project = store.find(Project, name=project_name).one()
+    if not hasPermission(request, PERM_VIEW_PROJECT, project):
+        return HTTPUnauthorized()
     issues = store.find(Issue, project_id=project.id)
     api = TemplateAPI(context, request)
     return render_template_to_response('templates/project_view.pt',

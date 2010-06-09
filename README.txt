@@ -1,5 +1,22 @@
-0.1
----
+- automated tests + coverage
+
+- use an existing form rendering/marshalling package
+
+- add more time-related details:
+
+  - estimated time (internal): the time you think you are going to
+    spend on this issue. This value is private and not shown to the
+    customer;
+
+  - time billed: the time the customer is going to be billed. It may
+    be equal to the estimated time, but could as well be less or more,
+    depending on the context;
+
+  - time spent (real): the time you have truly spent on this issue;
+
+  - time spent (public): the time spent on this issue as it should be
+    seen by the customer. It may be different than the time really
+    spent, and relates to the time billed.
 
 - complete issue_add_form with additional metadata
 
@@ -7,43 +24,77 @@
 
 - relationships between issues : parent/child, blocker/blocked
 
+- new button: "add new issue" in issue_view, under the properties
+  panel. Drop-down menu with "add issue", "add sub-issue" or "add
+  sibling issue". Or shall we add this in the new toolbox bar? On the
+  other hand, this toolbox bar may not be that useful. The login link
+  may very well appear elsewhere, for example in the footer. Actually,
+  where will the search box appear? In the header, aligned to the
+  right?
 
-0.2
----
+- allow other text formatting syntaxes:
 
-- CSS tweaks
+  - make the syntax configurable (set in a cookie);
 
-- security
+  - call the right renderer when previewing;
 
+  - store the renderer in the Change model, along the text.
 
-0.3
----
+- when clicking on "show/hide extra", scroll to the end of the page so
+  that the "update" button is visible. (use $.scrollTo(object) ? cf. http://plugins.jquery.com/project/ScrollTo)
 
-- automated tests
+- for each project: configure whether the public (customer-oriented)
+  timing information is displayed.
+
+- a checkbox to assign "to me"
+
+- add a way to change the title: quick edit (cf. issue tracker Pilot),
+  or when adding a comment
+
+- on each project:
+
+  - grant a permission to user U;
+
+  - grant a permission to group G (from LDAP).
+
+- CSS tweaks:
+
+  - form errors: add formError in formRow. Cf. postaleo / Dolmen for
+    example
+
+- add a way to delete an issue. Actually, it does not remove
+  anything. It toggles the "deleted" marker in the Issue model and add
+  a change. The view page is specific and only indicates that this
+  issue has been deleted, the author of the deletion and the
+  date. Only project administrators are allowed to undelete an issue
+  (which also adds a "Change" entry).
+
+- user preferences:
+
+  - markup syntax;
+
+  - preferred language.
+
+- global control panel to define managers and create projects;
+
+- show users' full name instead of their id.
 
 - attachments
-
-
-0.4
----
 
 - "paster setup-app <file.ini>" could be used to initialize the
   database
 
-
-0.5
----
-
 - optimize database
 
+- protect from CSRF and XSS: check origin of form submission (with an
+  hidden token), clean up comments (remove iframe, Javascript, etc.)
 
-0.x
----
+- search
+
+- e-mail notification
 
 - i18n
 
-- add user management (?)
+- better error handling (404 & 500)
 
-- better error handling (404)
-
-- e-mail notification
+- time reporting graphics

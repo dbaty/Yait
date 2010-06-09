@@ -3,10 +3,12 @@
 $Id$
 """
 
+from datetime import datetime
 import re
 
 from docutils.core import publish_parts
 from docutils.writers.html4css1 import Writer
+
 
 DOCUTILS_SETTINGS = {'output_encoding': 'utf-8',
                      'initial_header_level': 2}
@@ -20,6 +22,8 @@ def strToTime(s):
     A day is supposed to have 8 hours. As well, a week has 5 days.
 
     >>> strToTime('')
+    0
+    >>> strToTime('0')
     0
     >>> strToTime('1m')
     1
@@ -47,6 +51,8 @@ def strToTime(s):
 def timeToStr(t):
     """Convert a number of minutes into a human-readable string.
 
+    >>> timeToStr(0)
+    ''
     >>> timeToStr(1)
     '1m'
     >>> timeToStr(59)
@@ -75,6 +81,31 @@ def timeToStr(t):
             s += ' %d%s' % (q, u)
     s = s.lstrip()
     return s
+
+
+def strToDate(s, format='dd/mm/yyyy'):
+    """Convert a string to the date it respresents.
+
+    Only one format is available: ``dd/mm/yyyy``.
+
+    >>> strToDate('', 'yyyy/dd/mm')
+    Traceback (most recent call last):
+    ...
+    ValueError: Unrecognized date format: yyyy/dd/mm
+    >>> strToDate('', 'dd/mm/yyyy') is None
+    True
+    >>> from datetime import datetime
+    >>> strToDate('28/07/2011') == datetime(2011, 07, 28)
+    True
+    """
+    if format != 'dd/mm/yyyy':
+        raise ValueError('Unrecognized date format: %s' % format)
+    ## FIXME: ad error handling
+    if not s:
+        return None
+    components = map(int, s.split('/'))
+    components.reverse()
+    return datetime(*components)
 
 
 def renderReST(text):

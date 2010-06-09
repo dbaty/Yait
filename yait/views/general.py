@@ -16,11 +16,11 @@ from yait.views.utils import TemplateAPI
 
 def yait_index(context, request):
     """Index page of Yait."""
+    ## This page is accessible to anonymous users.
     ## FIXME:
-    ## - list of projects
+    ## - list of accessible projects
     ## - list of issues assigned to the current user (?)
     store = _getStore()
-    ## FIXME: show only accessible projects
     projects = store.find(Project)
     api = TemplateAPI(context, request)
     return render_template_to_response('templates/yait_index.pt',

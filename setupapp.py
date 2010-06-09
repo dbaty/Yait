@@ -19,11 +19,18 @@ from storm.locals import Store
 def initSqlite(db_string):
     database = create_database(db_string)
     store = Store(database)
+    for table in ('projects', 'issues', 'changes', 'issue_relationships',
+                  'managers', 'permissions'):
+        try:
+            store.execute('DROP table %s' % table)
+        except: ## yeah, bare except
+            pass
     store.execute(
         'CREATE TABLE projects ('
         'id INTEGER PRIMARY KEY, '
         'name VARCHAR(25) NOT NULL UNIQUE, '
-        'title VARCHAR(100) NOT NULL'
+        'title VARCHAR(100) NOT NULL, '
+        'is_public BOOLEAN NOT NULL'
         ')'
         )
     store.execute(
@@ -68,12 +75,25 @@ def initSqlite(db_string):
         'FOREIGN KEY (target_id) REFERENCES issues (id) '
         ')'
         )
+    store.execute(
+        'CREATE TABLE managers ('
+        'user_id VARCHAR(25)'
+        ')'
+        )
+    store.execute(
+        'CREATE TABLE permissions ('
+        'user_id VARCHAR(25), '
+        'project_id INTEGER NOT NULL, '
+        'perms INTEGER NOT NULL, '
+        'FOREIGN KEY (project_id) REFERENCES projects (id) '
+        ')'
+        )
     store.commit()
     store.close()
 
 
 def initPostgreSQL():
-    raise NotImplementedError ## 
+    raise NotImplementedError ## FIXME: see above
     pass
 
 

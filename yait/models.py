@@ -1,5 +1,6 @@
 from repoze.bfg.settings import get_settings
 
+from storm.locals import Bool
 from storm.locals import DateTime
 from storm.locals import Int
 from storm.locals import Pickle
@@ -36,7 +37,9 @@ ISSUE_PRIORITY_LABELS = (u'low', u'medium', u'high', u'critical')
 DEFAULT_ISSUE_PRIORITY = ISSUE_PRIORITY_MEDIUM
 
 ISSUE_STATUS_OPEN = u'open'
+ISSUE_STATUS_PARENT = u'parent'
 ISSUE_STATUS_VALUES = (ISSUE_STATUS_OPEN,
+                       ISSUE_STATUS_PARENT,
                        u'in progress',
                        u'on hold',
                        u'completed')
@@ -62,6 +65,7 @@ class Project(Model):
     id = Int(primary=True)
     name = Unicode()
     title = Unicode()
+    is_public = Bool()
 
 
 class Issue(Model):
@@ -76,7 +80,7 @@ class Issue(Model):
     kind = Int()
     priority = Int()
     status = Unicode()
-    resolution = Unicode() ## FIXME: useful? cf. 'setupapp.py'
+    resolution = Unicode() ## FIXME: useful? see also 'setupapp.py'
     date_created = DateTime()
     date_edited = DateTime()
     date_closed = DateTime()
@@ -84,6 +88,20 @@ class Issue(Model):
     time_estimated = Int()
     time_billed = Int()
     ## A 'changes' property is defined below after the 'Change' model.
+
+    _ordered = (
+        ## List of attributes ordered as they should appear in
+        ## comments details.
+        ('title', 'title'),
+        ('kind', 'kind'),
+        ('priority', 'priority'),
+        ('status', 'status'),
+        ('resolution', 'resolution'),
+        ('assignee', 'assignee'),
+        ('deadline', 'deadline'),
+        ('time_estimated', 'estimated'),
+        ('time_billed', 'billed'),
+        )
 
     def getKind(self):
         return ISSUE_KIND_LABELS[self.kind - 1]
@@ -121,12 +139,43 @@ class Change(Model):
     def getRenderedText(self):
         return renderReST(self.text)
 
+
+    def getDetails(self):
+        """Return a list of changes as mappings."""
+        details = []
+        for attr, label in Issue._ordered:
+            try:
+                before, after = self.changes[attr]
+            except KeyError:
+                continue
+            if not before:
+                before = 'none'
+            if not after:
+                after = 'none'
+            details.append(dict(label=label, before=before, after=after))
+        return details
+        
+
 Issue.changes = ReferenceSet(Issue.id, Change.issue_id)
 
 
 class IssueRelationship(Model):
     __storm_table__ = 'issue_relationships'
-    __storm_primary__ = 'source_id, target_id, kind'
+    __storm_primary__ = ('source_id', 'target_id', 'kind')
     source_id = Int()
     target_id = Int()
     kind = Int()
+
+
+class Manager(Model):
+    __storm_table__ = 'managers'
+    __storm_primary__ = 'user_id'
+    user_id = Unicode()
+
+
+class Permission(Model):
+    __storm_table__ = 'permissions'
+    __storm_primary__ = ('user_id', 'project_id')
+    user_id = Unicode()
+    project_id = Int()
+    perms = Int()

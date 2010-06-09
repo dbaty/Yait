@@ -32,7 +32,7 @@
     Unassigned
   </li>
   <li>Priority: <span tal:replace="issue.getPriority()"/></li>
-  <li>Deadline: <span tal:replace="issue.deadline or 'none'"/></li>
+  <li>Deadline: <span tal:replace="issue.deadline and issue.deadline.strftime('%d %b %Y') or 'none'"/></li>
   <li>Parent issue: FIXME</li>
   <li>Child issue(s): FIXME</li>
 </ul>
@@ -43,19 +43,33 @@
     <span tal:replace="issue.title"/>
   </h1>
 
-  <div class="change" tal:content="structure changes[0].getRenderedText()"/>
+  <div class="change">
+    <div class="changeText"
+         tal:content="structure changes[0].getRenderedText()"/>
+  </div>
 
   <ol id="changes"
       tal:condition="changes[1:]">
     <li tal:repeat="change changes[1:]"
         class="change">
-      <h2>
-        Update by <span tal:replace="change.author"/>
-        on <span tal:replace="change.date.strftime('%d %B %Y at %H:%M')"/>
-      </h2>
-      <div class="changeText"
-           tal:content="structure change.getRenderedText()">
-      </div>
+      <tal:defines tal:define="details change.getDetails()">
+        <h2>
+          Update by <span tal:replace="change.author"/>
+          on <span tal:replace="change.date.strftime('%d %B %Y at %H:%M')"/>
+          <a tal:attributes="name change.id"/>
+        </h2>
+        <div class="changeText"
+             tal:content="structure change.getRenderedText()">
+        </div>
+        <ul class="changeDetails"
+            tal:condition="details">
+          <li tal:repeat="detail details">
+            <span tal:replace="detail.label"/>:
+            <span tal:replace="detail.before"/> &rarr;
+            <span tal:replace="detail.after"/>
+          </li>
+        </ul>
+      </tal:defines>
     </li>
   </ol>
 
@@ -79,9 +93,137 @@
         <textarea id="text" name="text" cols="60" rows="10"
                   tal:content="form.values['text']"/>
       </div>
+
+      <div>
+        <a href="javascript: toggleExtraFieldset()">show/hide extra</a>
+      </div>
     </fieldset>
 
     <!-- FIXME: add extra fieldset -->
+    <fieldset id="extraFieldset"
+              tal:attributes="class not form.errors and 'hidden' or ''">
+
+      <div class="floatableFormPanel">
+
+        <div class="formRow">
+          <label for="status" class="required">Status</label>
+          <div class="formError"
+               tal:condition="form.errors.get('status')"
+               tal:content="form.errors.get('status')"></div>
+          <select id="status" name="status">
+            <option value="">Select a value below&hellip;</option>
+            <option tal:repeat="(value, label) form.vocab['status']"
+                    tal:attributes="value value;
+                                    selected str(value) == form.values['status']"
+                    tal:content="label"/>
+          </select>
+        </div>
+
+        <div class="formRow">
+          <!-- FIXME: use an auto-complete widget -->
+          <label for="assignee" class="required">Assign issue to</label>
+          <div class="formError"
+               tal:condition="form.errors.get('assignee')"
+               tal:content="form.errors.get('assignee')"></div>
+          <input id="assignee" name="assignee" type="text" size="12"
+                 tal:attributes="value form.values['assignee']"/>
+        </div>
+
+        <div class="formRow">
+          <label for="time_estimated" class="required">Estimated time</label>
+          <div class="formError"
+               tal:condition="form.errors.get('time_estimated')"
+               tal:content="form.errors.get('time_estimated')"></div>
+          <input id="time_estimated" name="time_estimated" type="text" size="5"
+                 tal:attributes="value form.values['time_estimated']"/>
+        </div>
+
+        <div class="formRow">
+          <label for="time_billed" class="required">Time billed</label>
+          <div class="formError"
+               tal:condition="form.errors.get('time_billed')"
+               tal:content="form.errors.get('time_billed')"></div>
+          <input id="time_billed" name="time_billed" type="text" size="5"
+                 tal:attributes="value form.values['time_billed']"/>
+        </div>
+
+        <div class="formRow">
+          <label for="time_spent" class="required">Time spent</label>
+          <div class="formError"
+               tal:condition="form.errors.get('time_spent')"
+               tal:content="form.errors.get('time_spent')">
+          </div>
+          <input id="time_spent" name="time_spent" type="text" size="5"
+               tal:attributes="value form.values['time_spent']"/>
+        </div>
+      </div>
+
+      <div class="floatableFormPanel">
+        <div class="formRow">
+          <!-- FIXME: use a date widget: http://www.kelvinluck.com/assets/jquery/datePicker/v2/demo/ -->
+          <label for="deadline" class="required">Deadline</label>
+          <div class="formError"
+               tal:condition="form.errors.get('deadline')"
+               tal:content="form.errors.get('deadline')">
+          </div>
+          <input id="deadline" name="deadline" type="text" size="5"
+                 tal:attributes="value form.values['deadline']"/>
+        </div>
+
+
+        <div class="formRow">
+          <label for="priority" class="required">Priority</label>
+          <div class="formError"
+               tal:condition="form.errors.get('priority')"
+               tal:content="form.errors.get('priority')"></div>
+          <select id="priority" name="priority">
+            <option value="">Select a value below&hellip;</option>
+            <option tal:repeat="(value, label) form.vocab['priority']"
+                    tal:attributes="value value;
+                                    selected str(value) == form.values['priority']"
+                    tal:content="label"/>
+          </select>
+        </div>
+
+        <div class="formRow">
+          <label for="kind" class="required">Kind</label>
+          <div class="formError"
+               tal:condition="form.errors.get('kind')"
+               tal:content="form.errors.get('kind')"></div>
+          <select id="kind" name="kind">
+            <option value="">Select a value below&hellip;</option>
+            <option tal:repeat="(value, label) form.vocab['kind']"
+                    tal:attributes="value value;
+                                    selected str(value) == form.values['kind']"
+                    tal:content="label"/>
+          </select>
+        </div>
+      </div>
+
+      <div class="floatableFormPanel lastFloatableFormPanel">
+        <div class="formRow">
+          <label for="parent" class="required">Parent issue</label>
+          <div class="formError"
+               tal:condition="form.errors.get('')"
+               tal:content="form.errors.get('parent')"></div>
+          <!-- FIXME: we need a special widget here -->
+          <select id="parent" name="parent">
+            <option value="">Select a value below&hellip;</option>
+          </select>
+        </div>
+
+        <div class="formRow">
+          <label for="parent" class="required">Child issue(s)</label>
+          <div class="formError"
+               tal:condition="form.errors.get('children')"
+               tal:content="form.errors.get('children')"></div>
+          <!-- FIXME: we need a special widget here -->
+          <select id="children" name="children" multiple="multiple">
+            <option value="">Select a value below&hellip;</option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
 
     <div class="buttons">
       <button type="submit" class="positive">
