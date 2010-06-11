@@ -2,11 +2,14 @@ YAIT
 ====
 
 Yait is an issue tracking software written in Python with
-`repoze.bfg`_. It is open source and fully tested (100% test coverage)
+`repoze.bfg`_. It is open source, fully tested (100% test coverage)
 and documented. It is fast. It has an attractive and straightforward
-user interface. It provides a very convenient yet rather infrequent
-feature that lets one create hierarchies of issues (tasks, sub-tasks
-and so on) that may also be used to manage milestones or versions.
+user interface. It provides a very convenient feature that lets one
+create hierarchies of issues (tasks, sub-tasks and so on) that may
+also be used to manage milestones or versions.
+
+FIXME: to be expanded/rewritten: i18n, relatively easy to install,
+etc.
 
 .. _repoze.bfg: http://bfg.repoze.org
 
@@ -41,24 +44,24 @@ Why *another* issue tracker
 The author has used several different issue tracking systems and have
 been slightly disappointed by most of them. Some have an user
 interface that is too complex, some are shipping with too much
-unneeded features. And, more importantly, none have the possibility to
-create hierarchies of issues, which was a required feature.
+unneeded features. And, more importantly, none had the possibility to
+create hierarchies of issues, which was a required feature. Also, they
+come with the wrong colors.
 
 
 Contribute
 ==========
 
 Contributions are most welcome. The source code lives in a Subversion
-repository. It is not planned to use GitHub, BitBucket or a similar
-publicly available DVCS repository.
+repository: `https://svn.noherring.com/code/Yait`
 
 
 Credits
 =======
 
 Several ideas have been borrowed from an issue tracker developped by
-`Pilot Systems`_ on top of the Zope IssueTracker product. Other ideas
-were naturally picked up here and there in other issue tracking
+`Pilot Systems`_ on top of the Zope `IssueTracker`_ product. Other
+ideas were naturally picked up here and there in other issue tracking
 softwares.
 
 This software would not exist without the tremendous work deployed by
@@ -70,6 +73,8 @@ The following persons have contributed to Yait:
 - Damien Baty: main author.
 
 .. _Pilot Systems: http://www.pilotsystems.net
+
+.. _IssueTracker: http://www.issuetrackerproduct.com
 
 .. _repoze.bfg: http://bfg.repoze.org
 

@@ -1,8 +1,22 @@
 - automated tests + coverage
 
+- check 'commit_veto()'
+
+- review "issue properties" panel. It is confused.
+
+- display date in the user's timezone:
+
+  - http://www.onlineaspect.com/2007/06/08/auto-detect-a-time-zone-with-javascript
+
+  - http://www.csgnetwork.com/timezoneproginfo.html
+
+- add a way to configure a project so that "time spent (real)" is
+  required. In this case, display the field below the text field (and
+  not in the "extra" field set).
+
 - use an existing form rendering/marshalling package
 
-- add more time-related details:
+- document time-related details:
 
   - estimated time (internal): the time you think you are going to
     spend on this issue. This value is private and not shown to the
@@ -44,7 +58,8 @@
   that the "update" button is visible. (use $.scrollTo(object) ? cf. http://plugins.jquery.com/project/ScrollTo)
 
 - for each project: configure whether the public (customer-oriented)
-  timing information is displayed.
+  timing information is displayed ('time_billed' and
+  'time_spent_public').
 
 - a checkbox to assign "to me"
 
@@ -56,6 +71,8 @@
   - grant a permission to user U;
 
   - grant a permission to group G (from LDAP).
+
+- validate HTML, CSS and Javascript (jslint)
 
 - CSS tweaks:
 
@@ -73,7 +90,10 @@
 
   - markup syntax;
 
-  - preferred language.
+  - preferred language;
+
+  - order in which changes are shown: chronologically or
+    anti-chronologically
 
 - global control panel to define managers and create projects;
 
@@ -97,4 +117,19 @@
 
 - better error handling (404 & 500)
 
+- recent activity per project
+
 - time reporting graphics
+
+- add credit for icons: Tango (http://tango.freedesktop.org/), etc.
+
+- when the text renderer gives an error, refuse to save the issue/comment;
+
+- when the text renderer gives an error, show error outside of the
+  text container.
+
+- add favicon
+
+- check "api.urlOf()" when the URL looks like: domain.com/foo/yait
+
+- add a "Component/category" field (à la Jira)

@@ -100,7 +100,7 @@ def strToDate(s, format='dd/mm/yyyy'):
     """
     if format != 'dd/mm/yyyy':
         raise ValueError('Unrecognized date format: %s' % format)
-    ## FIXME: ad error handling
+    ## FIXME: add error handling
     if not s:
         return None
     components = map(int, s.split('/'))

@@ -20,7 +20,7 @@ def initSqlite(db_string):
     database = create_database(db_string)
     store = Store(database)
     for table in ('projects', 'issues', 'changes', 'issue_relationships',
-                  'managers', 'permissions'):
+                  'managers', 'roles'):
         try:
             store.execute('DROP table %s' % table)
         except: ## yeah, bare except
@@ -60,7 +60,8 @@ def initSqlite(db_string):
         'issue_id INTEGER NOT NULL, '
         'author VARCHAR(25) NOT NULL,'
         'date DATETIME NOT NULL, '
-        'time_spent INT, '
+        'time_spent_real INT, '
+        'time_spent_public INT, '
         'text TEXT, '
         'changes TEXT, '
         'FOREIGN KEY (issue_id) REFERENCES issues (id)'
@@ -81,10 +82,10 @@ def initSqlite(db_string):
         ')'
         )
     store.execute(
-        'CREATE TABLE permissions ('
+        'CREATE TABLE roles ('
         'user_id VARCHAR(25), '
         'project_id INTEGER NOT NULL, '
-        'perms INTEGER NOT NULL, '
+        'role INTEGER NOT NULL, '
         'FOREIGN KEY (project_id) REFERENCES projects (id) '
         ')'
         )

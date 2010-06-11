@@ -1,6 +1,11 @@
 from wtforms.form import Form
 from wtforms.fields import BooleanField
+from wtforms.fields import DateTimeField
+from wtforms.fields import SelectField
+from wtforms.fields import SelectMultipleField
+from wtforms.fields import TextAreaField
 from wtforms.fields import TextField
+from wtforms.validators import optional
 from wtforms.validators import required
 from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput
@@ -16,7 +21,19 @@ from yait.models import ISSUE_PRIORITY_VALUES
 from yait.models import ISSUE_STATUS_VALUES
 from yait.models import Project
 from yait.utils import strToTime
-from yait.utils import strToDate
+from yait.utils import timeToStr
+
+
+class TimeInfoField(TextField):
+    """A custom text field for time-related information."""
+
+    ## FIXME: cf. also '_value()'
+    def process_data(self, value):
+        self.data = timeToStr(value or 0)
+
+    def process_formdata(self, value_list):
+        if value_list:
+            self.data = strToTime(value_list[0])
 
 
 class BaseForm(Form):
@@ -25,111 +42,62 @@ class BaseForm(Form):
 
 
 class AddProject(BaseForm):
+    ## FIXME: check length of name
+    ## FIXME: check length of title
     name = TextField(label=u'Name',
-                     description=u'Should be short, will be part of the URL ',
-                     validators=[required()]
-                     )
+                     description=u'Should be short, will be part of the URL.',
+                     validators=[required()])
     title = TextField(label=u'Title', validators=[required()])
     is_public = BooleanField(
-        label=u'Check this box to make this project public, i.e. '
-        'accessible to anonymous users. ',
-        widget=CheckboxInput)
+        label=u'Make this project public, i.e. accessible to '
+        'anonymous users.')
 
     def validate_name(self, field):
-        """Make sure that the name is not already taken."""
         store = _getStore()
         if store.find(Project, name=field.data).one():
             raise ValidationError(u'This name is not available.')
-        
+        ## FIXME: check that the name contains only alphanumerical
+        ## characters, underscores and dashes.
+        ## FIXME: check that the name does not clash with a view name
+        ## available on the site level.
 
 
-## FIXME: remove everything below once we're done with the integration
-## of WTForms.
-
-## FIXME: do we want to use an existing form lib? Do we really need
-## this module at all?
-
-
-class Form(object):
-    values = {}
-    required = ()
-
-    def __init__(self, values=None):
-        self.values = self.default.copy()
-        if values:
-            self.values.update(values)
-        self.errors = {}
-
-    def addError(self, field, msg):
-        self.errors[field] = msg
-
-    def validate(self):
-        for field in self.required:
-            if not self.values[field]:
-                self.addError(field, 'This field is required.')
-        return self.errors == {}
-
-    def convertValues(self):
-        for field, converter in self.convert:
-            self.values[field] = converter(self.values[field])
-
-
-class AddForm(Form):
-    pass
+class ExtraFieldset:
+    status = SelectField(
+        label=u'Status',
+        choices=zip(ISSUE_STATUS_VALUES, ISSUE_STATUS_VALUES),
+        default=DEFAULT_ISSUE_STATUS,
+        validators=[required()])
+    ## FIXME: we need a specific widget and validator
+    assignee = TextField(label=u'Assign issue to')
+    ## FIXME: need a specific field or widget for time-related fields
+    time_estimated = TimeInfoField(label=u'Estimated time (internal)')
+    time_billed = TimeInfoField(label=u'Time billed')
+    time_spent_real = TimeInfoField(label=u'Time spent (real, internal)')
+    time_spent_public = TimeInfoField(label=u'Time spent (public)')
+    deadline = DateTimeField(label='Deadline', validators=[optional()])
+    priority = SelectField(
+        label=u'Priority',
+        coerce=int,
+        choices=zip(ISSUE_PRIORITY_VALUES, ISSUE_PRIORITY_LABELS),
+        default=DEFAULT_ISSUE_PRIORITY,
+        validators=[required()])
+    kind = SelectField(
+        label=u'Kind',
+        coerce=int,
+        choices=zip(ISSUE_KIND_VALUES, ISSUE_KIND_LABELS),
+        default=DEFAULT_ISSUE_KIND,
+        validators=[required()])
+    parent = TextField(label=u'Parent issue') ## FIXME: use an auto-complete widget
+    children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput) ## FIXME: need ork on UI
 
 
-class ProjectAddForm(AddForm):
-    default = dict(name='',
-                   title='',
-                   is_public=False)
-    required = ('name', 'title')
-    convert = (('is_public', bool), )
-
-    def validate(self):
-        if self.values['name']:
-            store = _getStore()
-            if store.find(Project, name=self.values['name']).one():
-                self.addError('name', 'This name is not available.')
-        return AddForm.validate(self)
+class AddIssue(BaseForm, ExtraFieldset):
+    title = TextField(label=u'Title', validators=[required()])
+    text = TextAreaField(label=u'Text', validators=[required()])
 
 
-class IssueAddForm(AddForm):
-    default = dict(
-        assignee=u'',
-        children=(),
-        deadline=u'',
-        kind=str(DEFAULT_ISSUE_KIND),
-        parent=u'',
-        priority=str(DEFAULT_ISSUE_PRIORITY),
-        status=str(DEFAULT_ISSUE_STATUS),
-        text=u'',
-        time_estimated=u'',
-        time_billed=u'',
-        time_spent=u'',
-        title=u'')
-    required = ('status', 'title', 'text')
-    convert = (('kind', int),
-               ('priority', int),
-               ('time_estimated', strToTime),
-               ('time_billed', strToTime),
-               ('time_spent', strToTime),
-               ('deadline', strToDate))
-    vocab = dict(
-        kind=zip(ISSUE_KIND_VALUES, ISSUE_KIND_LABELS),
-        priority=zip(ISSUE_PRIORITY_VALUES, ISSUE_PRIORITY_LABELS),
-        status=zip(ISSUE_STATUS_VALUES, ISSUE_STATUS_VALUES)
-        )
+class AddChange(BaseForm, ExtraFieldset):
+    """A form used to comment (change) an issue."""
+    text = TextAreaField(label=u'Text')
 
-    def validate(self):
-        for attr in ('time_estimated', 'time_billed', 'time_spent'):
-            if self.values[attr] and not strToTime(self.values[attr]):
-                self.addError(
-                    attr, 'Please provide a valid time value.')
-        return AddForm.validate(self)
-
-
-class ChangeAddForm(IssueAddForm):
-    ## FIXME: the only differences with IssueAddForm are:
-    ## - it has no 'title' field
-    ## - 'text' field is not required
-    required = ('status', )

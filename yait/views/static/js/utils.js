@@ -13,13 +13,16 @@ function toggleExtraFieldset() {
 function togglePreviewPane(url) {
     var preview_pane = document.getElementById('previewPane');
     var text_area = document.getElementById('text');
+    var preview_spinner = document.getElementById('previewSpinner');
     if (preview_pane.className == 'hidden') {
         text_area.className = 'hidden';
-        preview_pane.className = '';
+        preview_spinner.className = '';
         $.getJSON(url,
                   {text: text_area.value},
                   function(data) {
+                      preview_pane.className = '';
                       preview_pane.innerHTML = data.rendered;
+                      preview_spinner.className = 'hidden';
                   }
                  );
     } else {

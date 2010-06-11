@@ -1,6 +1,6 @@
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:define-macro="master">
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
 <head>
   <title>
     <span tal:replace="api.html_title_prefix"/>
@@ -15,13 +15,14 @@
   <metal:html-head metal:define-slot="html-head"/>
 </head>
 <body>
-
   <div id="header">
     <a tal:attributes="href api.urlOf('/')" tal:content="api.header_prefix"/>
     <metal:header metal:define-slot="header"></metal:header>
   </div>
 
-  <metal:content metal:define-slot="content"></metal:content>
+  <div id="container">
+    <metal:content metal:define-slot="content"></metal:content>
+  </div>
 
   <div id="footer">
     <div id="poweredBy">
@@ -34,6 +35,9 @@
       <li tal:condition="api.user_cn">
         <span tal:replace="api.user_cn"/>
         (<a href="logout">log out</a>)
+      </li>
+      <li tal:condition="api.hasPermission(u'Administer site')">
+        <a tal:attributes="href api.urlOf('control_panel')">site control panel</a>
       </li>
     </ul>
   </div>

@@ -53,15 +53,32 @@ p {
 
 a {
     color: #144578;
+    text-decoration: none;
+    padding-bottom: 0.1em;
+    border-bottom: 0.05em inset #144578;
+}
+
+a:hover {
+    border-bottom: 0.05em solid #144578;
+}
+
+a.noUnderline, a.noUnderline:hover {
+    border: 0;
 }
 
 .hidden {
     display: none;
 }
 
+#container {
+    width: 77.2em; /* sum({content,properties}.{width,margin,border-width}) */
+    margin: 0 auto;
+}
+
 #content {
     float: left;
-    width: 45em;
+    width: 50em;
+    margin: 0 1em;
 }
 /***********************************************************/
 
@@ -81,15 +98,16 @@ a {
 
 #header a {
     color: white;
-    text-decoration: none;
+    border: 0;
 }
 
-#header a:hover, #footer a:hover {
+#header a:hover {
     border-bottom: 0.05em solid white;
 }
 
 #footer {
-    margin-top: 1.25em; /* 1 / font-size */
+    clear: both;
+    margin-top: 1em; /* 1 / font-size */
     padding: 1em; /* font-size */
     font-size: 1em;
     border-top: 0.1em solid #CCCCCC;
@@ -122,8 +140,7 @@ a {
 ***********************************************************/
 #properties {
     float: left;
-    width: 15em;
-    margin: 0 1em 0 1em;
+    width: 31.25em; /* 25 / font-size */
     border: 0.1em solid #144578;
     list-style-type: none;
     font-size: 0.8em;
@@ -165,7 +182,7 @@ div.statusMessage, div.errorMessage, div.formError {
     margin-bottom: 0.5em;
 }
 
-div.statusMessage { /* FIXME: is this used? */
+div.statusMessage {
     border-color: #007D39;
     background-color: #F4FFFA;
 }
@@ -223,19 +240,22 @@ textarea {
     width: 46em;
 }
 
-label.required {
-    /* FIXME */
+label.required img {
+    vertical-align: middle;
 }
 
 div.formDescription {
     font-size: 0.8em;
-    color: black;
 }
 
 div.formError {
     font-size: 0.8em;
     margin-top: 0.3em;
     /* FIXME */
+}
+
+#showHideExtraFieldset {
+    font-size: 0.8em;
 }
 /***********************************************************/
 
@@ -249,32 +269,47 @@ div.formError {
 }
 
 .change, #previewPane {
-    border: 0.05em solid #CCCCCC;
     padding: 0;
     margin-bottom: 1em;
-    background-color: #EEEEEE;
 }
 
 #previewPane {
+    border: 0.05em solid #CCCCCC;
+    background-color: #EEEEEE;
     width: 44em;
     padding: 1em;
 }
 
+h2, .changeText, .changeDetails {
+    background-color: #EEEEEE;
+    border-style: solid;
+    border-color: #CCCCCC;
+    border-width: 0 0.05em 0.05em 0.05em;    
+}
+
 h2 {
-    margin: 1em;
+    padding: 1em;
+    margin: 0;
+    border-width: 0.05em;
 }
 
 .changeText {
-    margin: 1em 1em 0 1em;
-    padding: 0;
+    padding: 1em 1em 0 1em;
 }
 
 .changeDetails {
-    border-top: 0.05em solid #CCCCCC;
-    margin: 0;
     padding: 1em;
     list-style-type: none;
     color: #555555;
+}
+
+.permalink, .scrollToLastComment {
+    float: right;
+    border: 0;
+}
+
+.permalink:hover, .scrollToLastComment:hover {
+    border: 0;
 }
 
 #previewButton {
@@ -282,6 +317,30 @@ h2 {
     float: right;
 }
 /***********************************************************/
+
+
+
+/***********************************************************
+** Project view
+***************/
+#projectActions {
+    text-align: center;
+}
+
+#projectActions li {
+    display: inline;
+    padding: 5em;
+}
+
+#projectActions li:first-child {
+    display: inline;
+}
+
+#projectActions li a img {
+    vertical-align: middle;
+}
+/***********************************************************/
+
 
 /***********************************************************
 ** Search widget

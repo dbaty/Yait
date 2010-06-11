@@ -13,12 +13,12 @@ from yait.models import _getStore
 from yait.models import Issue
 from yait.models import Project
 from yait.views.utils import hasPermission
-from yait.views.utils import PERM_ADMIN_YAIT
+from yait.views.utils import PERM_ADMIN_SITE
 from yait.views.utils import PERM_VIEW_PROJECT
 from yait.views.utils import TemplateAPI
 
 def project_add_form(context, request, form=None):
-    if not hasPermission(request, PERM_ADMIN_YAIT):
+    if not hasPermission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
     if form is None:
@@ -28,7 +28,7 @@ def project_add_form(context, request, form=None):
 
 
 def addProject(context, request):
-    if not hasPermission(request, PERM_ADMIN_YAIT):
+    if not hasPermission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     form = AddProject(request.POST)
     if not form.validate():

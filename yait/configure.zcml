@@ -21,10 +21,14 @@
      view=".views.login.post_login"
      />
 
-  <!-- General views -->
+  <!-- Site views -->
   <route path=""
-         name="yait_index"
-         view=".views.general.yait_index"/>
+         name="site_index"
+         view=".views.site.site_index"/>
+  <route path="ajax_renderReST"
+         name="ajax_renderReST"
+         view=".views.issue.ajax_renderReST"
+         renderer="json"/> <!-- Must be declared before 'project_view' -->
 
   <!-- Project views -->
   <route path="add_project_form"
@@ -36,10 +40,6 @@
   <route path=":project_name"
          name="project_view"
          view=".views.project.project_view"/>
-  <route path="ajax_renderReST"
-         name="ajax_renderReST"
-         view=".views.ajax.renderReST"
-         renderer="json"/>
 
   <!-- Issue views -->
   <route path=":project_name/add_issue_form"

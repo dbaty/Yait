@@ -1,4 +1,4 @@
-<layout metal:use-macro="api.layout.macros['master']">
+<layout metal:use-macro="api.layout">
 <metal:title metal:fill-slot="title">
   &mdash; <span tal:replace="project.title"/>
   &mdash; #<span tal:replace="issue.ref"/>: <span tal:replace="issue.title"/>
@@ -10,7 +10,94 @@
 
 <metal:content metal:fill-slot="content">
 
-<ul id="properties">
+<div id="content">
+  <h1>
+    <a tal:condition="len(changes) > 1"
+       tal:attributes="href '#%d' % changes[-1].id"
+       class="scrollToLastComment"
+       title="scroll to last comment...">&darr;</a>
+    <a tal:attributes="href api.urlOf('%s/%d' % (project.name, issue.id))"
+       class="permalink" title="issue permalink">#</a>
+     #<span tal:replace="issue.ref"/> &mdash;
+    <span tal:replace="issue.title"/>
+  </h1>
+
+  <div class="change">
+    <div class="changeText"
+         tal:content="structure changes[0].getRenderedText()"/>
+  </div>
+
+  <ol id="changes"
+      tal:condition="changes[1:]">
+    <li tal:repeat="change changes[1:]"
+        class="change">
+      <div class="statusMessage"
+           tal:condition="repeat['change'].end and api.request.params.get('issue_updated')"
+           style="margin-bottom: 1em;">
+        <a name="issue_updated"></a>
+        The issue has been updated, see below.
+      </div>
+      <tal:defines tal:define="details change.getDetails(
+                   include_private_time_info=api.hasPermission(
+                         u'See private timing information', project))">
+        <h2>
+          <a tal:attributes="name change.id;
+                        href api.urlOf('%s/%d#%d' % (project.name, issue.id, change.id))"
+             title="comment permalink"
+             class="permalink">#</a>
+          Update by <span tal:replace="change.author"/>
+          on <span tal:replace="change.date.strftime('%d %B %Y at %H:%M')"/>
+        </h2>
+        <div class="changeText"
+             tal:define="t change.getRenderedText()"
+             tal:condition="t"
+             tal:content="structure t">
+        </div>
+        <ul class="changeDetails"
+            tal:condition="details">
+          <li tal:repeat="detail details">
+            <span tal:replace="detail.label"/>:
+            <tal:if tal:condition="not detail.attr.startswith('time_spent_')">
+              <span tal:replace="detail.before"/> &rarr;
+            </tal:if>
+            <span tal:replace="detail.after"/>
+          </li>
+        </ul>
+      </tal:defines>
+    </li>
+  </ol>
+
+  <form method="post"
+        tal:condition="api.hasPermission(u'Participate in project', project)"
+        tal:attributes="action api.urlOf(
+                            '%s/%s/update' % (project.name, issue.ref))"
+        tal:define="renderField api.form_macros['renderField'];
+                    field_options {}">
+    <fieldset>
+      <legend>Comment or update issue</legend>
+      <metal:issue-text-field metal:use-macro="api.form_macros['issue-text-field']"/>
+      <metal:link-extra-fieldset metal:use-macro="api.form_macros['link-extra-fieldset']"/>
+    </fieldset>
+
+    <metal:issue-extra-fieldset
+       metal:use-macro="api.form_macros['issue-extra-fieldset']"/>
+
+    <div class="buttons">
+      <button type="submit" class="positive">
+        <img tal:attributes="src api.urlOf('static/img/tick.png')" alt=""/>
+        Update
+      </button>
+    </div>
+  </form>
+
+</div>
+
+
+
+<ul id="properties"
+    tal:define="time_info issue.getTimeInfo(
+         include_private_info=api.hasPermission(
+                  u'See private timing information', project))">
   <li id="issueStatus" tal:content="issue.status"></li>
   <li>Kind: <span tal:replace="issue.getKind()"/></li>
   <li>Reported by <span tal:replace="issue.reporter"/></li>
@@ -35,205 +122,11 @@
   <li>Deadline: <span tal:replace="issue.deadline and issue.deadline.strftime('%d %b %Y') or 'none'"/></li>
   <li>Parent issue: FIXME</li>
   <li>Child issue(s): FIXME</li>
+  <li>Time billed: <span tal:replace="time_info['billed']"/></li>
+  <li>Time estimated: <span tal:replace="time_info['estimated']"/></li>
+  <li>Time spent (real): <span tal:replace="time_info['spent_real']"/></li>
+  <li>Time spent (public): <span tal:replace="time_info['spent_public']"/></li>
 </ul>
-
-<div id="content">
-  <h1>
-    #<span tal:replace="issue.ref"/> &mdash;
-    <span tal:replace="issue.title"/>
-  </h1>
-
-  <div class="change">
-    <div class="changeText"
-         tal:content="structure changes[0].getRenderedText()"/>
-  </div>
-
-  <ol id="changes"
-      tal:condition="changes[1:]">
-    <li tal:repeat="change changes[1:]"
-        class="change">
-      <tal:defines tal:define="details change.getDetails()">
-        <h2>
-          Update by <span tal:replace="change.author"/>
-          on <span tal:replace="change.date.strftime('%d %B %Y at %H:%M')"/>
-          <a tal:attributes="name change.id"/>
-        </h2>
-        <div class="changeText"
-             tal:content="structure change.getRenderedText()">
-        </div>
-        <ul class="changeDetails"
-            tal:condition="details">
-          <li tal:repeat="detail details">
-            <span tal:replace="detail.label"/>:
-            <span tal:replace="detail.before"/> &rarr;
-            <span tal:replace="detail.after"/>
-          </li>
-        </ul>
-      </tal:defines>
-    </li>
-  </ol>
-
-  <form method="post"
-        tal:attributes="action api.urlOf(
-                            '%s/%s/update' % (project.name, issue.ref))">
-    <fieldset>
-      <legend>Comment or update issue</legend>
-
-      <div class="formRow">
-        <div class="formError"
-             tal:condition="form.errors.get('text')"
-             tal:content="form.errors.get('text')"></div>
-        <a id="previewButton"
-           title="preview comment"
-           tal:attributes="href 'javascript: togglePreviewPane(\'%s\')' % 
-                                        api.urlOf('ajax_renderReST')"
-           ><img tal:attributes="src api.urlOf('static/img/preview.png')"
-                 height="16" width="16" alt="preview comment"/></a>
-        <div id="previewPane" class="hidden"></div>
-        <textarea id="text" name="text" cols="60" rows="10"
-                  tal:content="form.values['text']"/>
-      </div>
-
-      <div>
-        <a href="javascript: toggleExtraFieldset()">show/hide extra</a>
-      </div>
-    </fieldset>
-
-    <!-- FIXME: add extra fieldset -->
-    <fieldset id="extraFieldset"
-              tal:attributes="class not form.errors and 'hidden' or ''">
-
-      <div class="floatableFormPanel">
-
-        <div class="formRow">
-          <label for="status" class="required">Status</label>
-          <div class="formError"
-               tal:condition="form.errors.get('status')"
-               tal:content="form.errors.get('status')"></div>
-          <select id="status" name="status">
-            <option value="">Select a value below&hellip;</option>
-            <option tal:repeat="(value, label) form.vocab['status']"
-                    tal:attributes="value value;
-                                    selected str(value) == form.values['status']"
-                    tal:content="label"/>
-          </select>
-        </div>
-
-        <div class="formRow">
-          <!-- FIXME: use an auto-complete widget -->
-          <label for="assignee" class="required">Assign issue to</label>
-          <div class="formError"
-               tal:condition="form.errors.get('assignee')"
-               tal:content="form.errors.get('assignee')"></div>
-          <input id="assignee" name="assignee" type="text" size="12"
-                 tal:attributes="value form.values['assignee']"/>
-        </div>
-
-        <div class="formRow">
-          <label for="time_estimated" class="required">Estimated time</label>
-          <div class="formError"
-               tal:condition="form.errors.get('time_estimated')"
-               tal:content="form.errors.get('time_estimated')"></div>
-          <input id="time_estimated" name="time_estimated" type="text" size="5"
-                 tal:attributes="value form.values['time_estimated']"/>
-        </div>
-
-        <div class="formRow">
-          <label for="time_billed" class="required">Time billed</label>
-          <div class="formError"
-               tal:condition="form.errors.get('time_billed')"
-               tal:content="form.errors.get('time_billed')"></div>
-          <input id="time_billed" name="time_billed" type="text" size="5"
-                 tal:attributes="value form.values['time_billed']"/>
-        </div>
-
-        <div class="formRow">
-          <label for="time_spent" class="required">Time spent</label>
-          <div class="formError"
-               tal:condition="form.errors.get('time_spent')"
-               tal:content="form.errors.get('time_spent')">
-          </div>
-          <input id="time_spent" name="time_spent" type="text" size="5"
-               tal:attributes="value form.values['time_spent']"/>
-        </div>
-      </div>
-
-      <div class="floatableFormPanel">
-        <div class="formRow">
-          <!-- FIXME: use a date widget: http://www.kelvinluck.com/assets/jquery/datePicker/v2/demo/ -->
-          <label for="deadline" class="required">Deadline</label>
-          <div class="formError"
-               tal:condition="form.errors.get('deadline')"
-               tal:content="form.errors.get('deadline')">
-          </div>
-          <input id="deadline" name="deadline" type="text" size="5"
-                 tal:attributes="value form.values['deadline']"/>
-        </div>
-
-
-        <div class="formRow">
-          <label for="priority" class="required">Priority</label>
-          <div class="formError"
-               tal:condition="form.errors.get('priority')"
-               tal:content="form.errors.get('priority')"></div>
-          <select id="priority" name="priority">
-            <option value="">Select a value below&hellip;</option>
-            <option tal:repeat="(value, label) form.vocab['priority']"
-                    tal:attributes="value value;
-                                    selected str(value) == form.values['priority']"
-                    tal:content="label"/>
-          </select>
-        </div>
-
-        <div class="formRow">
-          <label for="kind" class="required">Kind</label>
-          <div class="formError"
-               tal:condition="form.errors.get('kind')"
-               tal:content="form.errors.get('kind')"></div>
-          <select id="kind" name="kind">
-            <option value="">Select a value below&hellip;</option>
-            <option tal:repeat="(value, label) form.vocab['kind']"
-                    tal:attributes="value value;
-                                    selected str(value) == form.values['kind']"
-                    tal:content="label"/>
-          </select>
-        </div>
-      </div>
-
-      <div class="floatableFormPanel lastFloatableFormPanel">
-        <div class="formRow">
-          <label for="parent" class="required">Parent issue</label>
-          <div class="formError"
-               tal:condition="form.errors.get('')"
-               tal:content="form.errors.get('parent')"></div>
-          <!-- FIXME: we need a special widget here -->
-          <select id="parent" name="parent">
-            <option value="">Select a value below&hellip;</option>
-          </select>
-        </div>
-
-        <div class="formRow">
-          <label for="parent" class="required">Child issue(s)</label>
-          <div class="formError"
-               tal:condition="form.errors.get('children')"
-               tal:content="form.errors.get('children')"></div>
-          <!-- FIXME: we need a special widget here -->
-          <select id="children" name="children" multiple="multiple">
-            <option value="">Select a value below&hellip;</option>
-          </select>
-        </div>
-      </div>
-    </fieldset>
-
-    <div class="buttons">
-      <button type="submit" class="positive">
-        <img tal:attributes="src api.urlOf('static/img/tick.png')" alt=""/>
-        Update
-      </button>
-    </div>
-  </form>
-
-</div>
 
 </metal:content>
 </layout>

@@ -5,28 +5,39 @@ $Id$
 
 from repoze.bfg.chameleon_zpt import get_template
 
-from storm.exceptions import NotOneError
-
 from yait.models import _getStore
 from yait.models import Manager
-from yait.models import Permission
+from yait.models import Role
 
 
 ## Template constants
 HEADER_PREFIX = u'Yait'
 HTML_TITLE_PREFIX = HEADER_PREFIX
 
-## Permissions
-PERM_ADMIN_YAIT = 'Administer Yait'
-PERM_ADMIN_PROJECT = 'Administer project'
-PERM_VIEW_PROJECT = 'View project'
-PERM_PARTICIPATE_IN_PROJECT = 'Participate in project'
-PERM_SEE_PRIVATE_TIMING_INFO = 'See private timing information'
-PERM_VALUES = {PERM_ADMIN_YAIT: 1,
-               PERM_ADMIN_PROJECT: 2,
-               PERM_VIEW_PROJECT: 4,
-               PERM_PARTICIPATE_IN_PROJECT: 8,
-               PERM_SEE_PRIVATE_TIMING_INFO: 16}
+## Permissions and roles
+PERM_ADMIN_SITE = u'Administer site'
+PERM_ADMIN_PROJECT = u'Administer project'
+PERM_VIEW_PROJECT = u'View project'
+PERM_PARTICIPATE_IN_PROJECT = u'Participate in project'
+PERM_SEE_PRIVATE_TIMING_INFO = u'See private timing information'
+ALL_PERMS = (PERM_ADMIN_SITE, PERM_ADMIN_PROJECT, PERM_VIEW_PROJECT,
+             PERM_PARTICIPATE_IN_PROJECT, PERM_SEE_PRIVATE_TIMING_INFO)
+ROLE_SITE_ADMIN = u'Site administrator'
+ROLE_PROJECT_ADMIN = 1
+ROLE_PROJECT_VIEWER = 2
+ROLE_PROJECT_PARTICIPANT = 3
+ROLE_PROJECT_INTERNAL_PARTICIPANT = 4
+PERMISSIONS_FOR_ROLE = {
+    ROLE_SITE_ADMIN: ALL_PERMS,
+    ROLE_PROJECT_ADMIN: (PERM_ADMIN_PROJECT,
+                         PERM_VIEW_PROJECT, PERM_PARTICIPATE_IN_PROJECT,
+                         PERM_SEE_PRIVATE_TIMING_INFO),
+    ROLE_PROJECT_VIEWER: (PERM_VIEW_PROJECT, ),
+    ROLE_PROJECT_PARTICIPANT: (PERM_VIEW_PROJECT,
+                               PERM_PARTICIPATE_IN_PROJECT),
+    ROLE_PROJECT_PARTICIPANT: (PERM_VIEW_PROJECT,
+                               PERM_PARTICIPATE_IN_PROJECT,
+                               PERM_SEE_PRIVATE_TIMING_INFO)}
 
 
 class TemplateAPI(object):
@@ -41,6 +52,7 @@ class TemplateAPI(object):
         self.header_prefix = HEADER_PREFIX
         self.html_title_prefix = HTML_TITLE_PREFIX
         self.layout = get_template('templates/master.pt')
+        self.form_macros = get_template('templates/form_macros.pt').macros
         self.show_login_link = True
         if self.here_url.split('?')[0].endswith('login_form'):
             self.show_login_link = False
@@ -48,6 +60,9 @@ class TemplateAPI(object):
 
     def urlOf(self, path):
         return '/'.join((self.app_url, path)).strip('/')
+
+    def hasPermission(self, *args, **kwargs):
+        return hasPermission(self.request, *args, **kwargs)
 
 
 def getUserMetadata(request):
@@ -64,45 +79,47 @@ def hasPermission(request, permission, context=None):
 
     Context must be a ``Project`` on which the permission is to be
     checked, or ``None`` if the permission is to be checked on the
-    root level. In the latter case, only ``PERM_ADMIN_YAIT`` may be
+    root level. In the latter case, only ``PERM_ADMIN_SITE`` may be
     checked (because other permissions do not make sense outside of
     projects).
     """
-    assert context or (permission == PERM_ADMIN_YAIT)
+    assert permission in ALL_PERMS, 'Unknown permission: %s' % permission
+    assert context or (permission == PERM_ADMIN_SITE)
+
+    cache_key_admin = '_user_is_site_admin'
+    if getattr(request, cache_key_admin, None):
+        return True
 
     if context is None:
-        cache_key = '_user_perms_global'
+        cache_key = '_user_site_perms' ## will never be read, actually
     else:
         cache_key = '_user_perms_%s' % context.name
     if getattr(request, cache_key, None) is not None:
         return permission in getattr(request, cache_key)
 
-    ## Shortcut for public projects
+    ## Shortcuts for public projects and anonymous users
     if context is not None and context.is_public and \
             permission == PERM_VIEW_PROJECT:
         return True
-
     if not isLoggedIn(request):
         return False
 
     ## FIXME: we should also look for permissions granted to the
-    ## groups the use belongs to.
+    ## groups the user belongs to.
     user_id = getUserMetadata(request)['uid']
     user_id = unicode(user_id) ## FIXME: is this not a work around another problem?
     store = _getStore()
-    user_perm_values = 0
-    if store.find(Manager, user_id=user_id):
-        user_perm_values = PERM_VALUES[PERM_ADMIN_YAIT]
-    if context is not None:
-        row = store.find(Permission, user_id=user_id).one()
-        if row is not None:
-            user_perm_values ^= row.perms
 
-    ## Turn integer value into a list of permissions
-    user_perms = []
-    for perm, value in PERM_VALUES.items():
-        if user_perm_values & value:
-            user_perms.append(perm)
+    if store.find(Manager, user_id=user_id):
+        user_perms = PERMISSIONS_FOR_ROLE[ROLE_SITE_ADMIN]
+        setattr(request, cache_key_admin, True)
+    else:
+        row = store.find(Role, user_id=user_id).one()
+        if row is not None:
+            user_perms = PERMISSIONS_FOR_ROLE[Role.role]
+        else:
+            user_perms = ()
+
     setattr(request, cache_key, user_perms)
     return permission in user_perms
 

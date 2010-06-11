@@ -1,4 +1,4 @@
-<layout metal:use-macro="api.layout.macros['master']">
+<layout metal:use-macro="api.layout">
 <metal:title metal:fill-slot="title">
   &mdash; <span tal:replace="project.title"/>
 </metal:title>
@@ -7,168 +7,24 @@
   <a tal:attributes="href api.urlOf(project.name)" tal:content="project.title"/>
 </metal:header>
 
-<metal:content metal:fill-slot="content">
+<metal:content metal:fill-slot="content"
+               tal:define="renderField api.form_macros['renderField']">
 
 <form method="post"
-      tal:attributes="action api.urlOf('%s/addIssue' % project.name)">
+      tal:attributes="action api.urlOf('%s/addIssue' % project.name)"
+      tal:define="field_options {}">
 
   <fieldset>
     <legend>Add a new issue</legend>
-
-    <div class="formRow">
-      <label for="title" class="required">Title</label>
-      <div class="formError"
-           tal:condition="form.errors.get('title')"
-           tal:content="form.errors.get('title')"></div>
-      <input id="title" name="title" type="text" size="80"
-             tal:attributes="value form.values['title']"/>
-    </div>
-
-    <div class="formRow">
-      <label for="text" class="required">Text</label>
-      <div class="formError"
-           tal:condition="form.errors.get('text')"
-           tal:content="form.errors.get('text')"></div>
-        <a id="previewButton"
-           title="preview comment"
-           tal:attributes="href 'javascript: togglePreviewPane(\'%s\')' % 
-                                        api.urlOf('ajax_renderReST')"
-           ><img tal:attributes="src api.urlOf('static/img/preview.png')"
-                 height="16" width="16" alt="preview comment"/></a>
-      <div id="previewPane" class="hidden"></div>
-      <textarea id="text" name="text" cols="80" rows="10"
-                tal:content="form.values['text']"/>
-    </div>
-
-    <div>
-      <a href="javascript: toggleExtraFieldset()">show/hide extra</a>
-    </div>
+    <metal:field tal:define="field_name 'title';
+                             field_options dict(size=80)"
+                 metal:use-macro="renderField"/>
+    <metal:issue-text-field metal:use-macro="api.form_macros['issue-text-field']"/>
+    <metal:link-extra-fieldset metal:use-macro="api.form_macros['link-extra-fieldset']"/>
   </fieldset>
 
-  <fieldset id="extraFieldset"
-            tal:attributes="class not form.errors and 'hidden' or ''">
-
-    <div class="floatableFormPanel">
-
-      <div class="formRow">
-        <label for="status" class="required">Status</label>
-        <div class="formError"
-             tal:condition="form.errors.get('status')"
-             tal:content="form.errors.get('status')"></div>
-        <select id="status" name="status">
-          <option value="">Select a value below&hellip;</option>
-          <option tal:repeat="(value, label) form.vocab['status']"
-                  tal:attributes="value value;
-                                  selected str(value) == form.values['status']"
-                  tal:content="label"/>
-        </select>
-      </div>
-
-      <div class="formRow">
-        <!-- FIXME: use an auto-complete widget -->
-        <label for="assignee" class="required">Assign issue to</label>
-        <div class="formError"
-             tal:condition="form.errors.get('assignee')"
-             tal:content="form.errors.get('assignee')"></div>
-        <input id="assignee" name="assignee" type="text" size="12"
-               tal:attributes="value form.values['assignee']"/>
-      </div>
-
-      <div class="formRow">
-        <label for="time_estimated" class="required">Estimated time</label>
-        <div class="formError"
-             tal:condition="form.errors.get('time_estimated')"
-             tal:content="form.errors.get('time_estimated')"></div>
-        <input id="time_estimated" name="time_estimated" type="text" size="5"
-               tal:attributes="value form.values['time_estimated']"/>
-      </div>
-
-      <div class="formRow">
-        <label for="time_billed" class="required">Time billed</label>
-        <div class="formError"
-             tal:condition="form.errors.get('time_billed')"
-             tal:content="form.errors.get('time_billed')"></div>
-        <input id="time_billed" name="time_billed" type="text" size="5"
-               tal:attributes="value form.values['time_billed']"/>
-      </div>
-
-      <div class="formRow">
-        <label for="time_spent" class="required">Time spent</label>
-        <div class="formError"
-             tal:condition="form.errors.get('time_spent')"
-             tal:content="form.errors.get('time_spent')">
-        </div>
-        <input id="time_spent" name="time_spent" type="text" size="5"
-               tal:attributes="value form.values['time_spent']"/>
-      </div>
-    </div>
-
-    <div class="floatableFormPanel">
-      <div class="formRow">
-        <!-- FIXME: use a date widget: http://www.kelvinluck.com/assets/jquery/datePicker/v2/demo/ -->
-        <label for="deadline" class="required">Deadline</label>
-        <div class="formError"
-             tal:condition="form.errors.get('deadline')"
-             tal:content="form.errors.get('deadline')">
-        </div>
-        <input id="deadline" name="deadline" type="text" size="5"
-               tal:attributes="value form.values['deadline']"/>
-      </div>
-
-
-      <div class="formRow">
-        <label for="priority" class="required">Priority</label>
-        <div class="formError"
-             tal:condition="form.errors.get('priority')"
-             tal:content="form.errors.get('priority')"></div>
-        <select id="priority" name="priority">
-          <option value="">Select a value below&hellip;</option>
-          <option tal:repeat="(value, label) form.vocab['priority']"
-                  tal:attributes="value value;
-                               selected str(value) == form.values['priority']"
-                  tal:content="label"/>
-        </select>
-      </div>
-
-      <div class="formRow">
-        <label for="kind" class="required">Kind</label>
-        <div class="formError"
-             tal:condition="form.errors.get('kind')"
-             tal:content="form.errors.get('kind')"></div>
-        <select id="kind" name="kind">
-          <option value="">Select a value below&hellip;</option>
-          <option tal:repeat="(value, label) form.vocab['kind']"
-                  tal:attributes="value value;
-                                  selected str(value) == form.values['kind']"
-                  tal:content="label"/>
-        </select>
-      </div>
-    </div>
-
-    <div class="floatableFormPanel lastFloatableFormPanel">
-      <div class="formRow">
-        <label for="parent" class="required">Parent issue</label>
-        <div class="formError"
-             tal:condition="form.errors.get('')"
-             tal:content="form.errors.get('parent')"></div>
-        <!-- FIXME: we need a special widget here -->
-        <select id="parent" name="parent">
-          <option value="">Select a value below&hellip;</option>
-        </select>
-      </div>
-
-      <div class="formRow">
-        <label for="parent" class="required">Child issue(s)</label>
-        <div class="formError"
-             tal:condition="form.errors.get('children')"
-             tal:content="form.errors.get('children')"></div>
-        <!-- FIXME: we need a special widget here -->
-        <select id="children" name="children" multiple="multiple">
-          <option value="">Select a value below&hellip;</option>
-        </select>
-      </div>
-    </div>
-  </fieldset>
+  <metal:issue-extra-fieldset
+     metal:use-macro="api.form_macros['issue-extra-fieldset']"/>
 
   <div class="buttons">
     <button type="submit" class="positive">

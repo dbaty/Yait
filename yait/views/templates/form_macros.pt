@@ -1,0 +1,132 @@
+<tal:comment tal:replace="None">
+  This template defines several macros used in various forms:
+  - renderField
+  - issue-text-field
+  - issue-extra-fieldset
+</tal:comment>
+
+
+
+<tal:comment tal:replace="None">
+  Name: renderField
+  Description: display a field in a form.
+  Parameters:
+    - form: a form object
+    - field_name: the name of the field to be displayed
+    - options (optional): dictionary of options to be passed to the
+      widget
+</tal:comment>
+<metal:renderField metal:define-macro="renderField">
+  <div class="formRow"
+       tal:define="field getattr(form, field_name)">
+    <label tal:attributes="for field_name;
+                           class 'required' in field.flags and 'required'">
+      <span tal:replace="field.label.text"/>
+      <img tal:condition="'required' in field.flags" 
+           tal:attributes="src api.urlOf('static/img/required.png')"
+           width="4" height="4" alt="(required)"/>
+    </label>
+    <div tal:condition="field.description" tal:content="field.description"
+         class="formDescription"/>
+    <div class="formError"
+         tal:condition="field_name in form.errors"
+         tal:content="form.errors.get(field_name)[0]"/>
+    <metal:before-input metal:define-slot="before-input"/>
+    <tal:widget tal:replace="structure field(**field_options)"/>
+  </div>
+</metal:renderField>
+
+
+
+<tal:comment tal:replace="None">
+  Name: issue-text-field
+  Description: display the 'text' field of the issue add/update forms.
+  Parameters: none
+</tal:comment>
+<metal:issue-text-field metal:define-macro="issue-text-field">
+  <metal:field tal:define="field_name 'text';
+                           field_options dict(rows=10, cols=80)"
+               metal:use-macro="renderField">
+    <metal:before-input metal:fill-slot="before-input">
+      <a id="previewButton"
+         class="noUnderline"
+         title="preview comment"
+         tal:attributes="href 'javascript: togglePreviewPane(\'%s\')' % 
+                         api.urlOf('ajax_renderReST')"
+         ><img tal:attributes="src api.urlOf('static/img/preview.png')"
+               height="16" width="16" alt="preview comment"/></a>
+      <div id="previewSpinner" class="hidden">
+        <img tal:attributes="src api.urlOf('static/img/spinner.gif')"
+             width="16" height="16" alt="loading, please wait..."/>
+        Loading, please wait&hellip;
+      </div>
+      <div id="previewPane" class="hidden"></div>
+    </metal:before-input>
+  </metal:field>
+</metal:issue-text-field>
+
+
+
+<tal:comment tal:replace="None">
+  Name: link-extra-fieldset
+  Description: display 'show/hide extra...' link
+</tal:comment>
+<metal:link-extra-fieldset metal:define-macro="link-extra-fieldset">
+  <div id="showHideExtraFieldset">
+    <a href="javascript: toggleExtraFieldset()">show/hide extra&hellip;</a>
+  </div>
+</metal:link-extra-fieldset>
+
+
+
+<tal:comment tal:replace="None">
+  Name: issue-extra-fieldset
+  Description: display the "extra" fieldset in the issue add/update forms.
+  Parameters: none
+</tal:comment>
+<metal:issue-extra-fieldset metal:define-macro="issue-extra-fieldset">
+  <fieldset id="extraFieldset"
+            tal:attributes="class not form.errors and 'hidden' or ''">
+
+    <div class="floatableFormPanel">
+
+      <metal:field tal:define="field_name 'status'" metal:use-macro="renderField"/>
+      <!-- FIXME: use an auto-complete widget -->
+      <metal:field tal:define="field_name 'assignee'" metal:use-macro="renderField"/>
+      <!-- FIXME: use a date widget: http://www.kelvinluck.com/assets/jquery/datePicker/v2/demo/ -->
+      <metal:field tal:define="field_name 'deadline'" metal:use-macro="renderField"/>
+      <metal:field tal:define="field_name 'priority'" metal:use-macro="renderField"/>
+      <metal:field tal:define="field_name 'kind'" metal:use-macro="renderField"/>
+    </div>
+
+    <div class="floatableFormPanel"
+         tal:define="show_private_timing_info api.hasPermission(
+                                   u'See private timing information', project);
+                     show_public_timing_info True or 'FIXME: should be configurable'"
+         tal:condition="show_public_timing_info or show_private_timing_info">
+      <tal:if tal:condition="show_private_timing_info">
+        <metal:field tal:define="field_name 'time_estimated'"
+                     metal:use-macro="renderField"/>
+      </tal:if>
+      <tal:if tal:condition="show_public_timing_info">
+        <metal:field tal:define="field_name 'time_billed'"
+                     metal:use-macro="renderField"/>
+      </tal:if>
+      <tal:if tal:condition="show_private_timing_info">
+        <metal:field tal:define="field_name 'time_spent_real'"
+                     metal:use-macro="renderField"/>
+      </tal:if>
+      <tal:if tal:condition="show_public_timing_info">
+        <metal:field tal:define="field_name 'time_spent_public'"
+                     metal:use-macro="renderField"/>
+      </tal:if>
+    </div>
+
+    <div class="floatableFormPanel lastFloatableFormPanel">
+      <!-- FIXME: use an auto-complete widget -->
+      <metal:field tal:define="field_name 'parent'" metal:use-macro="renderField"/>
+      <!-- FIXME: we need a special widget here -->
+      <metal:field tal:define="field_name 'children'" metal:use-macro="renderField"/>
+    </div>
+  </fieldset>
+</metal:issue-extra-fieldset>
