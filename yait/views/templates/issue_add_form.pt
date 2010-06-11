@@ -12,7 +12,9 @@
 
 <form method="post"
       tal:attributes="action api.urlOf('%s/addIssue' % project.name)"
-      tal:define="field_options {}">
+      tal:define="field_options {};
+                  can_see_private_time_info api.hasPermission(
+                         u'See private time information', project)">
 
   <fieldset>
     <legend>Add a new issue</legend>

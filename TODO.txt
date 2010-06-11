@@ -4,6 +4,12 @@
 
 - review "issue properties" panel. It is confused.
 
+- profile and optimize:
+
+  - repoze.profile
+
+  - make Storm more verbose (display all requests)
+
 - display date in the user's timezone:
 
   - http://www.onlineaspect.com/2007/06/08/auto-detect-a-time-zone-with-javascript

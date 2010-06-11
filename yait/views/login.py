@@ -36,3 +36,10 @@ def post_login(request):
         destination = '/login_form?came_from=%s&__logins=%s' % (
             came_from, login_counter)
     return HTTPFound(location=destination)
+
+
+def post_logout(request):
+    url = '%s?status_message=%s' % (
+        request.application_url,
+        quote_plus(u'You have been logged out.'))
+    return HTTPFound(location=url)

@@ -237,7 +237,7 @@ input, textarea, select {
 }
 
 textarea {
-    width: 46em;
+    width: 46em; /* FIXME: why 46? */
 }
 
 label.required img {
@@ -271,6 +271,7 @@ div.formError {
 .change, #previewPane {
     padding: 0;
     margin-bottom: 1em;
+    word-wrap: break-word;
 }
 
 #previewPane {
@@ -280,21 +281,22 @@ div.formError {
     padding: 1em;
 }
 
-h2, .changeText, .changeDetails {
+.changeHeader, .changeText, .changeDetails {
     background-color: #EEEEEE;
     border-style: solid;
     border-color: #CCCCCC;
-    border-width: 0 0.05em 0.05em 0.05em;    
+    border-width: 0 0.05em 0.05em 0.05em; /* no border-top... */
 }
 
-h2 {
+.changeHeader, .changeIssueText {
     padding: 1em;
     margin: 0;
-    border-width: 0.05em;
+    border-width: 0.05em;  /* ...with a border-top for this one */
 }
 
 .changeText {
     padding: 1em 1em 0 1em;
+    max-width: inherit;
 }
 
 .changeDetails {

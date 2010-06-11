@@ -100,9 +100,8 @@
     </div>
 
     <div class="floatableFormPanel"
-         tal:define="show_private_timing_info api.hasPermission(
-                                   u'See private timing information', project);
-                     show_public_timing_info True or 'FIXME: should be configurable'"
+         tal:define="show_private_timing_info can_see_private_time_info;
+                     show_public_timing_info True or 'FIXME: should be configurable per project'"
          tal:condition="show_public_timing_info or show_private_timing_info">
       <tal:if tal:condition="show_private_timing_info">
         <metal:field tal:define="field_name 'time_estimated'"

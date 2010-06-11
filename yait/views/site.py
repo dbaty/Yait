@@ -19,6 +19,6 @@ def site_index(context, request):
     store = _getStore()
     projects = store.find(Project)
     api = TemplateAPI(context, request)
-    return render_template_to_response('templates/yait_index.pt',
+    return render_template_to_response('templates/site_index.pt',
                                        api=api,
                                        projects=projects)

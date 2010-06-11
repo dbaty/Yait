@@ -8,7 +8,9 @@
   <a tal:attributes="href api.urlOf(project.name)" tal:content="project.title"/>
 </metal:header>
 
-<metal:content metal:fill-slot="content">
+<metal:content metal:fill-slot="content"
+               tal:define="can_see_private_time_info api.hasPermission(
+                         u'See private time information', project)">
 
 <div id="content">
   <h1>
@@ -23,12 +25,12 @@
   </h1>
 
   <div class="change">
-    <div class="changeText"
+    <div class="changeText changeIssueText"
          tal:content="structure changes[0].getRenderedText()"/>
   </div>
 
   <ol id="changes"
-      tal:condition="changes[1:]">
+      tal:condition="len(changes) > 1">
     <li tal:repeat="change changes[1:]"
         class="change">
       <div class="statusMessage"
@@ -38,9 +40,8 @@
         The issue has been updated, see below.
       </div>
       <tal:defines tal:define="details change.getDetails(
-                   include_private_time_info=api.hasPermission(
-                         u'See private timing information', project))">
-        <h2>
+                   include_private_time_info=can_see_private_time_info)">
+        <h2 class="changeHeader">
           <a tal:attributes="name change.id;
                         href api.urlOf('%s/%d#%d' % (project.name, issue.id, change.id))"
              title="comment permalink"
@@ -89,15 +90,13 @@
       </button>
     </div>
   </form>
-
 </div>
 
 
 
 <ul id="properties"
     tal:define="time_info issue.getTimeInfo(
-         include_private_info=api.hasPermission(
-                  u'See private timing information', project))">
+                             include_private_info=can_see_private_time_info)">
   <li id="issueStatus" tal:content="issue.status"></li>
   <li>Kind: <span tal:replace="issue.getKind()"/></li>
   <li>Reported by <span tal:replace="issue.reporter"/></li>
@@ -122,10 +121,18 @@
   <li>Deadline: <span tal:replace="issue.deadline and issue.deadline.strftime('%d %b %Y') or 'none'"/></li>
   <li>Parent issue: FIXME</li>
   <li>Child issue(s): FIXME</li>
-  <li>Time billed: <span tal:replace="time_info['billed']"/></li>
-  <li>Time estimated: <span tal:replace="time_info['estimated']"/></li>
-  <li>Time spent (real): <span tal:replace="time_info['spent_real']"/></li>
-  <li>Time spent (public): <span tal:replace="time_info['spent_public']"/></li>
+  <li tal:condition="can_see_private_time_info">
+    Time estimated: <span tal:replace="time_info['estimated'] or 'none'"/>
+  </li>
+  <li>Time billed: <span tal:replace="time_info['billed'] or 'none'"/></li>
+  <li tal:condition="can_see_private_time_info">
+    Time spent (real): <span tal:replace="time_info['spent_real'] or 'none'"/>
+  </li>
+  <li>
+    <tal:if tal:condition="not can_see_private_time_info">Time spent</tal:if>
+    <tal:if tal:condition="can_see_private_time_info">Time spent (public)</tal:if>
+    <span tal:replace="time_info['spent_public'] or 'none'"/>
+  </li>
 </ul>
 
 </metal:content>

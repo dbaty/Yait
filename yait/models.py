@@ -92,7 +92,8 @@ class Issue(Model):
     deadline = DateTime()
     time_estimated = Int()
     time_billed = Int()
-    ## A 'changes' property is defined below after the 'Change' model.
+    ## A 'changes' property is defined below after the 'Change'
+    ## model. Do NOT use directly: use 'getChanges()'
 
     _ordered = (
         ## List of attributes ordered as they should appear in
@@ -115,6 +116,17 @@ class Issue(Model):
 
     def getPriority(self):
         return ISSUE_PRIORITY_LABELS[self.priority - 1]
+
+    def getChanges(self):
+        """Return an ordered list of changes.
+
+        The ReferenceSet provided by Storm does not cache results.
+        Thus, multiple calls to ``self.changes`` imply multiple SELECT
+        calls.
+        """
+        if getattr(self, '_cached_changes', None) is None:
+            self._cached_changes = list(self.changes)
+        return self._cached_changes
 
     def getParent(self):
         pass ## FIXME
@@ -152,7 +164,7 @@ class Issue(Model):
         if include_private_info:
             data.update(estimated=self.time_estimated or 0)
             data.update(spent_real=0)
-        for change in self.changes:
+        for change in self.getChanges():
             data['spent_public'] += change.time_spent_public or 0
             if include_private_info:
                 data['spent_real'] += change.time_spent_real or 0
@@ -208,9 +220,9 @@ class Change(Model):
             details.append(dict(attr=attr, label=label,
                                 before=before, after=after))
         return details
-        
 
-Issue.changes = ReferenceSet(Issue.id, Change.issue_id)
+
+Issue.changes = ReferenceSet(Issue.id, Change.issue_id, order_by=Change.id)
 
 
 class IssueRelationship(Model):

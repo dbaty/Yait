@@ -20,6 +20,11 @@
      name="post_login"
      view=".views.login.post_login"
      />
+  <route
+     path="post_logout"
+     name="post_logout"
+     view=".views.login.post_logout"
+     />
 
   <!-- Site views -->
   <route path=""

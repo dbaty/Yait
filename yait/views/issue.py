@@ -92,7 +92,6 @@ def issue_view(context, request, form=None):
     issue_ref = int(context.issue_ref)
     issue = store.find(
         Issue, project_id=project.id, ref=issue_ref).one()
-    changes = store.find(Change, issue_id=issue.id).order_by(Change.id)
     if form is None:
         form = AddChange(assignee=issue.assignee,
                          children=issue.getChildren(),
@@ -105,11 +104,12 @@ def issue_view(context, request, form=None):
                          time_billed=issue.time_billed,
                          title=issue.title)
     api = TemplateAPI(context, request)
+    ## FIXME: list(changes) issues an additional SELECT.
     return render_template_to_response('templates/issue_view.pt',
                                        api=api,
                                        project=project,
                                        issue=issue,
-                                       changes=list(changes),
+                                       changes=issue.getChanges(),
                                        form=form)
 
 def issue_update(context, request):

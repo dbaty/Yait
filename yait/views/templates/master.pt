@@ -21,6 +21,12 @@
   </div>
 
   <div id="container">
+    <div class="statusMessage"
+         tal:condition="api.status_message"
+         tal:content="api.status_message"/>
+    <div class="errorMessage"
+         tal:condition="api.error_message"
+         tal:content="api.error_message"/>
     <metal:content metal:define-slot="content"></metal:content>
   </div>
 
@@ -30,11 +36,11 @@
     </div>
     <ul id="footerActions">
       <li tal:condition="not api.user_cn and api.show_login_link">
-        <a href="login_form?manual=1">log in</a>
+        <a tal:attributes="href api.urlOf('login_form?manual=1')">log in</a>
       </li>
       <li tal:condition="api.user_cn">
         <span tal:replace="api.user_cn"/>
-        (<a href="logout">log out</a>)
+        (<a tal:attributes="href api.urlOf('logout')">log out</a>)
       </li>
       <li tal:condition="api.hasPermission(u'Administer site')">
         <a tal:attributes="href api.urlOf('control_panel')">site control panel</a>

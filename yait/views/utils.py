@@ -19,7 +19,7 @@ PERM_ADMIN_SITE = u'Administer site'
 PERM_ADMIN_PROJECT = u'Administer project'
 PERM_VIEW_PROJECT = u'View project'
 PERM_PARTICIPATE_IN_PROJECT = u'Participate in project'
-PERM_SEE_PRIVATE_TIMING_INFO = u'See private timing information'
+PERM_SEE_PRIVATE_TIMING_INFO = u'See private time information'
 ALL_PERMS = (PERM_ADMIN_SITE, PERM_ADMIN_PROJECT, PERM_VIEW_PROJECT,
              PERM_PARTICIPATE_IN_PROJECT, PERM_SEE_PRIVATE_TIMING_INFO)
 ROLE_SITE_ADMIN = u'Site administrator'
@@ -51,6 +51,12 @@ class TemplateAPI(object):
         self.referrer = request.environ.get('HTTP_REFERER', None)
         self.header_prefix = HEADER_PREFIX
         self.html_title_prefix = HTML_TITLE_PREFIX
+        referrer = request.headers.get('Referer', '')
+        if referrer.startswith(request.application_url):
+            self.status_message = request.params.get('status_message', '')
+            self.error_message = request.params.get('error_message', '')
+        else:
+            self.status_message = self.error_message = ''
         self.layout = get_template('templates/master.pt')
         self.form_macros = get_template('templates/form_macros.pt').macros
         self.show_login_link = True
