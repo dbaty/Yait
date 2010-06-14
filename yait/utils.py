@@ -21,6 +21,10 @@ def strToTime(s):
 
     A day is supposed to have 8 hours. As well, a week has 5 days.
 
+    >>> strToTime('1t')
+    Traceback (most recent call last):
+    ...
+    ValueError: Wrong time format: 1t
     >>> strToTime('')
     0
     >>> strToTime('0')
@@ -38,11 +42,13 @@ def strToTime(s):
     >>> strToTime('1w')
     2400
     """
-    m = TIME_REGEXP.match(s)
-    if m is None:
+    if s in (None, '', '0'):
         return 0
+    matches = TIME_REGEXP.match(s).groups()
+    if not any(matches):
+        raise ValueError('Wrong time format: %s' % s)
     t = 0
-    for i, j in zip(m.groups(), (2400, 480, 60, 1)):
+    for i, j in zip(matches, (2400, 480, 60, 1)):
         if i is not None:
             t += int(i) * j
     return t
@@ -83,7 +89,7 @@ def timeToStr(t):
     return s
 
 
-def strToDate(s, format='dd/mm/yyyy'):
+def strToDate(s, format='dd/mm/yyyy'): ## FIXME: is it used anywhere?
     """Convert a string to the date it respresents.
 
     Only one format is available: ``dd/mm/yyyy``.

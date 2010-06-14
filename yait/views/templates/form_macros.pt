@@ -99,7 +99,7 @@
       <metal:field tal:define="field_name 'kind'" metal:use-macro="renderField"/>
     </div>
 
-    <div class="floatableFormPanel"
+    <div class="floatableFormPanel lastFloatableFormPanel"
          tal:define="show_private_timing_info can_see_private_time_info;
                      show_public_timing_info True or 'FIXME: should be configurable per project'"
          tal:condition="show_public_timing_info or show_private_timing_info">
@@ -119,9 +119,6 @@
         <metal:field tal:define="field_name 'time_spent_public'"
                      metal:use-macro="renderField"/>
       </tal:if>
-    </div>
-
-    <div class="floatableFormPanel lastFloatableFormPanel">
       <!-- FIXME: use an auto-complete widget -->
       <metal:field tal:define="field_name 'parent'" metal:use-macro="renderField"/>
       <!-- FIXME: we need a special widget here -->

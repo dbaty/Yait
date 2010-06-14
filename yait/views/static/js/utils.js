@@ -30,3 +30,13 @@ function togglePreviewPane(url) {
         preview_pane.className = 'hidden';
     }
 }
+
+
+// Pin element, i.e. make it fixed, insensible to window scrolling.
+function pinElement(elm) {
+    var top = elm.offsetTop;
+    var left = elm.offsetLeft;
+    elm.style.top = top + 'px';
+    elm.style.left = left + 'px';
+    elm.style.position = 'fixed';
+}

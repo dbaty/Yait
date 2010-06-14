@@ -104,13 +104,13 @@ def issue_view(context, request, form=None):
                          time_billed=issue.time_billed,
                          title=issue.title)
     api = TemplateAPI(context, request)
-    ## FIXME: list(changes) issues an additional SELECT.
     return render_template_to_response('templates/issue_view.pt',
                                        api=api,
                                        project=project,
                                        issue=issue,
                                        changes=issue.getChanges(),
-                                       form=form)
+                                       form=form,
+                                       now=datetime.now())
 
 def issue_update(context, request):
     project_name = context.project_name

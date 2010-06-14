@@ -1,8 +1,12 @@
 - automated tests + coverage
 
-- check 'commit_veto()'
+- relationships between issues : parent/child, blocker/blocked
 
-- review "issue properties" panel. It is confused.
+- add auto-complete widget for "assign issue to"
+
+- review layout of the extra fieldset
+
+- check 'commit_veto()'
 
 - profile and optimize:
 
@@ -20,8 +24,6 @@
   required. In this case, display the field below the text field (and
   not in the "extra" field set).
 
-- use an existing form rendering/marshalling package
-
 - document time-related details:
 
   - estimated time (internal): the time you think you are going to
@@ -38,19 +40,9 @@
     seen by the customer. It may be different than the time really
     spent, and relates to the time billed.
 
-- complete issue_add_form with additional metadata
-
-- complete issue_view ("add comment" form) with additional metadata
-
-- relationships between issues : parent/child, blocker/blocked
-
-- new button: "add new issue" in issue_view, under the properties
-  panel. Drop-down menu with "add issue", "add sub-issue" or "add
-  sibling issue". Or shall we add this in the new toolbox bar? On the
-  other hand, this toolbox bar may not be that useful. The login link
-  may very well appear elsewhere, for example in the footer. Actually,
-  where will the search box appear? In the header, aligned to the
-  right?
+- review footer ("logged in as..." is too long). Perhaps we create a
+  toolbar above the #content area with the following buttons: add
+  issue, search, configure project, preferences.
 
 - allow other text formatting syntaxes:
 
@@ -61,7 +53,7 @@
   - store the renderer in the Change model, along the text.
 
 - when clicking on "show/hide extra", scroll to the end of the page so
-  that the "update" button is visible. (use $.scrollTo(object) ? cf. http://plugins.jquery.com/project/ScrollTo)
+  that the "update" button is visible. Use $.scrollTo(object) (cf. http://plugins.jquery.com/project/ScrollTo) or scrollTop() (?)
 
 - for each project: configure whether the public (customer-oriented)
   timing information is displayed ('time_billed' and
@@ -78,7 +70,8 @@
 
   - grant a permission to group G (from LDAP).
 
-- validate HTML, CSS and Javascript (jslint)
+- validate HTML, CSS and Javascript (jslint). Check that using the
+  HTML 5 doctype is not going to be an issue (with IE, particularly).
 
 - CSS tweaks:
 
@@ -121,6 +114,8 @@
 
 - i18n
 
+- handle trailing slash after the name of a project
+
 - better error handling (404 & 500)
 
 - recent activity per project
@@ -139,3 +134,9 @@
 - check "api.urlOf()" when the URL looks like: domain.com/foo/yait
 
 - add a "Component/category" field (à la Jira)
+
+- show priority and deadline in different colors: orange if imminent,
+  red if past.
+
+- add settings so that the JSON calls are not cached:
+  http://stackoverflow.com/questions/264216/getjson-returning-cached-data-in-ie8

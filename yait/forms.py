@@ -33,7 +33,11 @@ class TimeInfoField(TextField):
 
     def process_formdata(self, value_list):
         if value_list:
-            self.data = strToTime(value_list[0])
+            try:
+                self.data = strToTime(value_list[0])
+            except:
+                self.data = value_list[0]
+                raise
 
 
 class BaseForm(Form):

@@ -1,4 +1,11 @@
 <layout metal:use-macro="api.layout">
+<metal:html-head metal:fill-slot="html-head">
+  <script type="text/javascript">
+    $(document).ready(function() {
+      pinElement(document.getElementById('meta'));
+    });
+  </script>
+</metal:html-head>
 <metal:title metal:fill-slot="title">
   &mdash; <span tal:replace="project.title"/>
   &mdash; #<span tal:replace="issue.ref"/>: <span tal:replace="issue.title"/>
@@ -15,7 +22,7 @@
 <div id="content">
   <h1>
     <a tal:condition="len(changes) > 1"
-       tal:attributes="href '#%d' % changes[-1].id"
+       tal:attributes="href '#change-%d' % changes[-1].id"
        class="scrollToLastComment"
        title="scroll to last comment...">&darr;</a>
     <a tal:attributes="href api.urlOf('%s/%d' % (project.name, issue.id))"
@@ -34,16 +41,16 @@
     <li tal:repeat="change changes[1:]"
         class="change">
       <div class="statusMessage"
+           id="issue_updated"
            tal:condition="repeat['change'].end and api.request.params.get('issue_updated')"
            style="margin-bottom: 1em;">
-        <a name="issue_updated"></a>
         The issue has been updated, see below.
       </div>
       <tal:defines tal:define="details change.getDetails(
                    include_private_time_info=can_see_private_time_info)">
-        <h2 class="changeHeader">
-          <a tal:attributes="name change.id;
-                        href api.urlOf('%s/%d#%d' % (project.name, issue.id, change.id))"
+        <h2 class="changeHeader"
+            tal:attributes="id 'change-%d' % change.id">
+          <a tal:attributes="href api.urlOf('%s/%d#change-%d' % (project.name, issue.id, change.id))"
              title="comment permalink"
              class="permalink">#</a>
           Update by <span tal:replace="change.author"/>
@@ -93,47 +100,90 @@
 </div>
 
 
+<div id="meta">
+<div id="properties"
+     tal:define="time_info issue.getTimeInfo(
+                 include_private_info=can_see_private_time_info)">
+  <div id="issueStatus" tal:content="issue.status"></div>
 
-<ul id="properties"
-    tal:define="time_info issue.getTimeInfo(
-                             include_private_info=can_see_private_time_info)">
-  <li id="issueStatus" tal:content="issue.status"></li>
-  <li>Kind: <span tal:replace="issue.getKind()"/></li>
-  <li>Reported by <span tal:replace="issue.reporter"/></li>
-  <li>
-    Reported on
-    <abbr tal:content="issue.date_created.strftime('%d %b %Y')"
-          tal:attributes="title issue.date_created.strftime('%H:%M')"/>
+  <h3>Details</h3>
+  <ul>
+    <li>Kind: <span tal:replace="issue.getKind()"/></li>
+    <li>Priority: <span tal:replace="issue.getPriority()"/></li>
+  </ul>
+
+  <h3>Participants</h3>
+  <ul>
+    <li>Reported by <span tal:replace="issue.reporter"/></li>
+    <li tal:condition="issue.assignee">
+      Assigned to <span tal:replace="issue.assignee"/>
+    </li>
+    <li tal:condition="not issue.assignee" class="issueUnassigned">
+      Unassigned
+    </li>
+    <li>Watchers: FIXME <!-- FIXME: list and add button--></li>
+  </ul>
+
+  <h3>Dates and time</h3>
+  <ul>
+    <li>
+      Reported on
+      <abbr tal:content="issue.date_created.strftime('%d %b %Y')"
+            tal:attributes="title issue.date_created.strftime('%H:%M')"/>
+    </li>
+    <li tal:condition="issue.date_edited != issue.date_created">
+      Updated on
+      <abbr tal:content="issue.date_edited.strftime('%d %b %Y')"
+            tal:attributes="title issue.date_edited.strftime('%H:%M')"/>
+    </li>
+    <li tal:condition="issue.deadline"
+        tal:attributes="class True and 'deadlineIsPast'">
+      Deadline: <span tal:replace="issue.deadline.strftime('%d %b %Y')"/>
+    </li>
+    <li tal:condition="not issue.deadline">
+      No deadline
+    </li>
+    <li tal:condition="can_see_private_time_info">
+      Time estimated: <span tal:replace="time_info['estimated'] or 'none'"/>
+    </li>
+    <li>Time billed: <span tal:replace="time_info['billed'] or 'none'"/></li>
+    <li tal:condition="can_see_private_time_info">
+      Time spent (real): <span tal:replace="time_info['spent_real'] or 'none'"/>
+    </li>
+    <li>
+      <tal:if tal:condition="not can_see_private_time_info">Time spent</tal:if>
+      <tal:if tal:condition="can_see_private_time_info">Time spent (public)</tal:if>
+      <span tal:replace="time_info['spent_public'] or 'none'"/>
+    </li>
+  </ul>
+
+  <h3>Related issues</h3>
+  <ul class="last">
+    <li>Parent issue: FIXME</li>
+    <li>Child issue(s): FIXME</li>
+  </ul>
+</div>
+
+<ul id="projectActionsInIssueView">
+  <li tal:condition="api.hasPermission(u'Participate in project', project)"
+      tal:define="action_url api.urlOf('%s/add_issue_form' % project.name)">
+    <a tal:attributes="href action_url"
+       class="noUnderline"
+       ><img tal:attributes="src api.urlOf('static/img/add.png')"
+             width="32" height="32" alt="add issue"/></a>
+    <a tal:attributes="href action_url">add issue</a>
   </li>
-  <li tal:condition="issue.date_edited != issue.date_created">
-    Updated on
-    <abbr tal:content="issue.date_edited.strftime('%d %b %Y')"
-          tal:attributes="title issue.date_edited.strftime('%H:%M')"/>
-  </li>
-  <li tal:condition="issue.assignee">
-    Assigned to <span tal:replace="issue.assignee"/>
-  </li>
-  <li tal:condition="not issue.assignee"
-      id="issueUnassigned">
-    Unassigned
-  </li>
-  <li>Priority: <span tal:replace="issue.getPriority()"/></li>
-  <li>Deadline: <span tal:replace="issue.deadline and issue.deadline.strftime('%d %b %Y') or 'none'"/></li>
-  <li>Parent issue: FIXME</li>
-  <li>Child issue(s): FIXME</li>
-  <li tal:condition="can_see_private_time_info">
-    Time estimated: <span tal:replace="time_info['estimated'] or 'none'"/>
-  </li>
-  <li>Time billed: <span tal:replace="time_info['billed'] or 'none'"/></li>
-  <li tal:condition="can_see_private_time_info">
-    Time spent (real): <span tal:replace="time_info['spent_real'] or 'none'"/>
-  </li>
-  <li>
-    <tal:if tal:condition="not can_see_private_time_info">Time spent</tal:if>
-    <tal:if tal:condition="can_see_private_time_info">Time spent (public)</tal:if>
-    <span tal:replace="time_info['spent_public'] or 'none'"/>
+  <li tal:condition="api.hasPermission(u'Administer project', project)"
+      tal:define="action_url api.urlOf('%s/control_panel' % project.name)">
+    <a tal:attributes="href action_url"
+       class="noUnderline"
+       ><img tal:attributes="src api.urlOf('static/img/configure.png')"
+             width="32" height="32" alt="add issue"/></a>
+    <a tal:attributes="href action_url">configure project</a>
   </li>
 </ul>
+
+</div>
 
 </metal:content>
 </layout>

@@ -9,7 +9,7 @@ img {
     padding: 0;
 }
 
-h1, h2 {
+h1, h2, h3 {
     font-size: 100%;
     font-weight: normal;
 }
@@ -38,6 +38,7 @@ h1 {
     font-size: 1.4em;
     font-weight: bold;
     margin-bottom: 0.714em; /* 1 / font-size */
+
 }
 
 h2 {
@@ -71,13 +72,20 @@ a.noUnderline, a.noUnderline:hover {
 }
 
 #container {
-    width: 77.2em; /* sum({content,properties}.{width,margin,border-width}) */
+    /*
+      The width is content.width        45em
+                 + content.margin       2em (2 * 1em)
+                 + properties.width     16em
+                 + properties.margin    0
+                 + a tiny bit of space  0.4em
+    */
+    width: 63.4em;
     margin: 0 auto;
 }
 
 #content {
     float: left;
-    width: 50em;
+    width: 45em;
     margin: 0 1em;
 }
 /***********************************************************/
@@ -136,36 +144,69 @@ a.noUnderline, a.noUnderline:hover {
 
 
 /***********************************************************
-** Properties panel
-***********************************************************/
-#properties {
+** Meta column
+**************/
+#meta {
     float: left;
-    width: 31.25em; /* 25 / font-size */
-    border: 0.1em solid #144578;
-    list-style-type: none;
-    font-size: 0.8em;
+    width: 16em;
 }
 
-#properties li {
-    padding: 0.3em 0.5em;
+#properties {
+    border: 0.1em solid #CCCCCC;
+    font-size: 0.8em;
+    background-color: #EEEEEE;
 }
 
 #properties #issueStatus {
     text-align: center;
     font-weight: bold;
     font-size: 2em;
-    border-bottom: 0.05em solid #144578;
-    color: black;
+    border-bottom: 0.05em solid #CCCCCC;
     padding: 0.5em;
+    background-color: #CCCCCC;
+    color: black;
 }
 
-#properties #issueUnassigned {
-    /* FIXME */
+.issueUnassigned, .deadlineInThePast {
+    font-weight: bold;
+    color: #CC0000;
 }
 
 #properties abbr {
     border-bottom: 1px dotted #CCCCCC;
+    cursor: help;
 }
+
+#properties h3 {
+    font-weight: bold;
+    padding-bottom: 0.1em;
+    margin: 0.4em 1em 0.3em 1em;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+#properties ul {
+    list-style-type: none
+}
+
+#properties ul.last {
+    margin-bottom: 0.4em;
+}
+
+#properties ul li {
+    padding: 0 1em;
+    padding: 0.2em 0 0.2em 1em;
+}
+
+#projectActionsInIssueView {
+    margin-top: 0.5em;
+    list-style-type: none;
+    text-align: right;
+}
+
+#projectActionsInIssueView li a img {
+    vertical-align: middle;
+}
+
 /***********************************************************/
 
 
@@ -199,8 +240,7 @@ div.errorMessage, div.formError {
 ** Forms
 ********/
 form {
-    width: 50em;
-    margin: 0 auto;
+    /* FIXME: fix login.pt and other templates that may not use #container */
 }
 
 fieldset {
@@ -210,7 +250,7 @@ fieldset {
 }
 
 div.floatableFormPanel {
-    width: 29%;
+    width: 45%;
     float: left;
     border-right: 1px solid #CCCCCC;
     padding-right: 1em;
@@ -237,7 +277,7 @@ input, textarea, select {
 }
 
 textarea {
-    width: 46em; /* FIXME: why 46? */
+    width: 40em; /* FIXME: why 40? */
 }
 
 label.required img {
@@ -271,13 +311,13 @@ div.formError {
 .change, #previewPane {
     padding: 0;
     margin-bottom: 1em;
-    word-wrap: break-word;
+    word-wrap: break-word; /* CSS 3 only */
 }
 
 #previewPane {
     border: 0.05em solid #CCCCCC;
     background-color: #EEEEEE;
-    width: 44em;
+    width: 38em;
     padding: 1em;
 }
 
