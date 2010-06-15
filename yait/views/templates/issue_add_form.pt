@@ -11,6 +11,7 @@
                tal:define="renderField api.form_macros['renderField']">
 
 <form method="post"
+      id="addIssueForm"
       tal:attributes="action api.urlOf('%s/addIssue' % project.name)"
       tal:define="field_options {};
                   can_see_private_time_info api.hasPermission(
@@ -19,7 +20,7 @@
   <fieldset>
     <legend>Add a new issue</legend>
     <metal:field tal:define="field_name 'title';
-                             field_options dict(size=80)"
+                             field_options dict(size=60)"
                  metal:use-macro="renderField"/>
     <metal:issue-text-field metal:use-macro="api.form_macros['issue-text-field']"/>
     <metal:link-extra-fieldset metal:use-macro="api.form_macros['link-extra-fieldset']"/>

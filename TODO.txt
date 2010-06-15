@@ -1,10 +1,26 @@
 - automated tests + coverage
 
+- global control panel to define managers and create projects;
+
+- project control panel : configure whether the public
+  (customer-oriented) timing information is displayed ('time_billed'
+  and 'time_spent_public').
+
+- add a way to configure a project so that "time spent (real)" is
+  required. In this case, display the field below the text field (and
+  not in the "extra" field set).
+
+- project control panel : grant a permission to user U;
+
 - relationships between issues : parent/child, blocker/blocked
+
+- site view ;
+
+- project view ;
 
 - add auto-complete widget for "assign issue to"
 
-- review layout of the extra fieldset
+- review layout of the extra fieldset (?)
 
 - check 'commit_veto()'
 
@@ -19,10 +35,6 @@
   - http://www.onlineaspect.com/2007/06/08/auto-detect-a-time-zone-with-javascript
 
   - http://www.csgnetwork.com/timezoneproginfo.html
-
-- add a way to configure a project so that "time spent (real)" is
-  required. In this case, display the field below the text field (and
-  not in the "extra" field set).
 
 - document time-related details:
 
@@ -40,9 +52,9 @@
     seen by the customer. It may be different than the time really
     spent, and relates to the time billed.
 
-- review footer ("logged in as..." is too long). Perhaps we create a
-  toolbar above the #content area with the following buttons: add
-  issue, search, configure project, preferences.
+- review footer (?). Perhaps we create a toolbar above the #content
+  area with the following buttons: add issue, search, configure
+  project, preferences.
 
 - allow other text formatting syntaxes:
 
@@ -55,20 +67,10 @@
 - when clicking on "show/hide extra", scroll to the end of the page so
   that the "update" button is visible. Use $.scrollTo(object) (cf. http://plugins.jquery.com/project/ScrollTo) or scrollTop() (?)
 
-- for each project: configure whether the public (customer-oriented)
-  timing information is displayed ('time_billed' and
-  'time_spent_public').
-
 - a checkbox to assign "to me"
 
 - add a way to change the title: quick edit (cf. issue tracker Pilot),
   or when adding a comment
-
-- on each project:
-
-  - grant a permission to user U;
-
-  - grant a permission to group G (from LDAP).
 
 - validate HTML, CSS and Javascript (jslint). Check that using the
   HTML 5 doctype is not going to be an issue (with IE, particularly).
@@ -90,11 +92,6 @@
   - markup syntax;
 
   - preferred language;
-
-  - order in which changes are shown: chronologically or
-    anti-chronologically
-
-- global control panel to define managers and create projects;
 
 - show users' full name instead of their id.
 
@@ -140,3 +137,5 @@
 
 - add settings so that the JSON calls are not cached:
   http://stackoverflow.com/questions/264216/getjson-returning-cached-data-in-ie8
+
+- handle LDAP groups;
