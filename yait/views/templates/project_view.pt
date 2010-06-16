@@ -9,7 +9,7 @@
 
 <metal:content metal:fill-slot="content">
 
-<ul id="projectActions">
+<ul id="actions">
   <li tal:condition="api.hasPermission(u'Participate in project', project)"
       tal:define="action_url api.urlOf('%s/add_issue_form' % project.name)">
     <a tal:attributes="href action_url"
@@ -23,7 +23,7 @@
     <a tal:attributes="href action_url"
        class="noUnderline"
        ><img tal:attributes="src api.urlOf('static/img/configure.png')"
-             width="32" height="32" alt="add issue"/></a>
+             width="32" height="32" alt="configure project"/></a>
     <a tal:attributes="href action_url">configure project</a>
   </li>
 </ul>

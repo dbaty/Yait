@@ -164,7 +164,7 @@
   </ul>
 </div>
 
-<ul id="projectActionsInIssueView">
+<ul id="issueViewActions">
   <li tal:condition="api.hasPermission(u'Participate in project', project)"
       tal:define="action_url api.urlOf('%s/add_issue_form' % project.name)">
     <a tal:attributes="href action_url"
@@ -172,6 +172,13 @@
        ><img tal:attributes="src api.urlOf('static/img/add.png')"
              width="32" height="32" alt="add issue"/></a>
     <a tal:attributes="href action_url">add issue</a>
+  </li>
+  <li tal:define="action_url api.urlOf('%s/search' % project.name)">
+    <a tal:attributes="href action_url"
+       class="noUnderline"
+       ><img tal:attributes="src api.urlOf('static/img/search.png')"
+             width="32" height="32" alt="search issues"/></a>
+    <a tal:attributes="href action_url">search issues</a>
   </li>
   <li tal:condition="api.hasPermission(u'Administer project', project)"
       tal:define="action_url api.urlOf('%s/control_panel' % project.name)">

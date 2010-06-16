@@ -233,6 +233,7 @@ class IssueRelationship(Model):
     kind = Int()
 
 
+## FIXME: rename as Admin (table: 'admins')
 class Manager(Model):
     __storm_table__ = 'managers'
     __storm_primary__ = 'user_id'

@@ -1,7 +1,5 @@
 - automated tests + coverage
 
-- global control panel to define managers and create projects;
-
 - project control panel : configure whether the public
   (customer-oriented) timing information is displayed ('time_billed'
   and 'time_spent_public').
@@ -52,9 +50,7 @@
     seen by the customer. It may be different than the time really
     spent, and relates to the time billed.
 
-- review footer (?). Perhaps we create a toolbar above the #content
-  area with the following buttons: add issue, search, configure
-  project, preferences.
+- review footer (?).
 
 - allow other text formatting syntaxes:
 
@@ -105,7 +101,7 @@
 - protect from CSRF and XSS: check origin of form submission (with an
   hidden token), clean up comments (remove iframe, Javascript, etc.)
 
-- search
+- search form
 
 - e-mail notification
 

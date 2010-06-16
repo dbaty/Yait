@@ -3,6 +3,7 @@
 ************/
 body, h1, h2,
 p, div, ul, ol, li,
+table, tr, th, td,
 form, fieldset, label, input, textarea, select,
 img {
     margin: 0;
@@ -67,6 +68,10 @@ a.noUnderline, a.noUnderline:hover {
     border: 0;
 }
 
+a img {
+    vertical-align: middle;
+}
+
 .hidden {
     display: none;
 }
@@ -118,7 +123,7 @@ a.noUnderline, a.noUnderline:hover {
     margin-top: 1em; /* 1 / font-size */
     padding: 1em; /* font-size */
     font-size: 1em;
-    border-top: 0.1em solid #CCCCCC;
+    border-top: 0.05em solid #CCCCCC;
     background-color: white;
     color: black;
 }
@@ -197,18 +202,12 @@ a.noUnderline, a.noUnderline:hover {
     padding: 0.2em 0 0.2em 1em;
 }
 
-#projectActionsInIssueView {
+#issueViewActions {
     margin-top: 0.5em;
     list-style-type: none;
     text-align: right;
 }
-
-#projectActionsInIssueView li a img {
-    vertical-align: middle;
-}
-
 /***********************************************************/
-
 
 
 /***********************************************************
@@ -244,9 +243,21 @@ div.errorMessage, div.formError {
     margin: 0 auto;
 }
 
+#addProjectForm {
+    width: 36em;
+    margin: 0 auto;
+}
+
 #loginForm {
     width: 17em;
     margin: 0 auto;
+}
+
+form.ninja input {
+    /* A ninja form may be beside you, you would not see it. Beware of the
+       ninja forms! */
+    margin: 0;
+    padding: 0;
 }
 
 fieldset {
@@ -305,6 +316,51 @@ div.formError {
 }
 /***********************************************************/
 
+
+/***********************************************************
+** Tables and listings
+**********************/
+#projectListing {
+    width: 30em;
+    margin: 0 auto;
+}
+
+#adminListing {
+    width: 15em;
+    margin: 0 auto;
+}
+
+table.listing {
+    border-collapse: collapse;
+}
+
+table.listing th {
+    border-bottom: 0.1em solid black;
+    padding: 0.2em;
+}
+
+table.listing tr.odd {
+    background-color: #EEEEEE;
+}
+
+table.listing td {
+    border-bottom: 0.1em inset #CCCCCC;
+    padding: 0.5em;
+    margin: 0;
+}
+
+table.listing td.centered {
+    text-align: center;
+}
+
+table.listing a {
+    border: 0;
+}
+
+table.listing tfoot td {
+    border: 0;
+}
+/***********************************************************/
 
 
 /***********************************************************
@@ -371,21 +427,17 @@ div.formError {
 /***********************************************************
 ** Project view
 ***************/
-#projectActions {
+#actions {
     text-align: center;
 }
 
-#projectActions li {
+#actions li {
     display: inline;
     padding: 5em;
 }
 
-#projectActions li:first-child {
+#actions li:first-child {
     display: inline;
-}
-
-#projectActions li a img {
-    vertical-align: middle;
 }
 /***********************************************************/
 

@@ -78,7 +78,7 @@ def initSqlite(db_string):
         )
     store.execute(
         'CREATE TABLE managers ('
-        'user_id VARCHAR(25)'
+        'user_id VARCHAR(25) PRIMARY KEY'
         ')'
         )
     store.execute(

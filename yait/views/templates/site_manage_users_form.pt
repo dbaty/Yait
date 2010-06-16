@@ -1,0 +1,73 @@
+<layout metal:use-macro="api.layout">
+<metal:html-head metal:fill-slot="html-head">
+  <script type="text/javascript">
+    <tal:comment tal:replace="None">
+      FIXME: I am not too happy to require Javascript to submit a
+      form. We should be able to include the text field in the form
+      without breaking the layout.
+    </tal:comment>
+    function addAdmin(form) {
+      form.admin_id.value = document.getElementById('admin_id_to_add').value;
+      return true;
+    }
+  </script>
+</metal:html-head>
+<metal:header metal:fill-slot="header">
+  &mdash;
+  <a tal:attributes="href api.urlOf('control_panel')">Site control panel</a>
+  &mdash; Manage administrators
+</metal:header>
+<metal:content metal:fill-slot="content">
+
+<table id="adminListing"
+       class="listing">
+  <thead>
+    <tr>
+      <th>User id</th>
+      <th>Delete</th>
+    </tr>
+  </thead>
+  <tfoot>
+    <tr>
+      <td>
+        <input type="text" id="admin_id_to_add" name="admin_id_to_add"/>
+      </td>
+      <td class="centered">
+        <form class="ninja"
+              tal:attributes="action api.urlOf('control_panel/addAdmin')"
+              onsubmit="return addAdmin(this);"
+              method="POST">
+          <input type="hidden" name="admin_id"/>
+          <input type="image" width="32" height="32" alt="add admin"
+                 tal:attributes="src api.urlOf('static/img/add.png')"/>
+        </form>
+      </td>
+    </tr>
+  </tfoot>
+  <tbody>
+    <tr tal:repeat="admin admins"
+        tal:attributes="class repeat['admin'].odd and 'odd' or 'even'">
+      <td>
+        <span tal:replace="admin.user_id"/>
+      </td>
+      <td class="centered">
+        <tal:if tal:condition="admin.user_id == current_user_id">
+          (you)
+        </tal:if>
+        <form tal:condition="admin.user_id != current_user_id"
+              class="ninja"
+              tal:attributes="action api.urlOf('control_panel/deleteAdmin')"
+              onsubmit="return window.confirm('Are you sure?');"
+              method="POST">
+          <input type="hidden" name="admin_id"
+                 tal:attributes="value admin.user_id"/>
+          <input type="image" width="16" height="16" alt="delete admin"
+                 tal:attributes="src api.urlOf('static/img/delete.png')"/>
+        </form>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+</metal:content>
+</layout>

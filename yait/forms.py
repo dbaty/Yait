@@ -27,7 +27,6 @@ from yait.utils import timeToStr
 class TimeInfoField(TextField):
     """A custom text field for time-related information."""
 
-    ## FIXME: cf. also '_value()'
     def process_data(self, value):
         self.data = timeToStr(value or 0)
 
@@ -35,9 +34,9 @@ class TimeInfoField(TextField):
         if value_list:
             try:
                 self.data = strToTime(value_list[0])
-            except:
+            except ValueError:
                 self.data = value_list[0]
-                raise
+                raise ValueError(u'Wrong syntax.')
 
 
 class BaseForm(Form):

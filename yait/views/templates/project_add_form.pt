@@ -2,6 +2,7 @@
 <metal:content metal:fill-slot="content">
 
 <form method="post"
+      id="addProjectForm"
       tal:define="renderField api.form_macros['renderField'];
                   field_options {}"
       tal:attributes="action api.urlOf('addProject')">
@@ -14,7 +15,7 @@
                  metal:use-macro="renderField"/>
 
     <metal:field tal:define="field_name 'title';
-                             field_options dict(size=30)"
+                             field_options dict(size=50)"
                  metal:use-macro="renderField"/>
 
     <div class="formRow">

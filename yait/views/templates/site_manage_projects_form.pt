@@ -1,0 +1,54 @@
+<layout metal:use-macro="api.layout">
+<metal:header metal:fill-slot="header">
+  &mdash;
+  <a tal:attributes="href api.urlOf('control_panel')">Site control panel</a>
+  &mdash; Manage projects
+</metal:header>
+
+<metal:content metal:fill-slot="content">
+
+<table id="projectListing"
+       class="listing">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Title</th>
+      <th>Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr tal:repeat="project projects"
+        tal:attributes="class repeat['project'].odd and 'odd' or 'even'">
+      <td>
+          <a tal:content="project.name"
+             tal:attributes="href api.urlOf(project.name)"/>
+      </td>
+      <td tal:content="project.title"/>
+      <td class="centered">
+        <form class="ninja"
+              tal:attributes="action api.urlOf('control_panel/deleteProject')"
+              onsubmit="return window.confirm('Are you sure?');"
+              method="POST">
+          <input type="hidden" name="project_id"
+                 tal:attributes="value project.id"/>
+          <input type="image" width="16" height="16" alt="delete project"
+                 tal:attributes="src api.urlOf('static/img/delete.png')"/>
+        </form>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<ul id="actions">
+  <li tal:define="action_url api.urlOf('add_project_form')">
+    <a tal:attributes="href action_url"
+       class="noUnderline"
+       ><img tal:attributes="src api.urlOf('static/img/add.png')"
+             width="32" height="32" alt="add a new project"/></a>
+    <a tal:attributes="href action_url">add a new project</a>
+  </li>
+</ul>
+
+</metal:content>
+</layout>
