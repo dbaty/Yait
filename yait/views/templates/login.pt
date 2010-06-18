@@ -10,7 +10,7 @@
   </script>
 </tal:block>
 <tal:block metal:fill-slot="content">
-  
+
   <div tal:condition="'manual' not in api.request.params"
        tal:content="error_msg or 'You must log in to access that page (%s).' % came_from"
        class="errorMessage"/>

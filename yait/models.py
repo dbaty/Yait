@@ -7,7 +7,6 @@ from storm.locals import Pickle
 from storm.locals import Reference
 from storm.locals import ReferenceSet
 from storm.locals import Unicode
-
 from storm.zope.zstorm import global_zstorm
 
 from yait.utils import renderReST

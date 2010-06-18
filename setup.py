@@ -30,6 +30,9 @@ setup(name='Yait',
       install_requires=[
             'repoze.bfg',
             'storm',
+            'repoze.tm2',
+            'repoze.who',
+            'repoze.who-friendlyform',
             'docutils',
             ],
       tests_require=[
