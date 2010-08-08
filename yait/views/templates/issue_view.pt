@@ -2,7 +2,7 @@
 <metal:html-head metal:fill-slot="html-head">
   <script type="text/javascript">
     $(document).ready(function() {
-      pinElement(document.getElementById('meta'));
+      pinMetaPanel();
     });
   </script>
 </metal:html-head>

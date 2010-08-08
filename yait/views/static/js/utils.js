@@ -32,11 +32,24 @@ function togglePreviewPane(url) {
 }
 
 
-// Pin element, i.e. make it fixed, insensible to window scrolling.
-function pinElement(elm) {
-    var top = elm.offsetTop;
-    var left = elm.offsetLeft;
-    elm.style.top = top + 'px';
-    elm.style.left = left + 'px';
-    elm.style.position = 'fixed';
+// Pin the meta information panel, i.e. make it fixed, insensible to
+// window scrolling.
+function pinMetaPanel() {
+    // We want to pin the panel only when needed, i.e. not when it
+    // would overlap the footer.
+    // FIXME: make sure that this is the correct way under IE.
+    if (document.documentElement.clientHeight < document.body.offsetHeight) {
+        var panel = document.getElementById('meta');
+        var top = panel.offsetTop;
+        var left = panel.offsetLeft;
+        panel.style.top = top + 'px';
+        panel.style.left = left + 'px';
+        panel.style.position = 'fixed';
+    }
 }
+
+
+http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/
+http://duplicity.nongnu.org/contrib.html
+https://bugs.launchpad.net/repoze.who.plugins.ldap/+bug/363180/
+http://repoze.org/viewcvs/whoplugins/
