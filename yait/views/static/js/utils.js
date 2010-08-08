@@ -47,9 +47,3 @@ function pinMetaPanel() {
         panel.style.position = 'fixed';
     }
 }
-
-
-http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/
-http://duplicity.nongnu.org/contrib.html
-https://bugs.launchpad.net/repoze.who.plugins.ldap/+bug/363180/
-http://repoze.org/viewcvs/whoplugins/
