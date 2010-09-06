@@ -1,0 +1,8 @@
+=======================
+List of changes in Yait
+=======================
+
+Yait 0.1
+========
+
+First release.

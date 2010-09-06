@@ -3,7 +3,8 @@
 $Id$
 """
 
-from repoze.bfg.chameleon_zpt import get_template
+from repoze.bfg.renderers import get_renderer
+from repoze.bfg.renderers import render_to_response
 
 from yait.models import _getStore
 from yait.models import Manager
@@ -35,9 +36,9 @@ PERMISSIONS_FOR_ROLE = {
     ROLE_PROJECT_VIEWER: (PERM_VIEW_PROJECT, ),
     ROLE_PROJECT_PARTICIPANT: (PERM_VIEW_PROJECT,
                                PERM_PARTICIPATE_IN_PROJECT),
-    ROLE_PROJECT_PARTICIPANT: (PERM_VIEW_PROJECT,
-                               PERM_PARTICIPATE_IN_PROJECT,
-                               PERM_SEE_PRIVATE_TIMING_INFO)}
+    ROLE_PROJECT_INTERNAL_PARTICIPANT: (PERM_VIEW_PROJECT,
+                                        PERM_PARTICIPATE_IN_PROJECT,
+                                        PERM_SEE_PRIVATE_TIMING_INFO)}
 
 
 class TemplateAPI(object):
@@ -48,38 +49,40 @@ class TemplateAPI(object):
         self.request = request
         self.app_url = request.application_url
         self.here_url = request.url
-        self.referrer = request.environ.get('HTTP_REFERER', None)
+        self.referrer = request.environ.get('HTTP_REFERER', '')
         self.header_prefix = HEADER_PREFIX
         self.html_title_prefix = HTML_TITLE_PREFIX
-        referrer = request.headers.get('Referer', '')
-        if referrer.startswith(request.application_url):
+        if self.referrer.startswith(request.application_url):
             self.status_message = request.params.get('status_message', '')
             self.error_message = request.params.get('error_message', '')
         else:
             self.status_message = self.error_message = ''
-        self.layout = get_template('templates/master.pt')
-        self.form_macros = get_template('templates/form_macros.pt').macros
+        self.layout = get_renderer(
+            'templates/master.pt').implementation()
+        self.form_macros = get_renderer(
+            'templates/form_macros.pt').implementation().macros
         self.show_login_link = True
         if self.here_url.split('?')[0].endswith('login_form'):
             self.show_login_link = False
-        self.user_cn = getUserMetadata(request).get('cn', None)
+        self.user_cn = get_user_metadata(request).get('cn', None)
 
-    def urlOf(self, path):
+    def url_of(self, path):
         return '/'.join((self.app_url, path)).strip('/')
 
-    def hasPermission(self, *args, **kwargs):
-        return hasPermission(self.request, *args, **kwargs)
+    def has_permission(self, *args, **kwargs):
+        return has_permission(self.request, *args, **kwargs)
 
 
-def getUserMetadata(request):
+def render(template, **kwargs):
+    ## FIXME: is it faster if we provide the request?
+    return render_to_response(template, value=kwargs)
+
+
+def get_user_metadata(request):
     return request.environ.get('repoze.who.identity', {})
 
 
-def isLoggedIn(request):
-    return request.environ.get('repoze.who.identity') is not None
-
-
-def hasPermission(request, permission, context=None):
+def has_permission(request, permission, context=None):
     """Return whether the current user is granted the given
     ``permission`` in this ``context``.
 
@@ -89,8 +92,14 @@ def hasPermission(request, permission, context=None):
     checked (because other permissions do not make sense outside of
     projects).
     """
-    assert permission in ALL_PERMS, 'Unknown permission: %s' % permission
-    assert context or (permission == PERM_ADMIN_SITE)
+    if permission not in ALL_PERMS:
+        raise ValueError(u'Unknown permission: "%s"' % permission)
+    if not context and permission != PERM_ADMIN_SITE:
+        raise ValueError(
+            u'Wrong permission on a site: "%s"' % permission)
+    if context and permission == PERM_ADMIN_SITE:
+        raise ValueError(
+            u'Wrong permission on a project: "%s"' % permission)
 
     cache_key_admin = '_user_is_site_admin'
     if getattr(request, cache_key_admin, None):
@@ -107,12 +116,10 @@ def hasPermission(request, permission, context=None):
     if context is not None and context.is_public and \
             permission == PERM_VIEW_PROJECT:
         return True
-    if not isLoggedIn(request):
+    if not request.environ.get('repoze.who.identity') is not None:
         return False
 
-    ## FIXME: we should also look for permissions granted to the
-    ## groups the user belongs to.
-    user_id = getUserMetadata(request)['uid']
+    user_id = get_user_metadata(request)['uid']
     user_id = unicode(user_id) ## FIXME: is this not a work around another problem?
     store = _getStore()
 
@@ -120,6 +127,8 @@ def hasPermission(request, permission, context=None):
         user_perms = PERMISSIONS_FOR_ROLE[ROLE_SITE_ADMIN]
         setattr(request, cache_key_admin, True)
     else:
+        ## FIXME: there is a bug here (we should filter on project
+        ## too). Let's leave it until there is a test against it :)
         row = store.find(Role, user_id=user_id).one()
         if row is not None:
             user_perms = PERMISSIONS_FOR_ROLE[Role.role]
@@ -130,7 +139,7 @@ def hasPermission(request, permission, context=None):
     return permission in user_perms
 
 
-def commit_veto(environ, status, headers):
+def rollback_transaction(environ, status, headers):
     """Returns whether the transaction machinery should cancel the
     transaction.
 

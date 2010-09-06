@@ -19,7 +19,7 @@ from yait.models import Change
 from yait.models import Issue
 from yait.models import Project
 from yait.utils import renderReST
-from yait.views.utils import hasPermission
+from yait.views.utils import has_permission
 from yait.views.utils import PERM_PARTICIPATE_IN_PROJECT
 from yait.views.utils import PERM_VIEW_PROJECT
 from yait.views.utils import PERM_SEE_PRIVATE_TIMING_INFO
@@ -29,7 +29,7 @@ from yait.views.utils import TemplateAPI
 def issue_add_form(context, request, form=None):
     store = _getStore()
     project = store.find(Project, name=context.project_name).one()
-    if not hasPermission(request, PERM_PARTICIPATE_IN_PROJECT, project):
+    if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
     if form is None:
@@ -47,7 +47,7 @@ def addIssue(context, request):
 
     store = _getStore()
     project = store.find(Project, name=context.project_name).one()
-    if not hasPermission(request, PERM_PARTICIPATE_IN_PROJECT, project):
+    if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
 
     last_ref = store.execute(
@@ -86,7 +86,7 @@ def issue_view(context, request, form=None):
     project_name = context.project_name
     store = _getStore()
     project = store.find(Project, name=project_name).one()
-    if not hasPermission(request, PERM_VIEW_PROJECT, project):
+    if not has_permission(request, PERM_VIEW_PROJECT, project):
         return HTTPUnauthorized()
 
     issue_ref = int(context.issue_ref)
@@ -116,7 +116,7 @@ def issue_update(context, request):
     project_name = context.project_name
     store = _getStore()
     project = store.find(Project, name=project_name).one()
-    if not hasPermission(request, PERM_PARTICIPATE_IN_PROJECT, project):
+    if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
 
     issue_ref = int(context.issue_ref)
@@ -156,7 +156,7 @@ def issue_update(context, request):
                     date=now,
                     text=form.text.data)
     if form.time_spent_real.data and \
-            hasPermission(request, PERM_SEE_PRIVATE_TIMING_INFO, project):
+            has_permission(request, PERM_SEE_PRIVATE_TIMING_INFO, project):
         change.time_spent_real = form.time_spent_real.data
         changes['time_spent_real'] = (None, change.time_spent_real)
     if form.time_spent_public.data:

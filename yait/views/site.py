@@ -13,8 +13,8 @@ from repoze.bfg.chameleon_zpt import render_template_to_response
 from yait.models import _getStore
 from yait.models import Manager
 from yait.models import Project
-from yait.views.utils import getUserMetadata
-from yait.views.utils import hasPermission
+from yait.views.utils import get_user_metadata
+from yait.views.utils import has_permission
 from yait.views.utils import PERM_ADMIN_SITE
 from yait.views.utils import TemplateAPI
 
@@ -34,7 +34,7 @@ def site_index(context, request):
 
 
 def control_panel(context, request):
-    if not hasPermission(request, PERM_ADMIN_SITE):
+    if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
     return render_template_to_response('templates/site_control_panel.pt',
@@ -43,20 +43,21 @@ def control_panel(context, request):
 
 ## FIXME: rename as 'manage_admins_form'
 def manage_users_form(context, request):
-    if not hasPermission(request, PERM_ADMIN_SITE):
+    if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     store = _getStore()
     admins = store.find(Manager)
     api = TemplateAPI(context, request)
-    user_id = getUserMetadata(request).get('uid', None)
+    user_id = get_user_metadata(request).get('uid', None)
     return render_template_to_response('templates/site_manage_users_form.pt',
                                        api=api,
                                        current_user_id=user_id,
                                        admins=admins)
 
 
+## FIXME: rename as 'add_admin()'
 def addAdmin(context, request):
-    if not hasPermission(request, PERM_ADMIN_SITE):
+    if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     admin_id = request.POST.get('admin_id')
     ## FIXME: check that admin_id exists in the user source.
@@ -74,8 +75,9 @@ def addAdmin(context, request):
     return HTTPFound(location=url)
     
 
+## FIXME: rename as 'delete_admin()'
 def deleteAdmin(context, request):
-    if not hasPermission(request, PERM_ADMIN_SITE):
+    if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     admin_id = request.POST.get('admin_id')
     store = _getStore()
@@ -88,7 +90,7 @@ def deleteAdmin(context, request):
     
 
 def manage_projects_form(context, request):
-    if not hasPermission(request, PERM_ADMIN_SITE):
+    if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     store = _getStore()
     projects = store.find(Project).order_by(Project.name)
@@ -98,8 +100,9 @@ def manage_projects_form(context, request):
                                        projects=projects)
 
 
+## FIXME: rename as 'delete_projects()'
 def deleteProject(context, request):
-    if not hasPermission(request, PERM_ADMIN_SITE):
+    if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     project_id = int(request.POST.get('project_id'))
     store = _getStore()

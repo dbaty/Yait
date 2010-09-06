@@ -1,3 +1,10 @@
+- switch to SQLAlchemy?
+
+- replace 'chameleon_zpt.render_template_to_response()' by
+  'renderers.render_to_response()'
+
+- pep8 naming
+
 - automated tests + coverage
 
 - project control panel : configure whether the public
@@ -37,14 +44,14 @@
 - document time-related details:
 
   - estimated time (internal): the time you think you are going to
-    spend on this issue. This value is private and not shown to the
+    spend on this issue. This value is private and is not shown to the
     customer;
 
   - time billed: the time the customer is going to be billed. It may
     be equal to the estimated time, but could as well be less or more,
     depending on the context;
 
-  - time spent (real): the time you have truly spent on this issue;
+  - time spent (real): the time you have really spent on this issue;
 
   - time spent (public): the time spent on this issue as it should be
     seen by the customer. It may be different than the time really
@@ -128,6 +135,8 @@
 
 - add a "Component/category" field (à la Jira)
 
+- add tags (instead of component/category?)
+
 - show priority and deadline in different colors: orange if imminent,
   red if past.
 
@@ -135,3 +144,5 @@
   http://stackoverflow.com/questions/264216/getjson-returning-cached-data-in-ie8
 
 - handle LDAP groups;
+
+- user guide

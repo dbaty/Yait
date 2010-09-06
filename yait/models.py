@@ -122,6 +122,9 @@ class Issue(Model):
         The ReferenceSet provided by Storm does not cache results.
         Thus, multiple calls to ``self.changes`` imply multiple SELECT
         calls.
+
+        FIXME: this will not be necessary with SQLAlchemy, where we
+        can use 'joinedload', cf. file:///Users/damien/data/docs/sqlalchemy/0.6.3/mappers.html#mapper-loader-strategies
         """
         if getattr(self, '_cached_changes', None) is None:
             self._cached_changes = list(self.changes)
@@ -232,7 +235,7 @@ class IssueRelationship(Model):
     kind = Int()
 
 
-## FIXME: rename as Admin (table: 'admins')
+## FIXME: rename as Admin (table: 'admins'). UPDATE: really?
 class Manager(Model):
     __storm_table__ = 'managers'
     __storm_primary__ = 'user_id'
@@ -244,4 +247,4 @@ class Role(Model):
     __storm_primary__ = ('user_id', 'project_id')
     user_id = Unicode()
     project_id = Int()
-    roles = Int()
+    role = Int()
