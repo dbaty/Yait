@@ -124,6 +124,7 @@ class TestTemplateAPI(TestCase):
         res = api.has_permission(*args)
         self.assertEqual(res, (request, args))
 
+
 class TestGetUserMetadata(TestCase):
 
     def _callFUT(self, *args, **kwargs):
@@ -189,6 +190,13 @@ class TestHasPermission(TestCase):
         self.assertRaises(
             ValueError, self._callFUT,
             request=None, permission=PERM_ADMIN_PROJECT, context=None)
+
+    def test_invalid_permission_on_project(self):
+        from yait.views.utils import PERM_ADMIN_SITE
+        project = self._makeProject()
+        self.assertRaises(
+            ValueError, self._callFUT,
+            request=None, permission=PERM_ADMIN_SITE, context=project)
 
     def test_view_permission_on_public_project_for_anonymous(self):
         from yait.views.utils import PERM_VIEW_PROJECT
@@ -321,8 +329,17 @@ class TestHasPermission(TestCase):
                 admin_project=False))
 
     def test_cache_site_permissions(self):
-        pass ## FIXME: call has_permission once, then grant or revoke
-             ## the role in the DB, then try has_permission again
+        from yait.models import Role
+        from yait.views.utils import PERM_ADMIN_PROJECT
+        from yait.views.utils import ROLE_PROJECT_ADMIN
+        project = self._makeProject()
+        user_id = u'user1'
+        self._makeUser(user_id, roles={project: ROLE_PROJECT_ADMIN})
+        request = self._makeRequest(user_id=user_id)
+        self.assert_(self._callFUT(request, PERM_ADMIN_PROJECT, project))
+        role = self.session.query(Role).one()
+        self.session.delete(role)
+        self.assert_(self._callFUT(request, PERM_ADMIN_PROJECT, project))
 
     def test_cache_project_permissions(self):
         pass ## FIXME: call has_permission once, then grant or revoke

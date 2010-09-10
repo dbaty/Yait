@@ -119,10 +119,10 @@ def has_permission(request, permission, context=None):
     if context is not None and context.is_public and \
             permission == PERM_VIEW_PROJECT:
         return True
-    if not request.environ.get('repoze.who.identity') is not None:
+    user_id = get_user_metadata(request).get('uid', None)
+    if not user_id:
         return False
 
-    user_id = get_user_metadata(request)['uid']
     user_id = unicode(user_id) ## FIXME: is this not a work around another problem?
     session = DBSession()
 
