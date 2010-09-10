@@ -89,7 +89,7 @@ def time_to_str(t):
     return s
 
 
-def strToDate(s, format='dd/mm/yyyy'): ## FIXME: is it used anywhere?
+def str_to_date(s, format='dd/mm/yyyy'): ## FIXME: is it used anywhere?
     """Convert a string to the date it respresents.
 
     Only one format is available: ``dd/mm/yyyy``.
@@ -117,7 +117,7 @@ def strToDate(s, format='dd/mm/yyyy'): ## FIXME: is it used anywhere?
 def render_ReST(text):
     """Render the given ``text`` through the reStructuredText engine.
 
-    >>> renderReST('this is **bold**')
+    >>> render_ReST('this is **bold**')
     u'<p>this is <strong>bold</strong></p>'
     """
     writer = Writer()

@@ -10,6 +10,7 @@ from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.renderers import render_to_response
 
+from yait.models import Admin
 from yait.models import DBSession
 from yait.models import Project
 from yait.models import Role
@@ -54,28 +55,28 @@ def manage_admins_form(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     session = DBSession()
-    admins = session.query(Manager).order_by(Manager.user_id)
+    admins = session.query(Admin).order_by(Admin.user_id).all()
     api = TemplateAPI(context, request)
     user_id = get_user_metadata(request)['uid']
     return render_to_response('templates/site_manage_admins_form.pt',
                               dict(api=api,
-                              current_user_id=user_id,
-                              admins=admins))
+                                   current_user_id=user_id,
+                                   admins=admins))
 
 
 def add_admin(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
-    admin_id = request.POST.get('admin_id')
+    admin_id = request.POST['admin_id']
     ## FIXME: check that admin_id exists in the user source.
-    store = _getStore()
-    if store.find(Manager, user_id=admin_id).count():
+    session = DBSession()
+    if session.query(Admin).filter_by(user_id=admin_id).count():
         msg = quote_plus(u'User "%s" is already an administrator.' % admin_id)
         url = '%s/control_panel/manage_users_form?error_message=%s' % (
             request.application_url, msg)
         return HTTPFound(location=url)
-    admin = Manager(user_id=admin_id)
-    store.add(admin)
+    admin = Admin(user_id=admin_id)
+    session.add(admin)
     msg = quote_plus(u'User "%s" is now an administrator.' % admin_id)
     url = '%s/control_panel/manage_users_form?status_message=%s' % (
         request.application_url, msg)
@@ -85,10 +86,15 @@ def add_admin(context, request):
 def delete_admin(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
-    admin_id = request.POST.get('admin_id')
-    store = _getStore()
-    admin = store.find(Manager, user_id=admin_id).one()
-    store.remove(admin)
+    admin_id = request.POST['admin_id']
+    if admin_id == get_user_metadata(request)['uid']:
+        msg = quote_plus(u'You cannot remove yourself. Hopefully.')
+        url = '%s/control_panel/manage_users_form?error_message=%s' % (
+            request.application_url, msg)
+        return HTTPFound(location=url)
+    session = DBSession()
+    admin = session.query(Admin).filter_by(user_id=admin_id).one()
+    session.delete(admin)
     msg = quote_plus(u'User "%s" is not an administrator anymore.' % admin_id)
     url = '%s/control_panel/manage_users_form?status_message=%s' % (
         request.application_url, msg)

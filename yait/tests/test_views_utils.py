@@ -80,18 +80,30 @@ class TestTemplateAPI(TestCase):
         api = self._makeOne(request=request)
         self.assert_(not api.show_login_link)
 
-    def test_user_cn_anonymous(self):
+    def test_user_related_anonymous(self):
         api = self._makeOne()
+        self.assert_(not api.logged_in)
         self.assertEqual(api.user_cn, None)
 
-    def test_user_cn_logged_in(self):
+    def test_user_related_logged_in(self):
         from repoze.bfg.testing import DummyRequest
         request = DummyRequest(
             environ={'repoze.who.identity':
                          dict(uid=u'john.smith',
                               cn=u'John Smith')})
         api = self._makeOne(request=request)
+        self.assert_(api.logged_in)
         self.assertEqual(api.user_cn, u'John Smith')
+
+    def test_user_related_no_cn(self):
+        from repoze.bfg.testing import DummyRequest
+        request = DummyRequest(
+            environ={'repoze.who.identity':
+                         dict(uid=u'john.smith',
+                              cn=u'')})
+        api = self._makeOne(request=request)
+        self.assert_(api.logged_in)
+        self.assertEqual(api.user_cn, u'john.smith')
 
     def test_misc_attributes(self):
         from repoze.bfg.testing import DummyRequest        
@@ -134,7 +146,7 @@ class TestGetUserMetadata(TestCase):
     def test_anonymous(self):
         from repoze.bfg.testing import DummyRequest
         request = DummyRequest()
-        self.assertEqual(self._callFUT(request), {})
+        self.assertEqual(self._callFUT(request), None)
 
     def test_authenticated(self):
         from repoze.bfg.testing import DummyRequest

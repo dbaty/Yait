@@ -66,9 +66,6 @@ class TemplateAPI(object):
         self.show_login_link = True
         if self.here_url.split('?')[0].endswith('login_form'):
             self.show_login_link = False
-        ## FIXME: we test on self.user_cn in templates, that's
-        ## wrong. We should have a logged_in attribute. And user_cn
-        ## should be the cn or the id (if no cn is available).
         md = get_user_metadata(request)
         self.logged_in = md is not None
         self.user_cn = None
@@ -110,7 +107,7 @@ def has_permission(request, permission, context=None):
         return True
 
     if context is None:
-        cache_key = '_user_site_perms' ## will never be read, actually
+        cache_key = '_user_site_perms'
     else:
         cache_key = '_user_perms_%s' % context.name
     if getattr(request, cache_key, None) is not None:
@@ -124,9 +121,7 @@ def has_permission(request, permission, context=None):
     if not user_id:
         return False
 
-    user_id = unicode(user_id) ## FIXME: is this not a work around another problem?
     session = DBSession()
-
     user_perms = ()
     if session.query(Admin).filter_by(user_id=user_id).first():
         user_perms = PERMISSIONS_FOR_ROLE[ROLE_SITE_ADMIN]

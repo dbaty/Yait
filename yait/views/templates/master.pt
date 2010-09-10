@@ -35,21 +35,18 @@
       Powered by <a href="http://code.noherring.com/yait" target="_blank">Yait</a>
     </div>
     <ul id="footerActions">
-      <li tal:condition="not api.user_cn and api.show_login_link">
+      <li tal:condition="not api.logged_in and api.show_login_link">
         <a tal:attributes="href api.url_of('login_form?manual=1')">log in</a>
       </li>
-      <li tal:condition="api.user_cn">
+      <li tal:condition="api.logged_in">
         <span tal:replace="api.user_cn"/>
         (<a tal:attributes="href api.url_of('logout')">log out</a>)
       </li>
-      <li tal:condition="api.user_cn">
+      <li tal:condition="api.logged_in">
         <a tal:attributes="href api.url_of('preferences')">preferences</a>
       </li>
       <li tal:condition="api.has_permission(u'Administer site')">
         <a tal:attributes="href api.url_of('control_panel')">site control panel</a>
-      </li>
-      <li tal:condition="api.user_cn">
-        
       </li>
     </ul>
   </div>

@@ -37,16 +37,18 @@ class TestCaseForViews(TestCase):
         from repoze.bfg.testing import DummyModel
         return DummyModel()
 
-    def _makeRequest(self, user_id=None):
+    def _makeRequest(self, user_id=None, params=None):
         from repoze.bfg.testing import DummyRequest
         environ = {}
         if user_id is not None:
             environ['repoze.who.identity'] = dict(uid=user_id)
-        return DummyRequest(environ=environ)
+        return DummyRequest(environ=environ, params=params)
 
     def _makeSiteAdmin(self, user_id):
         from yait.models import Admin
-        self.session.add(Admin(user_id=user_id))
+        a = Admin(user_id=user_id)
+        self.session.add(a)
+        return a
 
     def _makeUser(self, user_id, roles=None):
         from yait.models import Role
