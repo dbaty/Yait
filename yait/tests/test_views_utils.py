@@ -329,6 +329,17 @@ class TestHasPermission(TestCase):
                 admin_project=False))
 
     def test_cache_site_permissions(self):
+        from yait.models import Admin
+        from yait.views.utils import PERM_ADMIN_SITE
+        user_id = u'admin'
+        self._makeSiteAdmin(user_id)
+        request = self._makeRequest(user_id=user_id)
+        self.assert_(self._callFUT(request, PERM_ADMIN_SITE))
+        role = self.session.query(Admin).one()
+        self.session.delete(role)
+        self.assert_(self._callFUT(request, PERM_ADMIN_SITE, None))
+
+    def test_cache_project_permissions(self):
         from yait.models import Role
         from yait.views.utils import PERM_ADMIN_PROJECT
         from yait.views.utils import ROLE_PROJECT_ADMIN
@@ -340,10 +351,6 @@ class TestHasPermission(TestCase):
         role = self.session.query(Role).one()
         self.session.delete(role)
         self.assert_(self._callFUT(request, PERM_ADMIN_PROJECT, project))
-
-    def test_cache_project_permissions(self):
-        pass ## FIXME: call has_permission once, then grant or revoke
-             ## the role in the DB, then try has_permission again
 
 
 class TestRollbackTransaction(TestCase):
