@@ -6,8 +6,8 @@ $Id$
 from urllib import quote_plus
 
 from webob.exc import HTTPFound
-from repoze.bfg.chameleon_zpt import render_template_to_response
 
+from yait.views.utils import render_to_response
 from yait.views.utils import TemplateAPI
 
 
@@ -18,11 +18,11 @@ def login_form(context, request):
     error_msg = None
     if login_counter != 0:
         error_msg = 'Wrong user name or password.'
-    return render_template_to_response('templates/login.pt',
-                                       api=api,
-                                       came_from=came_from,
-                                       error_msg=error_msg,
-                                       login_counter=login_counter)
+    return render_to_response('templates/login.pt',
+                              api=api,
+                              came_from=came_from,
+                              error_msg=error_msg,
+                              login_counter=login_counter)
 
 
 def post_login(request):

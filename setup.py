@@ -29,7 +29,7 @@ setup(name='Yait',
       zip_safe=False,
       install_requires=[
             'repoze.bfg',
-            'storm',
+            'SQLAlchemy',
             'repoze.tm2',
             'repoze.who',
             'repoze.who-friendlyform',

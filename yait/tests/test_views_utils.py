@@ -145,10 +145,11 @@ class TestGetUserMetadata(TestCase):
 class TestHasPermission(TestCase):
 
     def setUp(self):
-        pass ## FIXME: need anything here?
+        from yait.tests.base import getTestingDBSession
+        self.session = getTestingDBSession()
 
     def tearDown(self):
-        pass ## FIXME: need anything here?
+        self.session.remove()
 
     def _callFUT(self, *args, **kwargs):
         from yait.views.utils import has_permission
@@ -160,18 +161,23 @@ class TestHasPermission(TestCase):
         return DummyRequest(environ=environ)
 
     def _makeProject(self, public=False):
-        from yait.models import _getStore
         from yait.models import Project
-        store = _getStore()
         p = Project(name=u'name', title=u'title', is_public=public)
-        store.add(p)
+        self.session.add(p)
+        self.session.flush() # need to flush to have an id
         return p
 
     def _makeSiteAdmin(self, user_id):
-        from yait.models import _getStore
-        from yait.models import Manager
-        store = _getStore()
-        store.add(Manager(user_id=user_id))
+        from yait.models import Admin
+        self.session.add(Admin(user_id=user_id))
+
+    def _makeUser(self, user_id, roles=None):
+        from yait.models import Role
+        if roles is None:
+            roles = {}
+        for project, role in roles.items():
+            r = Role(user_id=user_id, project_id=project.id, role=role)
+            self.session.add(r)
 
     def test_unknown_permission(self):
         self.assertRaises(
@@ -205,22 +211,24 @@ class TestHasPermission(TestCase):
         self.assert_(
             not self._callFUT(request, PERM_VIEW_PROJECT, project))
 
-    def test_site_permission_for_site_manager(self):
+    def test_site_permission_for_site_admin(self):
         from yait.views.utils import PERM_ADMIN_SITE
         request = self._makeRequest(user_id=u'site_admin')
         self._makeSiteAdmin(u'site_admin')
         self.assert_(
             self._callFUT(request, PERM_ADMIN_SITE))
 
-    def _test_role(self, user_id, project, **expected):
+    def _test_role(self, user_id, project, expected):
         ## An helper method for all 'test_role_*()' below
-        from yait.views.utils import ALL_PERMS
         from yait.views.utils import PERM_VIEW_PROJECT
         from yait.views.utils import PERM_PARTICIPATE_IN_PROJECT
         from yait.views.utils import PERM_SEE_PRIVATE_TIMING_INFO
         from yait.views.utils import PERM_ADMIN_PROJECT
-        missing_perms = set(ALL_PERMS).difference(expected.keys())
-        assert not missing_perms, 'Some permissions are not tested!'
+        missing_perms = set(
+            ['view', 'participate', 'see_timing', 'admin_project']
+            ).difference(expected.keys())
+        assert not missing_perms, \
+            'The following permissions are not tested: %s' % missing_perms
         request = self._makeRequest(user_id=user_id)
         for key, permission in dict(
             view=PERM_VIEW_PROJECT,
@@ -232,8 +240,10 @@ class TestHasPermission(TestCase):
                 self._callFUT(request, permission, project), allowed)
 
     def test_role_site_admin(self):
-        self._makeSiteAdmin(u'admin')
-        self._test_role(u'admin', None, dict(
+        project = self._makeProject()
+        user_id = u'admin'
+        self._makeSiteAdmin(user_id)
+        self._test_role(user_id, project, dict(
                 view=True,
                 participate=True,
                 see_timing=True,
@@ -242,7 +252,7 @@ class TestHasPermission(TestCase):
     def test_role_project_admin(self):
         from yait.views.utils import ROLE_PROJECT_ADMIN
         project = self._makeProject()
-        user_id = u'user1'
+        user_id = u'project_admin'
         self._makeUser(user_id, roles={project: ROLE_PROJECT_ADMIN})
         self._test_role(user_id, project, dict(
                 view=True,
@@ -253,7 +263,7 @@ class TestHasPermission(TestCase):
     def test_role_project_internal_participant(self):
         from yait.views.utils import ROLE_PROJECT_INTERNAL_PARTICIPANT
         project = self._makeProject()
-        user_id = u'user1'
+        user_id = u'internal_participant'
         self._makeUser(user_id, roles={
                 project: ROLE_PROJECT_INTERNAL_PARTICIPANT})
         self._test_role(user_id, project, dict(
@@ -265,7 +275,7 @@ class TestHasPermission(TestCase):
     def test_role_project_participant(self):
         from yait.views.utils import ROLE_PROJECT_PARTICIPANT
         project = self._makeProject()
-        user_id = u'user1'
+        user_id = u'participant'
         self._makeUser(user_id, roles={
                 project: ROLE_PROJECT_PARTICIPANT})
         self._test_role(user_id, project, dict(
@@ -277,7 +287,7 @@ class TestHasPermission(TestCase):
     def test_role_project_viewer(self):
         from yait.views.utils import ROLE_PROJECT_VIEWER
         project = self._makeProject()
-        user_id = u'user1'
+        user_id = u'project_viewer'
         self._makeUser(user_id, roles={
                 project: ROLE_PROJECT_VIEWER})
         self._test_role(user_id, project, dict(
@@ -288,7 +298,7 @@ class TestHasPermission(TestCase):
 
     def test_no_role(self):
         project = self._makeProject()
-        user_id = u'user1'
+        user_id = u'no_role'
         self._makeUser(user_id)
         self._test_role(user_id, project, dict(
                 view=False,

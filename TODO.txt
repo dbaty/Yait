@@ -1,4 +1,15 @@
-- switch to SQLAlchemy?
+- switch to SQLAlchemy
+
+- switch to repoze.who 2
+
+- move to distribute
+
+- PEP 8 naming
+
+- find a new name: obal, peri, prao, aster, etc.
+
+- find (or write a tool) that runs tests, logs all SQL queries and
+  runs EXPLAIN (or something similar) on each query.
 
 - replace 'chameleon_zpt.render_template_to_response()' by
   'renderers.render_to_response()'

@@ -10,7 +10,7 @@ from wtforms.validators import required
 from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput
 
-from yait.models import _getStore
+from yait.models import DBSession
 from yait.models import DEFAULT_ISSUE_KIND
 from yait.models import DEFAULT_ISSUE_PRIORITY
 from yait.models import DEFAULT_ISSUE_STATUS
@@ -56,8 +56,8 @@ class AddProject(BaseForm):
         'anonymous users.')
 
     def validate_name(self, field):
-        store = _getStore()
-        if store.find(Project, name=field.data).one():
+        session = DBSession()
+        if session.query(Project).filter_by(name=field.data).all():
             raise ValidationError(u'This name is not available.')
         ## FIXME: check that the name contains only alphanumerical
         ## characters, underscores and dashes.

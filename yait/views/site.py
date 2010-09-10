@@ -10,8 +10,8 @@ from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
-from yait.models import _getStore
-from yait.models import Manager
+from yait.models import Admin
+from yait.models import DBSession
 from yait.models import Project
 from yait.views.utils import get_user_metadata
 from yait.views.utils import has_permission

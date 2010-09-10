@@ -14,8 +14,8 @@ from storm.locals import AutoReload
 
 from yait.forms import AddChange
 from yait.forms import AddIssue
-from yait.models import _getStore
 from yait.models import Change
+from yait.models import DBSession
 from yait.models import Issue
 from yait.models import Project
 from yait.utils import renderReST
@@ -27,8 +27,8 @@ from yait.views.utils import TemplateAPI
 
 
 def issue_add_form(context, request, form=None):
-    store = _getStore()
-    project = store.find(Project, name=context.project_name).one()
+    session = DBSession()
+    project = session.query(Project).filter_by(name=context.project_name).one()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
@@ -45,12 +45,12 @@ def addIssue(context, request):
     if not form.validate():
         return issue_add_form(context, request, form)
 
-    store = _getStore()
-    project = store.find(Project, name=context.project_name).one()
+    session = DBSession()
+    project = session.query(Project).filter_by(name=context.project_name).one()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
 
-    last_ref = store.execute(
+    last_ref = session.execute(
         'SELECT MAX(ref) FROM issues '
         'WHERE project_id=%d' % project.id).get_one()[0]
     if last_ref is None:
@@ -69,14 +69,14 @@ def addIssue(context, request):
                   reporter=reporter,
                   ref=ref)
     form.populate_obj(issue)
-    store.add(issue)
+    session.add(issue)
     issue.id = AutoReload
     change = Change(issue_id=issue.id,
                     author=reporter,
                     date=now,
                     changes={})
     form.populate_obj(change)
-    store.add(change)
+    session.add(change)
     url = '%s/%s/%d' % (
         request.application_url, project.name, issue.ref)
     return HTTPFound(location=url)
@@ -84,14 +84,14 @@ def addIssue(context, request):
 
 def issue_view(context, request, form=None):
     project_name = context.project_name
-    store = _getStore()
-    project = store.find(Project, name=project_name).one()
+    session = DBSession()
+    project = session.query(Project).filter_by(name=project_name).one()
     if not has_permission(request, PERM_VIEW_PROJECT, project):
         return HTTPUnauthorized()
 
     issue_ref = int(context.issue_ref)
-    issue = store.find(
-        Issue, project_id=project.id, ref=issue_ref).one()
+    issue = session.query(Issue).filter_by(
+        project_id=project.id, ref=issue_ref).one()
     if form is None:
         form = AddChange(assignee=issue.assignee,
                          children=issue.getChildren(),
@@ -114,14 +114,14 @@ def issue_view(context, request, form=None):
 
 def issue_update(context, request):
     project_name = context.project_name
-    store = _getStore()
-    project = store.find(Project, name=project_name).one()
+    session = DBSession()
+    project = session.query(Project).filter_by(name=project_name).one()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
 
     issue_ref = int(context.issue_ref)
-    issue = store.find(
-        Issue, project_id=project.id, ref=issue_ref).one()
+    issue = session.query(Issue).filter_by(
+        project_id=project.id, ref=issue_ref).one()
     userid = u'damien.baty' ## FIXME
 
     form = AddChange(request.POST)
@@ -170,7 +170,7 @@ def issue_update(context, request):
         raise NotImplementedError
 
     change.changes = changes
-    store.add(change)
+    session.add(change)
     change.id = AutoReload
     url = '%s/%s/%d?issue_updated=1#issue_updated' % (
         request.application_url, project.name, issue.ref)

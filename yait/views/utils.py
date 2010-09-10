@@ -6,8 +6,10 @@ $Id$
 from repoze.bfg.renderers import get_renderer
 from repoze.bfg.renderers import render_to_response
 
-from yait.models import _getStore
-from yait.models import Manager
+from sqlalchemy.orm.exc import NoResultFound
+
+from yait.models import Admin
+from yait.models import DBSession
 from yait.models import Role
 
 
@@ -31,14 +33,15 @@ ROLE_PROJECT_INTERNAL_PARTICIPANT = 4
 PERMISSIONS_FOR_ROLE = {
     ROLE_SITE_ADMIN: ALL_PERMS,
     ROLE_PROJECT_ADMIN: (PERM_ADMIN_PROJECT,
-                         PERM_VIEW_PROJECT, PERM_PARTICIPATE_IN_PROJECT,
-                         PERM_SEE_PRIVATE_TIMING_INFO),
-    ROLE_PROJECT_VIEWER: (PERM_VIEW_PROJECT, ),
-    ROLE_PROJECT_PARTICIPANT: (PERM_VIEW_PROJECT,
-                               PERM_PARTICIPATE_IN_PROJECT),
-    ROLE_PROJECT_INTERNAL_PARTICIPANT: (PERM_VIEW_PROJECT,
+                         PERM_SEE_PRIVATE_TIMING_INFO,
+                         PERM_PARTICIPATE_IN_PROJECT,
+                         PERM_VIEW_PROJECT),
+    ROLE_PROJECT_INTERNAL_PARTICIPANT: (PERM_SEE_PRIVATE_TIMING_INFO,
                                         PERM_PARTICIPATE_IN_PROJECT,
-                                        PERM_SEE_PRIVATE_TIMING_INFO)}
+                                        PERM_VIEW_PROJECT),
+    ROLE_PROJECT_PARTICIPANT: (PERM_PARTICIPATE_IN_PROJECT,
+                               PERM_VIEW_PROJECT),
+    ROLE_PROJECT_VIEWER: (PERM_VIEW_PROJECT, )}
 
 
 class TemplateAPI(object):
@@ -121,19 +124,20 @@ def has_permission(request, permission, context=None):
 
     user_id = get_user_metadata(request)['uid']
     user_id = unicode(user_id) ## FIXME: is this not a work around another problem?
-    store = _getStore()
+    session = DBSession()
 
-    if store.find(Manager, user_id=user_id):
+    user_perms = ()
+    if session.query(Admin).filter_by(user_id=user_id).first():
         user_perms = PERMISSIONS_FOR_ROLE[ROLE_SITE_ADMIN]
         setattr(request, cache_key_admin, True)
-    else:
-        ## FIXME: there is a bug here (we should filter on project
-        ## too). Let's leave it until there is a test against it :)
-        row = store.find(Role, user_id=user_id).one()
-        if row is not None:
-            user_perms = PERMISSIONS_FOR_ROLE[Role.role]
+    elif context is not None:
+        try:
+            row = session.query(Role).filter_by(
+                user_id=user_id, project_id=context.id).one()
+        except NoResultFound:
+            pass
         else:
-            user_perms = ()
+            user_perms = PERMISSIONS_FOR_ROLE[row.role]
 
     setattr(request, cache_key, user_perms)
     return permission in user_perms

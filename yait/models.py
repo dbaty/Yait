@@ -1,13 +1,20 @@
-from repoze.bfg.settings import get_settings
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import create_engine
+from sqlalchemy import DateTime
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import MetaData
+from sqlalchemy import PickleType
+from sqlalchemy import String
+from sqlalchemy import Text
+from sqlalchemy import Table
+from sqlalchemy.orm import mapper
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
 
-from storm.locals import Bool
-from storm.locals import DateTime
-from storm.locals import Int
-from storm.locals import Pickle
-from storm.locals import Reference
-from storm.locals import ReferenceSet
-from storm.locals import Unicode
-from storm.zope.zstorm import global_zstorm
+from zope.sqlalchemy import ZopeTransactionExtension
 
 from yait.utils import renderReST
 from yait.utils import timeToStr
@@ -53,47 +60,30 @@ RELATIONSHIP_KINDS = (u'is child of',
                       u'is blocked by')
 
 
-def _getStore():
-    """Return a Storm store."""
-    return global_zstorm.get('main_db', get_settings().db_string)
-
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+metadata = MetaData()
 
 class Model(object):
     def __init__(self, **kwargs):
         for attr, value in kwargs.items():
             setattr(self, attr, value)
 
-
 class Project(Model):
-    __storm_table__ = 'projects'
-    id = Int(primary=True)
-    name = Unicode()
-    title = Unicode()
-    is_public = Bool()
+    pass
+
+## FIXME: shall we use String (VARCHAR) or Text?
+## FIXME: add NOT NULL constraints
+## FIXME: add indexes
+projects_table = Table(
+    'projects',
+    metadata,
+    Column('id', Integer, primary_key=True),
+    Column('name', String),
+    Column('title', String),
+    Column('public', Boolean))
 
 
 class Issue(Model):
-    __storm_table__ = 'issues'
-    id = Int(primary=True)
-    project_id = Int()
-    project = Reference(project_id, Project.id)
-    ref = Int()
-    title = Unicode()
-    reporter = Unicode()
-    assignee = Unicode()
-    kind = Int()
-    priority = Int()
-    status = Unicode()
-    resolution = Unicode() ## FIXME: useful? see also 'setupapp.py'. Yes, it's useful.
-    date_created = DateTime()
-    date_edited = DateTime()
-    date_closed = DateTime()
-    deadline = DateTime()
-    time_estimated = Int()
-    time_billed = Int()
-    ## A 'changes' property is defined below after the 'Change'
-    ## model. Do NOT use directly: use 'getChanges()'
-
     _ordered = (
         ## List of attributes ordered as they should appear in
         ## comments details.
@@ -110,39 +100,25 @@ class Issue(Model):
         ('time_spent_public', 'spent (public)'),
         )
 
-    def getKind(self):
+    def get_kind(self):
         return ISSUE_KIND_LABELS[self.kind - 1]
 
-    def getPriority(self):
+    def get_priority(self):
         return ISSUE_PRIORITY_LABELS[self.priority - 1]
 
-    def getChanges(self):
-        """Return an ordered list of changes.
-
-        The ReferenceSet provided by Storm does not cache results.
-        Thus, multiple calls to ``self.changes`` imply multiple SELECT
-        calls.
-
-        FIXME: this will not be necessary with SQLAlchemy, where we
-        can use 'joinedload', cf. file:///Users/damien/data/docs/sqlalchemy/0.6.3/mappers.html#mapper-loader-strategies
-        """
-        if getattr(self, '_cached_changes', None) is None:
-            self._cached_changes = list(self.changes)
-        return self._cached_changes
-
-    def getParent(self):
+    def get_parent(self):
         pass ## FIXME
 
-    def getChildren(self):
+    def get_children(self):
         pass ## FIXME
 
-    def getBlockedBy(self):
+    def get_blocked_by(self):
         pass ## FIXME
 
-    def getBlocking(self):
+    def get_blocking(self):
         pass ## FIXME
 
-    def getTimeInfo(self, include_private_info):
+    def get_time_info(self, include_private_info):
         """Return a dictionary of time-related information for this
         issue:
 
@@ -166,7 +142,7 @@ class Issue(Model):
         if include_private_info:
             data.update(estimated=self.time_estimated or 0)
             data.update(spent_real=0)
-        for change in self.getChanges():
+        for change in self.changes:
             data['spent_public'] += change.time_spent_public or 0
             if include_private_info:
                 data['spent_real'] += change.time_spent_real or 0
@@ -174,22 +150,38 @@ class Issue(Model):
             data[key] = timeToStr(value)
         return data
 
+issues_table = Table(
+    'issues',
+    metadata,
+    Column('id', Integer, primary_key=True),
+    Column('project_id', Integer, ForeignKey('projects.id')),
+    Column('ref', Integer),
+    Column('title', String),
+    Column('reporter', String),
+    Column('assignee', String),
+    Column('kind', Integer), ## FIXME: could be an Enum
+    Column('priority', Integer), ## FIXME: could be an Enum
+    Column('status', String),
+    ## FIXME: is 'resolution' useful?
+    ## Update 1: Yes, it's useful.
+    ## Update2: ok, perhaps it's useful, but there is no UI
+    ## yet. Proposal: when the user selects the 'close' status, the
+    ## resolution field shows up. Otherwise, it is hidden (and
+    ## ignored in the form controller).
+    Column('resolution', String),
+    Column('date_created', DateTime),
+    Column('date_edited', DateTime),
+    Column('date_closed', DateTime),
+    Column('deadline', DateTime),
+    Column('time_estimated', Integer),
+    Column('time_billed', Integer))
+
 
 class Change(Model):
-    __storm_table__ = 'changes'
-    id = Int(primary=True)
-    issue_id = Int()
-    author = Unicode()
-    date = DateTime()
-    time_spent_real = Int()
-    time_spent_public = Int()
-    text = Unicode()
-    changes = Pickle()
-
-    def getRenderedText(self):
+    def get_rendered_text(self):
         return renderReST(self.text)
 
-    def getDetails(self, include_private_time_info=False):
+    def get_details(self, include_private_time_info=False):
         """Return a list of changes as mappings."""
         details = []
         for attr, label in Issue._ordered:
@@ -224,27 +216,84 @@ class Change(Model):
         return details
 
 
-Issue.changes = ReferenceSet(Issue.id, Change.issue_id, order_by=Change.id)
+changes_table = Table(
+    'changes',
+    metadata,
+    Column('id', Integer, primary_key=True),
+    Column('issue_id', Integer, ForeignKey('issues.id')),
+    Column('author', String),
+    Column('date', DateTime),
+    Column('time_spet_real', Integer),
+    Column('time_spent_public', Integer),
+    Column('text', Text),
+    Column('changes', PickleType(mutable=False))) ## FIXME: I think that we do need it to be mutable. To be checked.
 
 
 class IssueRelationship(Model):
-    __storm_table__ = 'issue_relationships'
-    __storm_primary__ = ('source_id', 'target_id', 'kind')
-    source_id = Int()
-    target_id = Int()
-    kind = Int()
+    pass
+
+issue_relationships_table = Table(
+    'issue_relationships',
+    metadata,
+    Column('source_id', Integer, ForeignKey('issues.id')),
+    Column('target_id', Integer, ForeignKey('issues.id')),
+    Column('kind', Integer)) ## FIXME: could be an Enum
 
 
-## FIXME: rename as Admin (table: 'admins'). UPDATE: really?
-class Manager(Model):
-    __storm_table__ = 'managers'
-    __storm_primary__ = 'user_id'
-    user_id = Unicode()
+class Admin(Model):
+    pass
+
+admins_table = Table(
+    'admins',
+    metadata,
+    Column('user_id', String, primary_key=True))
 
 
 class Role(Model):
-    __storm_table__ = 'roles'
-    __storm_primary__ = ('user_id', 'project_id')
-    user_id = Unicode()
-    project_id = Int()
-    role = Int()
+    pass
+
+roles_table = Table(
+    'roles',
+    metadata,
+    ## FIXME: add a constraint: the triple should be unique.
+    Column('user_id', String),
+    Column('project_id', Integer, ForeignKey('projects.id')),
+    Column('role', Integer)) ## FIXME: could be an Enum
+#####################################################################
+
+
+
+#####################################################################
+## Mappers
+##########
+projects_mapper = mapper(
+    Project, projects_table,
+    properties=dict(
+        issues=relationship(Issue, backref='project'))) ## FIXME: do we need 'backref'
+issues_mapper = mapper(
+    Issue, issues_table,
+    properties=dict(
+        changes=relationship(Change, backref='issue'))) ## FIXME: do we need 'backref'
+changes_mapper = mapper(Change, changes_table)
+issue_relationships_mapper = mapper(
+    IssueRelationship, issue_relationships_table,
+    primary_key=(issue_relationships_table.c.source_id,
+                 issue_relationships_table.c.target_id,
+                 issue_relationships_table.c.kind))
+admins_mapper = mapper(Admin, admins_table)
+roles_mapper = mapper(
+    Role, roles_table,
+    primary_key=(roles_table.c.user_id, roles_table.c.project_id))
+#####################################################################
+
+
+
+#####################################################################
+## Initialization
+#################
+def initialize_sql(db_string, echo=False):
+    engine = create_engine(db_string, echo=echo)
+    DBSession.configure(bind=engine)
+    metadata.bind = engine
+    metadata.create_all(engine)
+    return engine
