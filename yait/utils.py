@@ -16,30 +16,30 @@ TIME_REGEXP = re.compile('(?:(\d+)w)?'
                          ' ?(?:(\d+)d)?'
                          ' ?(?:(\d+)h)?'
                          ' ?(?:(\d+)m)?')
-def strToTime(s):
+def str_to_time(s):
     """Convert a string to a number of minutes.
 
     A day is supposed to have 8 hours. As well, a week has 5 days.
 
-    >>> strToTime('1t')
+    >>> str_to_time('1t')
     Traceback (most recent call last):
     ...
     ValueError: Wrong time format: 1t
-    >>> strToTime('')
+    >>> str_to_time('')
     0
-    >>> strToTime('0')
+    >>> str_to_time('0')
     0
-    >>> strToTime('1m')
+    >>> str_to_time('1m')
     1
-    >>> strToTime('1h 25m')
+    >>> str_to_time('1h 25m')
     85
-    >>> strToTime('1d')
+    >>> str_to_time('1d')
     480
-    >>> strToTime('1d 1h')
+    >>> str_to_time('1d 1h')
     540
-    >>> strToTime('1d 1h 1m')
+    >>> str_to_time('1d 1h 1m')
     541
-    >>> strToTime('1w')
+    >>> str_to_time('1w')
     2400
     """
     if s in (None, '', '0'):
@@ -54,28 +54,28 @@ def strToTime(s):
     return t
 
 
-def timeToStr(t):
+def time_to_str(t):
     """Convert a number of minutes into a human-readable string.
 
-    >>> timeToStr(0)
+    >>> time_to_str(0)
     ''
-    >>> timeToStr(1)
+    >>> time_to_str(1)
     '1m'
-    >>> timeToStr(59)
+    >>> time_to_str(59)
     '59m'
-    >>> timeToStr(60)
+    >>> time_to_str(60)
     '1h'
-    >>> timeToStr(61)
+    >>> time_to_str(61)
     '1h 1m'
-    >>> timeToStr(479)
+    >>> time_to_str(479)
     '7h 59m'
-    >>> timeToStr(480)
+    >>> time_to_str(480)
     '1d'
-    >>> timeToStr(541)
+    >>> time_to_str(541)
     '1d 1h 1m'
-    >>> timeToStr(2399)
+    >>> time_to_str(2399)
     '4d 7h 59m'
-    >>> timeToStr(2401)
+    >>> time_to_str(2401)
     '1w 1m'
     """
     s = ''
@@ -94,14 +94,14 @@ def strToDate(s, format='dd/mm/yyyy'): ## FIXME: is it used anywhere?
 
     Only one format is available: ``dd/mm/yyyy``.
 
-    >>> strToDate('', 'yyyy/dd/mm')
+    >>> str_to_date('', 'yyyy/dd/mm')
     Traceback (most recent call last):
     ...
     ValueError: Unrecognized date format: yyyy/dd/mm
-    >>> strToDate('', 'dd/mm/yyyy') is None
+    >>> str_to_date('', 'dd/mm/yyyy') is None
     True
     >>> from datetime import datetime
-    >>> strToDate('28/07/2011') == datetime(2011, 07, 28)
+    >>> str_to_date('28/07/2011') == datetime(2011, 07, 28)
     True
     """
     if format != 'dd/mm/yyyy':
@@ -114,7 +114,7 @@ def strToDate(s, format='dd/mm/yyyy'): ## FIXME: is it used anywhere?
     return datetime(*components)
 
 
-def renderReST(text):
+def render_ReST(text):
     """Render the given ``text`` through the reStructuredText engine.
 
     >>> renderReST('this is **bold**')

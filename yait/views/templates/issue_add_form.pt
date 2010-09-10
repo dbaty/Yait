@@ -4,7 +4,7 @@
 </metal:title>
 <metal:header metal:fill-slot="header">
   &mdash;
-  <a tal:attributes="href api.urlOf(project.name)" tal:content="project.title"/>
+  <a tal:attributes="href api.url_of(project.name)" tal:content="project.title"/>
 </metal:header>
 
 <metal:content metal:fill-slot="content"
@@ -12,9 +12,9 @@
 
 <form method="post"
       id="addIssueForm"
-      tal:attributes="action api.urlOf('%s/addIssue' % project.name)"
+      tal:attributes="action api.url_of('%s/addIssue' % project.name)"
       tal:define="field_options {};
-                  can_see_private_time_info api.hasPermission(
+                  can_see_private_time_info api.has_permission(
                          u'See private time information', project)">
 
   <fieldset>
@@ -31,7 +31,7 @@
 
   <div class="buttons">
     <button type="submit" class="positive">
-      <img tal:attributes="src api.urlOf('static/img/tick.png')" alt=""/>
+      <img tal:attributes="src api.url_of('static/img/tick.png')" alt=""/>
       Add issue
     </button>
   </div>

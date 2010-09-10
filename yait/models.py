@@ -16,8 +16,8 @@ from sqlalchemy.orm import sessionmaker
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
-from yait.utils import renderReST
-from yait.utils import timeToStr
+from yait.utils import render_ReST
+from yait.utils import time_to_str
 
 
 ## Be careful here if you change these values. The value is supposed
@@ -65,11 +65,21 @@ metadata = MetaData()
 
 class Model(object):
     def __init__(self, **kwargs):
+        ## We check that the attributes we want to initialize are
+        ## indeed columns of the table. It helps avoiding typos.
+        #allowed = dir(self)
         for attr, value in kwargs.items():
+            ## FIXME: 
+            #if attr not in allowed:
+            #    raise AttributeError(
+            #        'Initializing "%s" with the "%s" unknown attribute.' % (
+            #            self.__class__, attr))
             setattr(self, attr, value)
 
 class Project(Model):
-    pass
+
+    def __repr__(self):
+        return '<Project %s (id=%d)>' % (self.name, self.id)
 
 ## FIXME: shall we use String (VARCHAR) or Text?
 ## FIXME: add NOT NULL constraints
@@ -147,7 +157,7 @@ class Issue(Model):
             if include_private_info:
                 data['spent_real'] += change.time_spent_real or 0
         for key, value in data.items():
-            data[key] = timeToStr(value)
+            data[key] = time_to_str(value)
         return data
 
 issues_table = Table(
@@ -179,7 +189,7 @@ issues_table = Table(
 
 class Change(Model):
     def get_rendered_text(self):
-        return renderReST(self.text)
+        return render_ReST(self.text)
 
     def get_details(self, include_private_time_info=False):
         """Return a list of changes as mappings."""
@@ -197,7 +207,7 @@ class Change(Model):
                 before = 'none'
             else:
                 if attr.startswith('time_'):
-                    before = timeToStr(before)
+                    before = time_to_str(before)
                 elif attr == 'kind':
                     before = ISSUE_KIND_LABELS[before - 1]
                 elif attr == 'priority':
@@ -206,7 +216,7 @@ class Change(Model):
                 after = 'none'
             else:
                 if attr.startswith('time_'):
-                    after = timeToStr(after)
+                    after = time_to_str(after)
                 elif attr == 'kind':
                     after = ISSUE_KIND_LABELS[after - 1]
                 elif attr == 'priority':

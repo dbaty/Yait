@@ -7,18 +7,18 @@
 <metal:content metal:fill-slot="content">
 
 <ul id="actions">
-  <li tal:define="action_url api.urlOf('control_panel/manage_projects_form')">
+  <li tal:define="action_url api.url_of('control_panel/manage_projects_form')">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.urlOf('static/img/project.png')"
+       ><img tal:attributes="src api.url_of('static/img/project.png')"
              width="32" height="32" alt="manage projects"/></a>
     <a tal:attributes="href action_url">manage projects</a>
   </li>
   <li class="last"
-      tal:define="action_url api.urlOf('control_panel/manage_users_form')">
+      tal:define="action_url api.url_of('control_panel/manage_users_form')">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.urlOf('static/img/users.png')"
+       ><img tal:attributes="src api.url_of('static/img/users.png')"
              width="32" height="32" alt="manage administrators"/></a>
     <a tal:attributes="href action_url">manage administrators</a>
   </li>

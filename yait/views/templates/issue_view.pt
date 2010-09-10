@@ -12,11 +12,11 @@
 </metal:title>
 <metal:header metal:fill-slot="header">
   &mdash;
-  <a tal:attributes="href api.urlOf(project.name)" tal:content="project.title"/>
+  <a tal:attributes="href api.url_of(project.name)" tal:content="project.title"/>
 </metal:header>
 
 <metal:content metal:fill-slot="content"
-               tal:define="can_see_private_time_info api.hasPermission(
+               tal:define="can_see_private_time_info api.has_permission(
                          u'See private time information', project)">
 
 <div id="content">
@@ -25,7 +25,7 @@
        tal:attributes="href '#change-%d' % changes[-1].id"
        class="scrollToLastComment"
        title="scroll to last comment...">&darr;</a>
-    <a tal:attributes="href api.urlOf('%s/%d' % (project.name, issue.id))"
+    <a tal:attributes="href api.url_of('%s/%d' % (project.name, issue.id))"
        class="permalink" title="issue permalink">#</a>
      #<span tal:replace="issue.ref"/> &mdash;
     <span tal:replace="issue.title"/>
@@ -50,7 +50,7 @@
                    include_private_time_info=can_see_private_time_info)">
         <h2 class="changeHeader"
             tal:attributes="id 'change-%d' % change.id">
-          <a tal:attributes="href api.urlOf('%s/%d#change-%d' % (project.name, issue.id, change.id))"
+          <a tal:attributes="href api.url_of('%s/%d#change-%d' % (project.name, issue.id, change.id))"
              title="comment permalink"
              class="permalink">#</a>
           Update by <span tal:replace="change.author"/>
@@ -76,8 +76,8 @@
   </ol>
 
   <form method="post"
-        tal:condition="api.hasPermission(u'Participate in project', project)"
-        tal:attributes="action api.urlOf(
+        tal:condition="api.has_permission(u'Participate in project', project)"
+        tal:attributes="action api.url_of(
                             '%s/%s/update' % (project.name, issue.ref))"
         tal:define="renderField api.form_macros['renderField'];
                     field_options {}">
@@ -92,7 +92,7 @@
 
     <div class="buttons">
       <button type="submit" class="positive">
-        <img tal:attributes="src api.urlOf('static/img/tick.png')" alt=""/>
+        <img tal:attributes="src api.url_of('static/img/tick.png')" alt=""/>
         Update
       </button>
     </div>
@@ -165,26 +165,26 @@
 </div>
 
 <ul id="issueViewActions">
-  <li tal:condition="api.hasPermission(u'Participate in project', project)"
-      tal:define="action_url api.urlOf('%s/add_issue_form' % project.name)">
+  <li tal:condition="api.has_permission(u'Participate in project', project)"
+      tal:define="action_url api.url_of('%s/add_issue_form' % project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.urlOf('static/img/add.png')"
+       ><img tal:attributes="src api.url_of('static/img/add.png')"
              width="32" height="32" alt="add issue"/></a>
     <a tal:attributes="href action_url">add issue</a>
   </li>
-  <li tal:define="action_url api.urlOf('%s/search' % project.name)">
+  <li tal:define="action_url api.url_of('%s/search' % project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.urlOf('static/img/search.png')"
+       ><img tal:attributes="src api.url_of('static/img/search.png')"
              width="32" height="32" alt="search issues"/></a>
     <a tal:attributes="href action_url">search issues</a>
   </li>
-  <li tal:condition="api.hasPermission(u'Administer project', project)"
-      tal:define="action_url api.urlOf('%s/control_panel' % project.name)">
+  <li tal:condition="api.has_permission(u'Administer project', project)"
+      tal:define="action_url api.url_of('%s/control_panel' % project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.urlOf('static/img/configure.png')"
+       ><img tal:attributes="src api.url_of('static/img/configure.png')"
              width="32" height="32" alt="add issue"/></a>
     <a tal:attributes="href action_url">configure project</a>
   </li>

@@ -18,7 +18,7 @@ from yait.models import Change
 from yait.models import DBSession
 from yait.models import Issue
 from yait.models import Project
-from yait.utils import renderReST
+from yait.utils import render_ReST
 from yait.views.utils import has_permission
 from yait.views.utils import PERM_PARTICIPATE_IN_PROJECT
 from yait.views.utils import PERM_VIEW_PROJECT
@@ -26,7 +26,7 @@ from yait.views.utils import PERM_SEE_PRIVATE_TIMING_INFO
 from yait.views.utils import TemplateAPI
 
 
-def issue_add_form(context, request, form=None):
+def add_issue_form(context, request, form=None):
     session = DBSession()
     project = session.query(Project).filter_by(name=context.project_name).one()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
@@ -40,10 +40,10 @@ def issue_add_form(context, request, form=None):
                                        form=form)
 
 
-def addIssue(context, request):
+def add_issue(context, request):
     form = AddIssue(request.POST)
     if not form.validate():
-        return issue_add_form(context, request, form)
+        return add_issue_form(context, request, form)
 
     session = DBSession()
     project = session.query(Project).filter_by(name=context.project_name).one()
@@ -177,7 +177,7 @@ def issue_update(context, request):
     return HTTPFound(location=url)
 
 
-def ajax_renderReST(context, request):
+def ajax_render_ReST(context, request):
     """Render reStructuredText (called via AJAX)."""
     text = request.params.get('text', '')
-    return dict(rendered=renderReST(text))
+    return dict(rendered=render_ReST(text))

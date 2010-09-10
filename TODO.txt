@@ -1,20 +1,16 @@
-- switch to SQLAlchemy
-
 - switch to repoze.who 2
 
 - move to distribute
 
 - PEP 8 naming
 
-- find a new name: obal, peri, prao, aster, etc.
+- find a new name: obal, peri, prao, aster, noria, etc.
+
+- handle requests to "/robots.txt" (and possibly "/favicon.ico"
+  if/when the laster template is not used)
 
 - find (or write a tool) that runs tests, logs all SQL queries and
-  runs EXPLAIN (or something similar) on each query.
-
-- replace 'chameleon_zpt.render_template_to_response()' by
-  'renderers.render_to_response()'
-
-- pep8 naming
+  runs EXPLAIN (or something similar) on each query. (?)
 
 - automated tests + coverage
 
@@ -37,8 +33,6 @@
 - add auto-complete widget for "assign issue to"
 
 - review layout of the extra fieldset (?)
-
-- check 'commit_veto()'
 
 - profile and optimize:
 
@@ -72,7 +66,7 @@
 
 - allow other text formatting syntaxes:
 
-  - make the syntax configurable (set in a cookie);
+  - make the syntax configurable in the preferences (set in a cookie);
 
   - call the right renderer when previewing;
 
@@ -86,15 +80,14 @@
 - add a way to change the title: quick edit (cf. issue tracker Pilot),
   or when adding a comment
 
-- validate HTML, CSS and Javascript (jslint). Check that using the
-  HTML 5 doctype is not going to be an issue (with IE, particularly).
+- validate HTML, CSS and Javascript (jslint).
 
 - CSS tweaks:
 
   - form errors: add formError in formRow. Cf. postaleo / Dolmen for
     example
 
-- add a way to delete an issue. Actually, it does not remove
+- add a way to delete an issue. Actually, it should not remove
   anything. It toggles the "deleted" marker in the Issue model and add
   a change. The view page is specific and only indicates that this
   issue has been deleted, the author of the deletion and the
@@ -111,13 +104,12 @@
 
 - attachments
 
-- "paster setup-app <file.ini>" could be used to initialize the
-  database
-
 - optimize database
 
 - protect from CSRF and XSS: check origin of form submission (with an
-  hidden token), clean up comments (remove iframe, Javascript, etc.)
+  hidden token);
+
+- clean up comments (remove iframe, Javascript, etc.)
 
 - search form
 
@@ -142,11 +134,12 @@
 
 - add favicon
 
-- check "api.urlOf()" when the URL looks like: domain.com/foo/yait
+- check "api.url_of()" when the URL looks like: domain.com/foo/yait
 
-- add a "Component/category" field (à la Jira)
+- add a "Component/category" field (à la Jira). Do we need that if we
+  have tags?
 
-- add tags (instead of component/category?)
+- add tags
 
 - show priority and deadline in different colors: orange if imminent,
   red if past.

@@ -4,7 +4,6 @@ $Id$
 """
 
 from repoze.bfg.renderers import get_renderer
-from repoze.bfg.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -67,7 +66,14 @@ class TemplateAPI(object):
         self.show_login_link = True
         if self.here_url.split('?')[0].endswith('login_form'):
             self.show_login_link = False
-        self.user_cn = get_user_metadata(request).get('cn', None)
+        ## FIXME: we test on self.user_cn in templates, that's
+        ## wrong. We should have a logged_in attribute. And user_cn
+        ## should be the cn or the id (if no cn is available).
+        md = get_user_metadata(request)
+        self.logged_in = md is not None
+        self.user_cn = None
+        if self.logged_in:
+            self.user_cn = md.get('cn') or md.get('uid')
 
     def url_of(self, path):
         return '/'.join((self.app_url, path)).strip('/')
@@ -76,13 +82,8 @@ class TemplateAPI(object):
         return has_permission(self.request, *args, **kwargs)
 
 
-def render(template, **kwargs):
-    ## FIXME: is it faster if we provide the request?
-    return render_to_response(template, value=kwargs)
-
-
 def get_user_metadata(request):
-    return request.environ.get('repoze.who.identity', {})
+    return request.environ.get('repoze.who.identity', None)
 
 
 def has_permission(request, permission, context=None):
@@ -119,7 +120,7 @@ def has_permission(request, permission, context=None):
     if context is not None and context.is_public and \
             permission == PERM_VIEW_PROJECT:
         return True
-    user_id = get_user_metadata(request).get('uid', None)
+    user_id = (get_user_metadata(request) or {}).get('uid', None)
     if not user_id:
         return False
 

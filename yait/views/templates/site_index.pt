@@ -11,7 +11,8 @@ FIXME
   </li>
 </ul>
 
-<a tal:attributes="href api.url_of('add_project_form')">add a new project</a>
+<a tal:condition="api.has_permission(u'Administer site')"
+   tal:attributes="href api.url_of('add_project_form')">add a new project</a>
 
 </metal:content>
 </layout>

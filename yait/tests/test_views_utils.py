@@ -146,8 +146,8 @@ class TestGetUserMetadata(TestCase):
 class TestHasPermission(TestCase):
 
     def setUp(self):
-        from yait.tests.base import getTestingDBSession
-        self.session = getTestingDBSession()
+        from yait.tests.base import get_testing_db_session
+        self.session = get_testing_db_session()
 
     def tearDown(self):
         self.session.remove()
@@ -158,11 +158,15 @@ class TestHasPermission(TestCase):
 
     def _makeRequest(self, user_id=None):
         from repoze.bfg.testing import DummyRequest
-        environ={'repoze.who.identity': dict(uid=user_id)}
+        environ = {}
+        if user_id is not None:
+            environ['repoze.who.identity'] = dict(uid=user_id)
         return DummyRequest(environ=environ)
 
     def _makeProject(self, public=False):
         from yait.models import Project
+        ## FIXME: there is a typo here: 'is_public' should be
+        ## 'public'. Does it mask a bug?
         p = Project(name=u'name', title=u'title', is_public=public)
         self.session.add(p)
         self.session.flush() # need to flush to have an id

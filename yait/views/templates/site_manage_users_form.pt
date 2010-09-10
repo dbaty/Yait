@@ -14,7 +14,7 @@
 </metal:html-head>
 <metal:header metal:fill-slot="header">
   &mdash;
-  <a tal:attributes="href api.urlOf('control_panel')">Site control panel</a>
+  <a tal:attributes="href api.url_of('control_panel')">Site control panel</a>
   &mdash; Manage administrators
 </metal:header>
 <metal:content metal:fill-slot="content">
@@ -34,12 +34,12 @@
       </td>
       <td class="centered">
         <form class="ninja"
-              tal:attributes="action api.urlOf('control_panel/addAdmin')"
+              tal:attributes="action api.url_of('control_panel/addAdmin')"
               onsubmit="return addAdmin(this);"
               method="POST">
           <input type="hidden" name="admin_id"/>
           <input type="image" width="32" height="32" alt="add admin"
-                 tal:attributes="src api.urlOf('static/img/add.png')"/>
+                 tal:attributes="src api.url_of('static/img/add.png')"/>
         </form>
       </td>
     </tr>
@@ -56,13 +56,13 @@
         </tal:if>
         <form tal:condition="admin.user_id != current_user_id"
               class="ninja"
-              tal:attributes="action api.urlOf('control_panel/deleteAdmin')"
+              tal:attributes="action api.url_of('control_panel/deleteAdmin')"
               onsubmit="return window.confirm('Are you sure?');"
               method="POST">
           <input type="hidden" name="admin_id"
                  tal:attributes="value admin.user_id"/>
           <input type="image" width="16" height="16" alt="delete admin"
-                 tal:attributes="src api.urlOf('static/img/delete.png')"/>
+                 tal:attributes="src api.url_of('static/img/delete.png')"/>
         </form>
       </td>
     </tr>

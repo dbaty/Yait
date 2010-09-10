@@ -20,20 +20,20 @@ from yait.models import ISSUE_PRIORITY_LABELS
 from yait.models import ISSUE_PRIORITY_VALUES
 from yait.models import ISSUE_STATUS_VALUES
 from yait.models import Project
-from yait.utils import strToTime
-from yait.utils import timeToStr
+from yait.utils import str_to_time
+from yait.utils import time_to_str
 
 
 class TimeInfoField(TextField):
     """A custom text field for time-related information."""
 
     def process_data(self, value):
-        self.data = timeToStr(value or 0)
+        self.data = time_to_str(value or 0)
 
     def process_formdata(self, value_list):
         if value_list:
             try:
-                self.data = strToTime(value_list[0])
+                self.data = str_to_time(value_list[0])
             except ValueError:
                 self.data = value_list[0]
                 raise ValueError(u'Wrong syntax.')

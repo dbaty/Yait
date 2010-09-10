@@ -4,25 +4,25 @@
 </metal:title>
 <metal:header metal:fill-slot="header">
   &mdash;
-  <a tal:attributes="href api.urlOf(project.name)" tal:content="project.title"/>
+  <a tal:attributes="href api.url_of(project.name)" tal:content="project.title"/>
 </metal:header>
 
 <metal:content metal:fill-slot="content">
 
 <ul id="actions">
-  <li tal:condition="api.hasPermission(u'Participate in project', project)"
-      tal:define="action_url api.urlOf('%s/add_issue_form' % project.name)">
+  <li tal:condition="api.has_permission(u'Participate in project', project)"
+      tal:define="action_url api.url_of('%s/add_issue_form' % project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.urlOf('static/img/add.png')"
+       ><img tal:attributes="src api.url_of('static/img/add.png')"
              width="32" height="32" alt="add issue"/></a>
     <a tal:attributes="href action_url">add issue</a>
   </li>
-  <li tal:condition="api.hasPermission(u'Administer project', project)"
-      tal:define="action_url api.urlOf('%s/control_panel' % project.name)">
+  <li tal:condition="api.has_permission(u'Administer project', project)"
+      tal:define="action_url api.url_of('%s/control_panel' % project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.urlOf('static/img/configure.png')"
+       ><img tal:attributes="src api.url_of('static/img/configure.png')"
              width="32" height="32" alt="configure project"/></a>
     <a tal:attributes="href action_url">configure project</a>
   </li>
@@ -31,7 +31,7 @@
 <ul>
   <li tal:repeat="issue issues">
     <a tal:content="'%d: %s' % (issue.ref, issue.title)"
-       tal:attributes="href api.urlOf('%s/%d' % (project.name, issue.ref))">
+       tal:attributes="href api.url_of('%s/%d' % (project.name, issue.ref))">
     </a>
   </li>
 </ul>

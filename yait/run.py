@@ -1,13 +1,12 @@
 from repoze.bfg.configuration import Configurator
 
+from yait.models import initialize_sql
+
 
 def app(global_settings, **settings):
-    if settings.get('storm_verbose', '').lower() == 'true':
-        import sys
-        from storm.tracer import debug
-        debug(True, stream=sys.stdout)
     config = Configurator(settings=settings)
     config.begin()
-    config.load_zcml('configure.zcml')
+    config.load_zcml()
     config.end()
+    initialize_sql(settings['db_string'])
     return config.make_wsgi_app()

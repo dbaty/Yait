@@ -8,11 +8,11 @@ from urllib import quote_plus
 from webob.exc import HTTPFound
 from webob.exc import HTTPUnauthorized
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.renderers import render_to_response
 
-from yait.models import Admin
 from yait.models import DBSession
 from yait.models import Project
+from yait.models import Role
 from yait.views.utils import get_user_metadata
 from yait.views.utils import has_permission
 from yait.views.utils import PERM_ADMIN_SITE
@@ -21,42 +21,49 @@ from yait.views.utils import TemplateAPI
 
 def site_index(context, request):
     """Index page of Yait."""
-    ## This page is accessible to anonymous users.
-    ## FIXME:
-    ## - list of accessible projects
-    ## - list of issues assigned to the current user (?)
-    store = _getStore()
-    projects = store.find(Project)
+    session = DBSession()
     api = TemplateAPI(context, request)
-    return render_template_to_response('templates/site_index.pt',
-                                       api=api,
-                                       projects=projects)
+    is_admin = api.has_permission(PERM_ADMIN_SITE)
+    if is_admin:
+        projects = session.query(Project)
+    elif api.logged_in:
+        public = session.query(Project).filter_by(public=True)
+        has_role = session.query(Project).join(Role).filter(
+            Project.id == Role.project_id)
+        projects = has_role.union(public)
+    else:
+        projects = session.query(Project).filter_by(public=True)
+    projects = projects.order_by(Project.title).all()
+
+    ## FIXME: we should probably also list open issues assigned to the
+    ## logged-in users, here.
+    return render_to_response('templates/site_index.pt',
+                              dict(api=api,
+                                   projects=projects))
 
 
 def control_panel(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
-    return render_template_to_response('templates/site_control_panel.pt',
-                                       api=api)
+    return render_to_response('templates/site_control_panel.pt',
+                              dict(api=api))
 
 
-## FIXME: rename as 'manage_admins_form'
-def manage_users_form(context, request):
+def manage_admins_form(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
-    store = _getStore()
-    admins = store.find(Manager)
+    session = DBSession()
+    admins = session.query(Manager).order_by(Manager.user_id)
     api = TemplateAPI(context, request)
-    user_id = get_user_metadata(request).get('uid', None)
-    return render_template_to_response('templates/site_manage_users_form.pt',
-                                       api=api,
-                                       current_user_id=user_id,
-                                       admins=admins)
+    user_id = get_user_metadata(request)['uid']
+    return render_to_response('templates/site_manage_admins_form.pt',
+                              dict(api=api,
+                              current_user_id=user_id,
+                              admins=admins))
 
 
-## FIXME: rename as 'add_admin()'
-def addAdmin(context, request):
+def add_admin(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     admin_id = request.POST.get('admin_id')
@@ -75,8 +82,7 @@ def addAdmin(context, request):
     return HTTPFound(location=url)
     
 
-## FIXME: rename as 'delete_admin()'
-def deleteAdmin(context, request):
+def delete_admin(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     admin_id = request.POST.get('admin_id')
@@ -95,13 +101,12 @@ def manage_projects_form(context, request):
     store = _getStore()
     projects = store.find(Project).order_by(Project.name)
     api = TemplateAPI(context, request)
-    return render_template_to_response('templates/site_manage_projects_form.pt',
-                                       api=api,
-                                       projects=projects)
+    return render_to_response('templates/site_manage_projects_form.pt',
+                              api=api,
+                              projects=projects)
 
 
-## FIXME: rename as 'delete_projects()'
-def deleteProject(context, request):
+def delete_project(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     project_id = int(request.POST.get('project_id'))
