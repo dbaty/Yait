@@ -8,5 +8,6 @@ def app(global_settings, **settings):
     config.begin()
     config.load_zcml()
     config.end()
-    initialize_sql(settings['db_string'])
+    db_verbose = settings.get('db_verbose', 'false').lower() == 'true'
+    initialize_sql(settings['db_string'], echo=db_verbose)
     return config.make_wsgi_app()

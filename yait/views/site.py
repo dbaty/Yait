@@ -68,35 +68,45 @@ def add_admin(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     admin_id = request.POST['admin_id']
+    if not admin_id:
+        msg = quote_plus(u'Please provide an user id.')
+        url = '%s/control_panel/manage_admins_form?error_message=%s' % (
+            request.application_url, msg)
+        return HTTPFound(location=url)
     ## FIXME: check that admin_id exists in the user source.
     session = DBSession()
     if session.query(Admin).filter_by(user_id=admin_id).count():
         msg = quote_plus(u'User "%s" is already an administrator.' % admin_id)
-        url = '%s/control_panel/manage_users_form?error_message=%s' % (
+        url = '%s/control_panel/manage_admins_form?error_message=%s' % (
             request.application_url, msg)
         return HTTPFound(location=url)
     admin = Admin(user_id=admin_id)
     session.add(admin)
     msg = quote_plus(u'User "%s" is now an administrator.' % admin_id)
-    url = '%s/control_panel/manage_users_form?status_message=%s' % (
+    url = '%s/control_panel/manage_admins_form?status_message=%s' % (
         request.application_url, msg)
     return HTTPFound(location=url)
-    
+
 
 def delete_admin(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     admin_id = request.POST['admin_id']
+    if not admin_id:
+        msg = quote_plus(u'Please provide an user id.')
+        url = '%s/control_panel/manage_admins_form?error_message=%s' % (
+            request.application_url, msg)
+        return HTTPFound(location=url)
     if admin_id == get_user_metadata(request)['uid']:
         msg = quote_plus(u'You cannot remove yourself. Hopefully.')
-        url = '%s/control_panel/manage_users_form?error_message=%s' % (
+        url = '%s/control_panel/manage_admins_form?error_message=%s' % (
             request.application_url, msg)
         return HTTPFound(location=url)
     session = DBSession()
     admin = session.query(Admin).filter_by(user_id=admin_id).one()
     session.delete(admin)
     msg = quote_plus(u'User "%s" is not an administrator anymore.' % admin_id)
-    url = '%s/control_panel/manage_users_form?status_message=%s' % (
+    url = '%s/control_panel/manage_admins_form?status_message=%s' % (
         request.application_url, msg)
     return HTTPFound(location=url)
     
@@ -104,24 +114,34 @@ def delete_admin(context, request):
 def manage_projects_form(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
-    store = _getStore()
-    projects = store.find(Project).order_by(Project.name)
+    session = DBSession()
+    projects = session.query(Project).order_by(Project.title).all()
     api = TemplateAPI(context, request)
     return render_to_response('templates/site_manage_projects_form.pt',
-                              api=api,
-                              projects=projects)
+                              dict(api=api,
+                                   projects=projects))
 
 
 def delete_project(context, request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     project_id = int(request.POST.get('project_id'))
-    store = _getStore()
-    project = store.find(Project, id=project_id).one()
+    session = DBSession()
+    project = session.query(Project).filter_by(id=project_id).one()
     name, title = project.name, project.title
-    store.remove(project)
+    session.delete(project)
     msg = quote_plus(u'Project "%s" ("%s") has been deleted.' % (
             name, title))
     url = '%s/control_panel/manage_projects_form?status_message=%s' % (
         request.application_url, msg)
     return HTTPFound(location=url)
+
+
+def not_found(context, request):
+    api = TemplateAPI(context, request)
+    response = render_to_response(
+        'templates/notfound.pt',
+        value=dict(api=api,
+                   resource_url=request.url))
+    response.status = 404
+    return response

@@ -52,7 +52,7 @@
          class="noUnderline"
          title="preview comment"
          tal:attributes="href 'javascript: togglePreviewPane(\'%s\')' % 
-                         api.url_of('ajax_renderReST')"
+                         api.url_of('ajax_render_ReST')"
          ><img tal:attributes="src api.url_of('static/img/preview.png')"
                height="16" width="16" alt="preview comment"/></a>
       <div id="previewSpinner" class="hidden">

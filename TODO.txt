@@ -1,18 +1,38 @@
+Yait 0.2
+========
+
 - switch to repoze.who 2
 
 - move to distribute
 
 - PEP 8 naming
 
-- find a new name: obal, peri, prao, aster, noria, etc.
+- do not use 'dict()'
 
-- handle requests to "/robots.txt" (and possibly "/favicon.ico"
-  if/when the laster template is not used)
+- find a new name: obal, peri, prao, aster, noria, falgo, tern, tuit
 
-- find (or write a tool) that runs tests, logs all SQL queries and
-  runs EXPLAIN (or something similar) on each query. (?)
 
-- automated tests + coverage
+Yait 0.3
+========
+
+- home page
+
+- project home page:
+
+  - last 10 added or updated issues;
+
+  - "master tickets" (if feature is implemented)
+
+- relationships between issues : parent/child, blocker/blocked
+
+- completion of the 'add issue' form
+
+- add a way to change the title: quick edit (cf. issue tracker Pilot),
+  or when adding a comment
+
+- a checkbox to assign "to me"
+
+- attachments
 
 - project control panel : configure whether the public
   (customer-oriented) timing information is displayed ('time_billed'
@@ -22,23 +42,78 @@
   required. In this case, display the field below the text field (and
   not in the "extra" field set).
 
-- project control panel : grant a permission to user U;
+- check "api.url_of()" when the URL looks like: domain.com/foo/yait
 
-- relationships between issues : parent/child, blocker/blocked
+- search form
 
-- site view ;
+- e-mail notification:
 
-- project view ;
+  1. Issue added:
+
+    - the reporter is subscribed;
+
+    - send notification to the reporter and the list of automatically
+      notified users (configured per project).
+
+  2. Issue updated: send notification to the list of subscribers.
+
+  3. Subscriber added: send notification to the list of subscribers
+     and the new subscriber (same as #2 above)
+
+  IssueSubscription: issue_id, user_id
+
+  ProjectSubscription: project_id, user_id
+
+- i18n
+
+- sanitize user input comments (remove iframe, Javascript, etc.)
+
+- make sure that use POST instead of 'request.params' when it is fit
+
+- anti-XSRF measures
 
 - add auto-complete widget for "assign issue to"
 
+
+Yait 0.4
+========
+
+- project control panel : grant a permission to user U:
+
+  User/permission   Administer  View  Participate  See private info
+  ===============   ==========  ====  ===========  ================
+    john.smith          o         o       o               o
+       ...
+   <input field>        o         o       o               o
+
 - review layout of the extra fieldset (?)
+
+- review footer (?).
+
+
+Later
+=====
+
+- allow other text formatting syntaxes:
+
+  - make the syntax configurable in the preferences (set in a cookie);
+
+  - call the right renderer when previewing;
+
+  - store the renderer in the Change model, along the text.
+
+- when clicking on "show/hide extra", scroll to the end of the page so
+  that the "update" button is visible. Use $.scrollTo(object) (cf. http://plugins.jquery.com/project/ScrollTo) or scrollTop() (?)
+
+- find (or write a tool) that runs tests, logs all SQL queries and
+  runs EXPLAIN (or something similar) on each query. (?)
+
+- handle requests to "/robots.txt" (and possibly "/favicon.ico"
+  if/when the laster template is not used)
 
 - profile and optimize:
 
   - repoze.profile
-
-  - make Storm more verbose (display all requests)
 
 - display date in the user's timezone:
 
@@ -62,30 +137,16 @@
     seen by the customer. It may be different than the time really
     spent, and relates to the time billed.
 
-- review footer (?).
-
-- allow other text formatting syntaxes:
-
-  - make the syntax configurable in the preferences (set in a cookie);
-
-  - call the right renderer when previewing;
-
-  - store the renderer in the Change model, along the text.
-
-- when clicking on "show/hide extra", scroll to the end of the page so
-  that the "update" button is visible. Use $.scrollTo(object) (cf. http://plugins.jquery.com/project/ScrollTo) or scrollTop() (?)
-
-- a checkbox to assign "to me"
-
-- add a way to change the title: quick edit (cf. issue tracker Pilot),
-  or when adding a comment
-
 - validate HTML, CSS and Javascript (jslint).
 
 - CSS tweaks:
 
   - form errors: add formError in formRow. Cf. postaleo / Dolmen for
     example
+
+  - when the text of the issue is very short, the actions ('add
+    issue', 'search issues', 'configure project') appears in the
+    footer.
 
 - add a way to delete an issue. Actually, it should not remove
   anything. It toggles the "deleted" marker in the Issue model and add
@@ -102,20 +163,7 @@
 
 - show users' full name instead of their id.
 
-- attachments
-
 - optimize database
-
-- protect from CSRF and XSS: check origin of form submission (with an
-  hidden token);
-
-- clean up comments (remove iframe, Javascript, etc.)
-
-- search form
-
-- e-mail notification
-
-- i18n
 
 - handle trailing slash after the name of a project
 
@@ -133,8 +181,6 @@
   text container.
 
 - add favicon
-
-- check "api.url_of()" when the URL looks like: domain.com/foo/yait
 
 - add a "Component/category" field (à la Jira). Do we need that if we
   have tags?

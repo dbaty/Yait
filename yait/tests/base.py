@@ -33,16 +33,20 @@ class TestCaseForViews(TestCase):
         from repoze.bfg.testing import registerTemplateRenderer
         return registerTemplateRenderer(self.template_under_test)
 
-    def _makeModel(self):
+    def _makeModel(self, *args, **kwargs):
         from repoze.bfg.testing import DummyModel
-        return DummyModel()
+        return DummyModel(*args, **kwargs)
 
-    def _makeRequest(self, user_id=None, params=None):
+    def _makeRequest(self, user_id=None, post=None, environ=None):
         from repoze.bfg.testing import DummyRequest
-        environ = {}
+        if environ is None:
+            environ = {}
         if user_id is not None:
             environ['repoze.who.identity'] = dict(uid=user_id)
-        return DummyRequest(environ=environ, params=params)
+        if post is not None:
+            from webob.multidict import MultiDict
+            post = MultiDict(post)
+        return DummyRequest(environ=environ, post=post)
 
     def _makeSiteAdmin(self, user_id):
         from yait.models import Admin

@@ -121,12 +121,22 @@ class TestAddAdmin(TestCaseForViews):
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '401 Unauthorized')
 
+    def test_add_admin_no_user_id(self):
+        user_id = u'admin'
+        self._makeSiteAdmin(user_id)
+        context = self._makeModel()
+        post = dict(admin_id=u'')
+        request = self._makeRequest(user_id=user_id, post=post)
+        response = self._callFUT(context, request)
+        location = response.headers['Location']
+        self.assert_('error_message' in location)
+
     def test_add_admin_already_admin(self):
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        params = dict(admin_id=u'admin')
-        request = self._makeRequest(user_id=user_id, params=params)
+        post = dict(admin_id=u'admin')
+        request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
         self.assert_('error_message' in location)
@@ -134,10 +144,10 @@ class TestAddAdmin(TestCaseForViews):
     def test_add_admin_success(self):
         from yait.models import Admin
         user_id = u'admin'
-        admin = self._makeSiteAdmin(user_id)
+        self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        params = dict(admin_id=u'admin2')
-        request = self._makeRequest(user_id=user_id, params=params)
+        post = dict(admin_id=u'admin2')
+        request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
         self.assert_('status_message' in location)
@@ -162,8 +172,18 @@ class TestDeleteAdmin(TestCaseForViews):
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        params = dict(admin_id=user_id)
-        request = self._makeRequest(user_id=user_id, params=params)
+        post = dict(admin_id=user_id)
+        request = self._makeRequest(user_id=user_id, post=post)
+        response = self._callFUT(context, request)
+        location = response.headers['Location']
+        self.assert_('error_message' in location)
+
+    def test_delete_admin_no_user_id(self):
+        user_id = u'admin'
+        self._makeSiteAdmin(user_id)
+        context = self._makeModel()
+        post = dict(admin_id=u'')
+        request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
         self.assert_('error_message' in location)
@@ -174,9 +194,72 @@ class TestDeleteAdmin(TestCaseForViews):
         admin = self._makeSiteAdmin(user_id)
         self._makeSiteAdmin(u'admin2')
         context = self._makeModel()
-        params = dict(admin_id=u'admin2')
-        request = self._makeRequest(user_id=user_id, params=params)
+        post = dict(admin_id=u'admin2')
+        request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
         self.assert_('status_message' in location)
         self.assertEqual(self.session.query(Admin).all(), [admin])
+
+
+class TestManageProjectsForm(TestCaseForViews):
+
+    template_under_test = 'templates/site_manage_projects_form.pt'
+
+    def _callFUT(self, *args, **kwargs):
+        from yait.views.site import manage_projects_form
+        return manage_projects_form(*args, **kwargs)
+
+    def test_manage_projects_form_reject_not_admin(self):
+        context = self._makeModel()
+        request = self._makeRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '401 Unauthorized')
+
+    def test_manage_projects_form_allow_admin(self):
+        user_id = u'admin'
+        self._makeSiteAdmin(user_id)
+        p1 = self._makeProject(u'p1', u'p1')
+        p3 = self._makeProject(u'p3', u'p3')
+        p2 = self._makeProject(u'p2', u'p2')
+        renderer = self._makeRenderer()
+        context = self._makeModel()
+        request = self._makeRequest(user_id=user_id)
+        self._callFUT(context, request)
+        renderer.assert_(projects=[p1, p2, p3])
+
+
+class TestDeleteProject(TestCaseForViews):
+
+    def _callFUT(self, *args, **kwargs):
+        from yait.views.site import delete_project
+        return delete_project(*args, **kwargs)
+
+    def test_delete_project_reject_not_admin(self):
+        context = self._makeModel()
+        request = self._makeRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '401 Unauthorized')
+
+    def test_delete_project(self):
+        from yait.models import Project
+        p = self._makeProject(u'p1', u'p1')
+        user_id = u'admin'
+        self._makeSiteAdmin(user_id)
+        context = self._makeModel()
+        post = dict(project_id=p.id)
+        request = self._makeRequest(user_id=user_id, post=post)
+        response = self._callFUT(context, request)
+        location = response.headers['Location']
+        self.assert_('status_message' in location)
+        self.assertEqual(self.session.query(Project).all(), [])
+
+
+class TestNotFound(TestCaseForViews):
+
+    def test_not_found(self):
+        from yait.views.site import not_found
+        context = self._makeModel()
+        request = self._makeRequest()
+        response = not_found(context, request)
+        self.assert_(response.status, '404 Not Found')

@@ -34,7 +34,7 @@
       </td>
       <td class="centered">
         <form class="ninja"
-              tal:attributes="action api.url_of('control_panel/addAdmin')"
+              tal:attributes="action api.url_of('control_panel/add_admin')"
               onsubmit="return addAdmin(this);"
               method="POST">
           <input type="hidden" name="admin_id"/>
@@ -56,7 +56,7 @@
         </tal:if>
         <form tal:condition="admin.user_id != current_user_id"
               class="ninja"
-              tal:attributes="action api.url_of('control_panel/deleteAdmin')"
+              tal:attributes="action api.url_of('control_panel/delete_admin')"
               onsubmit="return window.confirm('Are you sure?');"
               method="POST">
           <input type="hidden" name="admin_id"

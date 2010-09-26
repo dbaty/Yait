@@ -10,15 +10,17 @@ from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
-from storm.locals import AutoReload
+from sqlalchemy.orm.exc import NoResultFound
 
-from yait.forms import AddChange
-from yait.forms import AddIssue
+from yait.forms import AddChangeForm
+from yait.forms import AddIssueForm
 from yait.models import Change
 from yait.models import DBSession
 from yait.models import Issue
 from yait.models import Project
 from yait.utils import render_ReST
+from yait.views.site import not_found
+from yait.views.utils import get_user_metadata
 from yait.views.utils import has_permission
 from yait.views.utils import PERM_PARTICIPATE_IN_PROJECT
 from yait.views.utils import PERM_VIEW_PROJECT
@@ -33,7 +35,7 @@ def add_issue_form(context, request, form=None):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
     if form is None:
-        form = AddIssue()
+        form = AddIssueForm()
     return render_template_to_response('templates/issue_add_form.pt',
                                        api=api,
                                        project=project,
@@ -41,28 +43,22 @@ def add_issue_form(context, request, form=None):
 
 
 def add_issue(context, request):
-    form = AddIssue(request.POST)
-    if not form.validate():
-        return add_issue_form(context, request, form)
-
     session = DBSession()
     project = session.query(Project).filter_by(name=context.project_name).one()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
+    form = AddIssueForm(request.POST)
+    if not form.validate():
+        return add_issue_form(context, request, form)
 
     last_ref = session.execute(
         'SELECT MAX(ref) FROM issues '
-        'WHERE project_id=%d' % project.id).get_one()[0]
+        'WHERE project_id=%d' % project.id).fetchone()[0]
     if last_ref is None:
         last_ref = 0
     ref = last_ref + 1
-    reporter = u'damien.baty' ## FIXME
+    reporter = get_user_metadata(request)['uid']
     now = datetime.now()
-
-    ## FIXME: I am still not sure that this is a good idea to store
-    ## the text of the issue as a comment. I am afraid it may cause
-    ## some problems later. I do not see any added value to this apart
-    ## from _not_ setting the time spent on the Issue model iself.
     issue = Issue(project_id=project.id,
                   date_created=now,
                   date_edited=now,
@@ -70,7 +66,7 @@ def add_issue(context, request):
                   ref=ref)
     form.populate_obj(issue)
     session.add(issue)
-    issue.id = AutoReload
+    session.flush()
     change = Change(issue_id=issue.id,
                     author=reporter,
                     date=now,
@@ -85,30 +81,35 @@ def add_issue(context, request):
 def issue_view(context, request, form=None):
     project_name = context.project_name
     session = DBSession()
-    project = session.query(Project).filter_by(name=project_name).one()
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        return not_found(context, request)
     if not has_permission(request, PERM_VIEW_PROJECT, project):
         return HTTPUnauthorized()
 
     issue_ref = int(context.issue_ref)
-    issue = session.query(Issue).filter_by(
-        project_id=project.id, ref=issue_ref).one()
+    try:
+        issue = session.query(Issue).filter_by(
+            project_id=project.id, ref=issue_ref).one()
+    except NoResultFound:
+        return not_found(context, request)
     if form is None:
-        form = AddChange(assignee=issue.assignee,
-                         children=issue.getChildren(),
-                         deadline=issue.deadline,
-                         kind=issue.kind,
-                         parent=issue.getParent(),
-                         priority=issue.priority,
-                         status=issue.status,
-                         time_estimated=issue.time_estimated,
-                         time_billed=issue.time_billed,
-                         title=issue.title)
+        form = AddChangeForm(assignee=issue.assignee,
+                             children=issue.get_children(),
+                             deadline=issue.deadline,
+                             kind=issue.kind,
+                             parent=issue.get_parent(),
+                             priority=issue.priority,
+                             status=issue.status,
+                             time_estimated=issue.time_estimated,
+                             time_billed=issue.time_billed,
+                             title=issue.title)
     api = TemplateAPI(context, request)
     return render_template_to_response('templates/issue_view.pt',
                                        api=api,
                                        project=project,
                                        issue=issue,
-                                       changes=issue.getChanges(),
                                        form=form,
                                        now=datetime.now())
 
@@ -124,7 +125,7 @@ def issue_update(context, request):
         project_id=project.id, ref=issue_ref).one()
     userid = u'damien.baty' ## FIXME
 
-    form = AddChange(request.POST)
+    form = AddChangeForm(request.POST)
     if not form.validate():
         return issue_view(context, request, form)
 
@@ -171,7 +172,7 @@ def issue_update(context, request):
 
     change.changes = changes
     session.add(change)
-    change.id = AutoReload
+    session.flush()
     url = '%s/%s/%d?issue_updated=1#issue_updated' % (
         request.application_url, project.name, issue.ref)
     return HTTPFound(location=url)

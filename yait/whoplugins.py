@@ -101,4 +101,8 @@ class LDAPAttributesPlugin(Base):
         except ldap.LDAPError, msg:
             environ['repoze.who.logger'].warn('Cannot add metadata: %s' % \
                                               msg)
-            return None
+            return {}
+
+
+    def clear_cache(self):
+        metadata_cache.clear()

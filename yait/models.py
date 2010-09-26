@@ -67,14 +67,14 @@ class Model(object):
     def __init__(self, **kwargs):
         ## We check that the attributes we want to initialize are
         ## indeed columns of the table. It helps avoiding typos.
-        #allowed = dir(self)
+        allowed = dir(self)
         for attr, value in kwargs.items():
-            ## FIXME: 
-            #if attr not in allowed:
-            #    raise AttributeError(
-            #        'Initializing "%s" with the "%s" unknown attribute.' % (
-            #            self.__class__, attr))
+            if attr not in allowed:
+                raise AttributeError(
+                    'Initializing "%s" with the "%s" unknown attribute.' % (
+                        self.__class__, attr))
             setattr(self, attr, value)
+
 
 class Project(Model):
 
@@ -83,14 +83,15 @@ class Project(Model):
 
 ## FIXME: shall we use String (VARCHAR) or Text?
 ## FIXME: add NOT NULL constraints
+## FIXME: add UNIQUE constraints
 ## FIXME: add indexes
 projects_table = Table(
     'projects',
     metadata,
     Column('id', Integer, primary_key=True),
-    Column('name', String),
-    Column('title', String),
-    Column('public', Boolean))
+    Column('name', String, nullable=False, unique=True),
+    Column('title', String, nullable=False),
+    Column('public', Boolean, nullable=False))
 
 
 class Issue(Model):
@@ -109,6 +110,10 @@ class Issue(Model):
         ('time_spent_real', 'spent (real)'),
         ('time_spent_public', 'spent (public)'),
         )
+
+    def __repr__(self):
+        return '<Issue %d (id=%d, project=%d)>' % (
+            self.ref, self.id, self.project_id)
 
     def get_kind(self):
         return ISSUE_KIND_LABELS[self.kind - 1]
@@ -188,6 +193,10 @@ issues_table = Table(
 
 
 class Change(Model):
+
+    def __repr__(self):
+        return '<Change %d (issue=%d)>' % (self.id, self.issue_id)
+
     def get_rendered_text(self):
         return render_ReST(self.text)
 
@@ -233,7 +242,7 @@ changes_table = Table(
     Column('issue_id', Integer, ForeignKey('issues.id')),
     Column('author', String),
     Column('date', DateTime),
-    Column('time_spet_real', Integer),
+    Column('time_spent_real', Integer),
     Column('time_spent_public', Integer),
     Column('text', Text),
     Column('changes', PickleType(mutable=False))) ## FIXME: I think that we do need it to be mutable. To be checked.
@@ -279,11 +288,12 @@ roles_table = Table(
 projects_mapper = mapper(
     Project, projects_table,
     properties=dict(
-        issues=relationship(Issue, backref='project'))) ## FIXME: do we need 'backref'
+        issues=relationship(Issue, lazy='select')))
 issues_mapper = mapper(
     Issue, issues_table,
     properties=dict(
-        changes=relationship(Change, backref='issue'))) ## FIXME: do we need 'backref'
+        ## FIXME: do we need 'backref'?
+        changes=relationship(Change, lazy='select')))
 changes_mapper = mapper(Change, changes_table)
 issue_relationships_mapper = mapper(
     IssueRelationship, issue_relationships_table,

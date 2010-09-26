@@ -12,7 +12,7 @@
 
 <form method="post"
       id="addIssueForm"
-      tal:attributes="action api.url_of('%s/addIssue' % project.name)"
+      tal:attributes="action api.url_of('%s/add_issue' % project.name)"
       tal:define="field_options {};
                   can_see_private_time_info api.has_permission(
                          u'See private time information', project)">

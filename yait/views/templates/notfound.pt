@@ -1,0 +1,9 @@
+<layout metal:use-macro="api.layout">
+<metal:content metal:fill-slot="content">
+
+<div class="errorMessage" i18n:translate="">It was impossible
+  to find the following resource:
+  <tt i18n:name="url" tal:content="resource_url"/></div>
+
+</metal:content>
+</layout>

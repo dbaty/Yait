@@ -175,11 +175,9 @@ class TestHasPermission(TestCase):
             environ['repoze.who.identity'] = dict(uid=user_id)
         return DummyRequest(environ=environ)
 
-    def _makeProject(self, public=False):
+    def _makeProject(self, name=u'name', public=False):
         from yait.models import Project
-        ## FIXME: there is a typo here: 'is_public' should be
-        ## 'public'. Does it mask a bug?
-        p = Project(name=u'name', title=u'title', is_public=public)
+        p = Project(name=name, title=u'title', public=public)
         self.session.add(p)
         self.session.flush() # need to flush to have an id
         return p
@@ -332,10 +330,10 @@ class TestHasPermission(TestCase):
 
     def test_role_in_another_project(self):
         from yait.views.utils import PERM_ADMIN_PROJECT
-        project1 = self._makeProject()
-        project2 = self._makeProject()
+        project1 = self._makeProject(name=u'p1')
+        project2 = self._makeProject(name=u'p2')
         user_id = u'user1'
-        ## give role on project 1
+        ## give role in project 1
         self._makeUser(user_id, roles={project1: PERM_ADMIN_PROJECT})
         ## but check in project 2
         self._test_role(user_id, project2, dict(

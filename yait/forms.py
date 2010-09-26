@@ -44,14 +44,14 @@ class BaseForm(Form):
     pass
 
 
-class AddProject(BaseForm):
-    ## FIXME: check length of name
-    ## FIXME: check length of title
+class AddProjectForm(BaseForm):
+    ## FIXME: check length of name (if we use a VARCHAR)
+    ## FIXME: check length of title (if we use a VARCHAR)
     name = TextField(label=u'Name',
                      description=u'Should be short, will be part of the URL.',
                      validators=[required()])
     title = TextField(label=u'Title', validators=[required()])
-    is_public = BooleanField(
+    public = BooleanField(
         label=u'Make this project public, i.e. accessible to '
         'anonymous users.')
 
@@ -95,12 +95,12 @@ class ExtraFieldset:
     children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput) ## FIXME: need ork on UI
 
 
-class AddIssue(BaseForm, ExtraFieldset):
+class AddIssueForm(BaseForm, ExtraFieldset):
     title = TextField(label=u'Title', validators=[required()])
     text = TextAreaField(label=u'Text', validators=[required()])
 
 
-class AddChange(BaseForm, ExtraFieldset):
+class AddChangeForm(BaseForm, ExtraFieldset):
     """A form used to comment (change) an issue."""
     text = TextAreaField(label=u'Text')
 

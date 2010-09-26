@@ -26,9 +26,9 @@ def login_form(context, request):
                                    login_counter=login_counter))
 
 
-def post_login(request):
+def post_login(context, request): ## FIXME: had only 'request', before
     identity = request.environ.get('repoze.who.identity')
-    came_from = request.params.get('came_from', '') or '/'
+    came_from = request.POST.get('came_from', '') or '/'
     if identity:
         destination = came_from
     else:
@@ -39,7 +39,7 @@ def post_login(request):
     return HTTPFound(location=destination)
 
 
-def post_logout(request):
+def post_logout(context, request): ## FIXME: had only 'request', before
     url = '%s?status_message=%s' % (
         request.application_url,
         quote_plus(u'You have been logged out.'))

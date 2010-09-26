@@ -27,6 +27,7 @@
      />
 
   <!-- Site views -->
+  <notfound view="lasco.views.not_found"/>
   <route path=""
          name="site_index"
          view=".views.site.site_index"/>

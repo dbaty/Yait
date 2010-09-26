@@ -29,7 +29,7 @@
 </ul>
 
 <ul>
-  <li tal:repeat="issue issues">
+  <li tal:repeat="issue project.issues">
     <a tal:content="'%d: %s' % (issue.ref, issue.title)"
        tal:attributes="href api.url_of('%s/%d' % (project.name, issue.ref))">
     </a>

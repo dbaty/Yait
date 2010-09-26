@@ -114,7 +114,7 @@ def has_permission(request, permission, context=None):
         return permission in getattr(request, cache_key)
 
     ## Shortcuts for public projects and anonymous users
-    if context is not None and context.is_public and \
+    if context is not None and context.public and \
             permission == PERM_VIEW_PROJECT:
         return True
     user_id = (get_user_metadata(request) or {}).get('uid', None)
