@@ -45,7 +45,7 @@
 </tal:comment>
 <metal:issue-text-field metal:define-macro="issue-text-field">
   <metal:field tal:define="field_name 'text';
-                           field_options dict(rows=10, cols=80)"
+                           field_options {'rows': 10, 'cols': 80}"
                metal:use-macro="renderField">
     <metal:before-input metal:fill-slot="before-input">
       <a id="previewButton"

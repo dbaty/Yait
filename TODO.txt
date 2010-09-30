@@ -5,9 +5,7 @@ Yait 0.2
 
 - move to distribute
 
-- PEP 8 naming
-
-- do not use 'dict()'
+- PEP 8 naming, including in tests ('makeOne', etc.)
 
 - find a new name: obal, peri, prao, aster, noria, falgo, tern, tuit
 

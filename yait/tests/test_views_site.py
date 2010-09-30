@@ -125,7 +125,7 @@ class TestAddAdmin(TestCaseForViews):
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        post = dict(admin_id=u'')
+        post = {'admin_id': u''}
         request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
@@ -135,7 +135,7 @@ class TestAddAdmin(TestCaseForViews):
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        post = dict(admin_id=u'admin')
+        post = {'admin_id': u'admin'}
         request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
@@ -146,7 +146,7 @@ class TestAddAdmin(TestCaseForViews):
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        post = dict(admin_id=u'admin2')
+        post = {'admin_id': u'admin2'}
         request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
@@ -172,7 +172,7 @@ class TestDeleteAdmin(TestCaseForViews):
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        post = dict(admin_id=user_id)
+        post = {'admin_id': user_id}
         request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
@@ -182,7 +182,7 @@ class TestDeleteAdmin(TestCaseForViews):
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        post = dict(admin_id=u'')
+        post = {'admin_id': u''}
         request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
@@ -194,7 +194,7 @@ class TestDeleteAdmin(TestCaseForViews):
         admin = self._makeSiteAdmin(user_id)
         self._makeSiteAdmin(u'admin2')
         context = self._makeModel()
-        post = dict(admin_id=u'admin2')
+        post = {'admin_id': u'admin2'}
         request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
@@ -247,7 +247,7 @@ class TestDeleteProject(TestCaseForViews):
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        post = dict(project_id=p.id)
+        post = {'project_id': p.id}
         request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']

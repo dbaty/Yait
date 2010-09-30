@@ -40,7 +40,7 @@ class TestPostLoginViews(TestCaseForViews):
         return post_login(*args, **kwargs)
 
     def test_post_login_try_logged_in(self):
-        post = dict(came_from='http://came.from')
+        post = {'came_from': 'http://came.from'}
         environ = {'repoze.who.identity': 'jsmith'}
         request = self._makeRequest(post=post, environ=environ)
         context = self._makeModel()
@@ -49,7 +49,7 @@ class TestPostLoginViews(TestCaseForViews):
         self.assertEqual(response.location, 'http://came.from')
 
     def test_post_login_try_not_logged_in(self):
-        post = dict(came_from='http://came.from')
+        post = {'came_from': 'http://came.from'}
         environ = {'repoze.who.logins': 123}
         request = self._makeRequest(post=post, environ=environ)
         context = self._makeModel()

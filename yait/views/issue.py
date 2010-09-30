@@ -30,7 +30,11 @@ from yait.views.utils import TemplateAPI
 
 def add_issue_form(context, request, form=None):
     session = DBSession()
-    project = session.query(Project).filter_by(name=context.project_name).one()
+    project_name = request.matchdict['project_name']
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        return not_found(context, request)        
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
@@ -44,7 +48,11 @@ def add_issue_form(context, request, form=None):
 
 def add_issue(context, request):
     session = DBSession()
-    project = session.query(Project).filter_by(name=context.project_name).one()
+    project_name = request.matchdict['project_name']
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        return not_found(context, request)
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
     form = AddIssueForm(request.POST)
@@ -79,7 +87,8 @@ def add_issue(context, request):
 
 
 def issue_view(context, request, form=None):
-    project_name = context.project_name
+    project_name = request.matchdict['project_name']
+    issue_ref = int(request.matchdict['issue_ref'])
     session = DBSession()
     try:
         project = session.query(Project).filter_by(name=project_name).one()
@@ -87,8 +96,6 @@ def issue_view(context, request, form=None):
         return not_found(context, request)
     if not has_permission(request, PERM_VIEW_PROJECT, project):
         return HTTPUnauthorized()
-
-    issue_ref = int(context.issue_ref)
     try:
         issue = session.query(Issue).filter_by(
             project_id=project.id, ref=issue_ref).one()
@@ -114,13 +121,12 @@ def issue_view(context, request, form=None):
                                        now=datetime.now())
 
 def issue_update(context, request):
-    project_name = context.project_name
+    project_name = request.matchdict['project_name']
+    issue_ref = int(request.matchdict['issue_ref'])
     session = DBSession()
     project = session.query(Project).filter_by(name=project_name).one()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
-
-    issue_ref = int(context.issue_ref)
     issue = session.query(Issue).filter_by(
         project_id=project.id, ref=issue_ref).one()
     userid = u'damien.baty' ## FIXME
@@ -181,4 +187,4 @@ def issue_update(context, request):
 def ajax_render_ReST(context, request):
     """Render reStructuredText (called via AJAX)."""
     text = request.params.get('text', '')
-    return dict(rendered=render_ReST(text))
+    return {'rendered': render_ReST(text)}

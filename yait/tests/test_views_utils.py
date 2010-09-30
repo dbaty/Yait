@@ -33,7 +33,7 @@ class TestTemplateAPI(TestCase):
     def test_request_related_attributes(self):
         from repoze.bfg.testing import DummyRequest
         request = DummyRequest(
-            environ=dict(HTTP_REFERER='http://referrer.com'))
+            environ={'HTTP_REFERER': 'http://referrer.com'})
         api = self._makeOne(request=request)
         self.assert_(api.request is request)
         self.assert_(api.app_url, 'http://example.com')
@@ -44,32 +44,32 @@ class TestTemplateAPI(TestCase):
     def test_status_message(self):
         from repoze.bfg.testing import DummyRequest
         request = DummyRequest(
-            params=dict(status_message='A status message.'),
-            environ=dict(HTTP_REFERER='http://example.com/foo'))
+            params={'status_message': 'A status message.'},
+            environ={'HTTP_REFERER': 'http://example.com/foo'})
         api = self._makeOne(request=request)
         self.assertEqual(api.status_message, 'A status message.')
 
     def test_error_message(self):
         from repoze.bfg.testing import DummyRequest
         request = DummyRequest(
-            params=dict(error_message='An error message.'),
-            environ=dict(HTTP_REFERER='http://example.com/foo'))
+            params={'error_message': 'An error message.'},
+            environ={'HTTP_REFERER': 'http://example.com/foo'})
         api = self._makeOne(request=request)
         self.assertEqual(api.error_message, 'An error message.')
 
     def test_status_message_foreign(self):
         from repoze.bfg.testing import DummyRequest
         request = DummyRequest(
-            params=dict(status_message='A status message.'),
-            environ=dict(HTTP_REFERER='http://other.com'))
+            params={'status_message': 'A status message.'},
+            environ={'HTTP_REFERER': 'http://other.com'})
         api = self._makeOne(request=request)
         self.assertEqual(api.status_message, '')
 
     def test_error_message_foreign(self):
         from repoze.bfg.testing import DummyRequest
         request = DummyRequest(
-            params=dict(error_message='An error message.'),
-            environ=dict(HTTP_REFERER='http://other.com'))
+            params={'error_message': 'An error message.'},
+            environ={'HTTP_REFERER': 'http://other.com'})
         api = self._makeOne(request=request)
         self.assertEqual(api.error_message, '')
 
@@ -89,8 +89,8 @@ class TestTemplateAPI(TestCase):
         from repoze.bfg.testing import DummyRequest
         request = DummyRequest(
             environ={'repoze.who.identity':
-                         dict(uid=u'john.smith',
-                              cn=u'John Smith')})
+                         {'uid': u'john.smith',
+                          'cn': u'John Smith'}})
         api = self._makeOne(request=request)
         self.assert_(api.logged_in)
         self.assertEqual(api.user_cn, u'John Smith')
@@ -99,8 +99,8 @@ class TestTemplateAPI(TestCase):
         from repoze.bfg.testing import DummyRequest
         request = DummyRequest(
             environ={'repoze.who.identity':
-                         dict(uid=u'john.smith',
-                              cn=u'')})
+                         {'uid': u'john.smith',
+                          'cn': u''}})
         api = self._makeOne(request=request)
         self.assert_(api.logged_in)
         self.assertEqual(api.user_cn, u'john.smith')
@@ -150,7 +150,7 @@ class TestGetUserMetadata(TestCase):
 
     def test_authenticated(self):
         from repoze.bfg.testing import DummyRequest
-        md = dict(uid=u'john.smith', cn=u'John Smith')
+        md = {'uid': u'john.smith', 'cn': u'John Smith'}
         request = DummyRequest(environ={'repoze.who.identity': md})
         self.assertEqual(self._callFUT(request), md)
 
@@ -172,7 +172,7 @@ class TestHasPermission(TestCase):
         from repoze.bfg.testing import DummyRequest
         environ = {}
         if user_id is not None:
-            environ['repoze.who.identity'] = dict(uid=user_id)
+            environ['repoze.who.identity'] = {'uid': user_id}
         return DummyRequest(environ=environ)
 
     def _makeProject(self, name=u'name', public=False):
@@ -252,11 +252,11 @@ class TestHasPermission(TestCase):
         assert not missing_perms, \
             'The following permissions are not tested: %s' % missing_perms
         request = self._makeRequest(user_id=user_id)
-        for key, permission in dict(
-            view=PERM_VIEW_PROJECT,
-            participate=PERM_PARTICIPATE_IN_PROJECT,
-            see_timing=PERM_SEE_PRIVATE_TIMING_INFO,
-            admin_project=PERM_ADMIN_PROJECT).items():
+        for key, permission in {
+            'view': PERM_VIEW_PROJECT,
+            'participate': PERM_PARTICIPATE_IN_PROJECT,
+            'see_timing': PERM_SEE_PRIVATE_TIMING_INFO,
+            'admin_project': PERM_ADMIN_PROJECT}.items():
             allowed = expected[key]
             self.assertEqual(
                 self._callFUT(request, permission, project), allowed)
@@ -265,22 +265,22 @@ class TestHasPermission(TestCase):
         project = self._makeProject()
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
-        self._test_role(user_id, project, dict(
-                view=True,
-                participate=True,
-                see_timing=True,
-                admin_project=True))
+        self._test_role(user_id, project, {
+                'view': True,
+                'participate': True,
+                'see_timing': True,
+                'admin_project': True})
 
     def test_role_project_admin(self):
         from yait.views.utils import ROLE_PROJECT_ADMIN
         project = self._makeProject()
         user_id = u'project_admin'
         self._makeUser(user_id, roles={project: ROLE_PROJECT_ADMIN})
-        self._test_role(user_id, project, dict(
-                view=True,
-                participate=True,
-                see_timing=True,
-                admin_project=True))
+        self._test_role(user_id, project, {
+                'view': True,
+                'participate': True,
+                'see_timing': True,
+                'admin_project': True})
 
     def test_role_project_internal_participant(self):
         from yait.views.utils import ROLE_PROJECT_INTERNAL_PARTICIPANT
@@ -288,11 +288,11 @@ class TestHasPermission(TestCase):
         user_id = u'internal_participant'
         self._makeUser(user_id, roles={
                 project: ROLE_PROJECT_INTERNAL_PARTICIPANT})
-        self._test_role(user_id, project, dict(
-                view=True,
-                participate=True,
-                see_timing=True,
-                admin_project=False))
+        self._test_role(user_id, project, {
+                'view': True,
+                'participate': True,
+                'see_timing': True,
+                'admin_project': False})
 
     def test_role_project_participant(self):
         from yait.views.utils import ROLE_PROJECT_PARTICIPANT
@@ -300,11 +300,11 @@ class TestHasPermission(TestCase):
         user_id = u'participant'
         self._makeUser(user_id, roles={
                 project: ROLE_PROJECT_PARTICIPANT})
-        self._test_role(user_id, project, dict(
-                view=True,
-                participate=True,
-                see_timing=False,
-                admin_project=False))
+        self._test_role(user_id, project, {
+                'view': True,
+                'participate': True,
+                'see_timing': False,
+                'admin_project': False})
 
     def test_role_project_viewer(self):
         from yait.views.utils import ROLE_PROJECT_VIEWER
@@ -312,21 +312,21 @@ class TestHasPermission(TestCase):
         user_id = u'project_viewer'
         self._makeUser(user_id, roles={
                 project: ROLE_PROJECT_VIEWER})
-        self._test_role(user_id, project, dict(
-                view=True,
-                participate=False,
-                see_timing=False,
-                admin_project=False))
+        self._test_role(user_id, project, {
+                'view': True,
+                'participate': False,
+                'see_timing': False,
+                'admin_project': False})
 
     def test_no_role(self):
         project = self._makeProject()
         user_id = u'no_role'
         self._makeUser(user_id)
-        self._test_role(user_id, project, dict(
-                view=False,
-                participate=False,
-                see_timing=False,
-                admin_project=False))
+        self._test_role(user_id, project, {
+                'view': False,
+                'participate': False,
+                'see_timing': False,
+                'admin_project': False})
 
     def test_role_in_another_project(self):
         from yait.views.utils import PERM_ADMIN_PROJECT
@@ -336,11 +336,11 @@ class TestHasPermission(TestCase):
         ## give role in project 1
         self._makeUser(user_id, roles={project1: PERM_ADMIN_PROJECT})
         ## but check in project 2
-        self._test_role(user_id, project2, dict(
-                view=False,
-                participate=False,
-                see_timing=False,
-                admin_project=False))
+        self._test_role(user_id, project2, {
+                'view': False,
+                'participate': False,
+                'see_timing': False,
+                'admin_project': False})
 
     def test_cache_site_permissions(self):
         from yait.models import Admin
@@ -374,17 +374,17 @@ class TestRollbackTransaction(TestCase):
         return rollback_transaction(environ, status, None)
 
     def test_rollback_on_get(self):
-        environ = dict(REQUEST_METHOD='GET')
+        environ = {'REQUEST_METHOD': 'GET'}
         self.assertEqual(self._callFUT(environ), True)
 
     def test_rollback_when_4xx(self):
-        environ = dict(REQUEST_METHOD='POST')
+        environ = {'REQUEST_METHOD': 'POST'}
         self.assertEqual(self._callFUT(environ, '400'), True)
 
     def test_rollback_when_5xx(self):
-        environ = dict(REQUEST_METHOD='POST')
+        environ = {'REQUEST_METHOD': 'POST'}
         self.assertEqual(self._callFUT(environ, '500'), True)
 
     def test_commit_when_2xx(self):
-        environ = dict(REQUEST_METHOD='POST')
+        environ = {'REQUEST_METHOD': 'POST'}
         self.assertEqual(self._callFUT(environ, '200'), False)

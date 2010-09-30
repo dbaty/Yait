@@ -27,7 +27,7 @@ def add_project_form(context, request, form=None):
     if form is None:
         form = AddProjectForm()
     return render_to_response('templates/project_add_form.pt',
-                              dict(api=api, form=form))
+                              {'api': api, 'form': form})
 
 
 def add_project(context, request):
@@ -46,7 +46,7 @@ def add_project(context, request):
 
 
 def project_view(context, request):
-    project_name = context.project_name
+    project_name = request.matchdict['project_name']
     session = DBSession()
     try:
         project = session.query(Project).filter_by(name=project_name).one()
@@ -64,5 +64,5 @@ def project_view(context, request):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
     return render_to_response('templates/project_view.pt',
-                              dict(api=api,
-                                   project=project))
+                              {'api': api,
+                               'project': project})

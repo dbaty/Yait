@@ -11,11 +11,11 @@
     <legend>Add a new project</legend>
 
     <metal:field tal:define="field_name 'name';
-                             field_options dict(size=15)"
+                             field_options {'size': 15}"
                  metal:use-macro="renderField"/>
 
     <metal:field tal:define="field_name 'title';
-                             field_options dict(size=50)"
+                             field_options {'size': 50}"
                  metal:use-macro="renderField"/>
 
     <div class="formRow">

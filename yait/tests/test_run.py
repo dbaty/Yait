@@ -14,6 +14,6 @@ class TestApp(TestCase):
         from repoze.bfg.router import Router
         from yait.run import app
         global_settings = {}
-        settings = dict(db_string='sqlite://')
+        settings = {'db_string': 'sqlite://'}
         wsgi_app = app(global_settings, **settings)
         self.assert_(isinstance(wsgi_app, Router))

@@ -52,7 +52,7 @@ class TestAddProject(TestCaseForViews):
         self._makeSiteAdmin(user_id)
         renderer = self._makeRenderer()
         context = self._makeModel()
-        post = dict(name=u'p1', title=u'')
+        post = {'name': u'p1', 'title': u''}
         request = self._makeRequest(user_id=user_id, post=post)
         self._callFUT(context, request)
         form = renderer._received.get('form', None)
@@ -66,7 +66,7 @@ class TestAddProject(TestCaseForViews):
         renderer = self._makeRenderer()
         context = self._makeModel()
         self._makeProject(name=u'p1')
-        post = dict(name=u'p1', title=u'Project 1', public='')
+        post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
         request = self._makeRequest(user_id=user_id, post=post)
         self._callFUT(context, request)
         form = renderer._received.get('form', None)
@@ -78,7 +78,7 @@ class TestAddProject(TestCaseForViews):
         user_id = u'admin'
         self._makeSiteAdmin(user_id)
         context = self._makeModel()
-        post = dict(name=u'p1', title=u'Project 1', public='')
+        post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
         request = self._makeRequest(user_id=user_id, post=post)
         response = self._callFUT(context, request)
         location = response.headers['Location']
@@ -98,23 +98,26 @@ class TestViewProject(TestCaseForViews):
         return project_view(*args, **kwargs)
 
     def test_project_view_unknowproject(self):
-        context = self._makeModel(project_name=u'unknown')
-        request = self._makeRequest()
+        context = self._makeModel()
+        matchdict = {'project_name': u'unknown'}
+        request = self._makeRequest(matchdict=matchdict)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_project_view_disallowed(self):
         self._makeProject(name=u'p1')
-        context = self._makeModel(project_name=u'p1')
-        request = self._makeRequest()
+        context = self._makeModel()
+        matchdict = {'project_name': u'p1'}
+        request = self._makeRequest(matchdict=matchdict)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_project_view_public_project(self):
         p = self._makeProject(name=u'p1', public=True)
         renderer = self._makeRenderer()
-        context = self._makeModel(project_name=u'p1')
-        request = self._makeRequest()
+        context = self._makeModel()
+        matchdict = {'project_name': u'p1'}
+        request = self._makeRequest(matchdict=matchdict)
         self._callFUT(context, request)
         renderer.assert_(project=p)
 
@@ -124,7 +127,9 @@ class TestViewProject(TestCaseForViews):
         user_id = u'user1'
         self._makeUser(user_id, roles={p: ROLE_PROJECT_VIEWER})
         renderer = self._makeRenderer()
-        context = self._makeModel(project_name=u'p1')
-        request = self._makeRequest(user_id=user_id)
+        context = self._makeModel()
+        matchdict = {'project_name': u'p1'}
+        request = self._makeRequest(user_id=user_id,
+                                    matchdict=matchdict)
         self._callFUT(context, request)
         renderer.assert_(project=p)

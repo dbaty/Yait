@@ -152,8 +152,8 @@ class Issue(Model):
 
         All time information is converted to the "1w 2d 3h" format.
         """
-        data = dict(billed=self.time_billed or 0,
-                    spent_public=0)
+        data = {'billed': self.time_billed or 0,
+                'spent_public': 0}
         if include_private_info:
             data.update(estimated=self.time_estimated or 0)
             data.update(spent_real=0)
@@ -230,8 +230,8 @@ class Change(Model):
                     after = ISSUE_KIND_LABELS[after - 1]
                 elif attr == 'priority':
                     after = ISSUE_PRIORITY_LABELS[after - 1]
-            details.append(dict(attr=attr, label=label,
-                                before=before, after=after))
+            details.append({'attr': attr, 'label': label,
+                            'before': before, 'after': after})
         return details
 
 
@@ -287,13 +287,10 @@ roles_table = Table(
 ##########
 projects_mapper = mapper(
     Project, projects_table,
-    properties=dict(
-        issues=relationship(Issue, lazy='select')))
+    properties={'issues': relationship(Issue, lazy='select')})
 issues_mapper = mapper(
     Issue, issues_table,
-    properties=dict(
-        ## FIXME: do we need 'backref'?
-        changes=relationship(Change, lazy='select')))
+    properties={'changes': relationship(Change, lazy='select')})
 changes_mapper = mapper(Change, changes_table)
 issue_relationships_mapper = mapper(
     IssueRelationship, issue_relationships_table,

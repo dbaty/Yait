@@ -30,6 +30,7 @@ class TestCaseForViews(TestCase):
         self.session.remove()
 
     def _makeRenderer(self):
+        ## FIXME: could be replaced by return self.config.testing_add_template(self.template_under_test)
         from repoze.bfg.testing import registerTemplateRenderer
         return registerTemplateRenderer(self.template_under_test)
 
@@ -37,16 +38,20 @@ class TestCaseForViews(TestCase):
         from repoze.bfg.testing import DummyModel
         return DummyModel(*args, **kwargs)
 
-    def _makeRequest(self, user_id=None, post=None, environ=None):
+    def _makeRequest(self, user_id=None, post=None, environ=None,
+                     matchdict=None):
         from repoze.bfg.testing import DummyRequest
         if environ is None:
             environ = {}
         if user_id is not None:
-            environ['repoze.who.identity'] = dict(uid=user_id)
+            environ['repoze.who.identity'] = {'uid': user_id}
         if post is not None:
             from webob.multidict import MultiDict
             post = MultiDict(post)
-        return DummyRequest(environ=environ, post=post)
+        request = DummyRequest(environ=environ, post=post)
+        if matchdict is not None:
+            request.matchdict = matchdict
+        return request
 
     def _makeSiteAdmin(self, user_id):
         from yait.models import Admin

@@ -19,8 +19,10 @@ class TestIssueAddForm(TestCaseForViews):
         p = self._makeProject(name=u'p1')
         user_id = u'user1'
         self._makeUser(user_id, roles={p: ROLE_PROJECT_VIEWER})
-        context = self._makeModel(project_name=u'p1')
-        request = self._makeRequest(user_id=user_id)
+        context = self._makeModel()
+        matchdict = {'project_name': u'p1'}
+        request = self._makeRequest(user_id=user_id,
+                                    matchdict=matchdict)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '401 Unauthorized')
 
@@ -31,8 +33,10 @@ class TestIssueAddForm(TestCaseForViews):
         user_id = u'user1'
         self._makeUser(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
         renderer = self._makeRenderer()
-        context = self._makeModel(project_name=u'p1')
-        request = self._makeRequest(user_id=user_id)
+        context = self._makeModel()
+        matchdict = {'project_name': u'p1'}
+        request = self._makeRequest(user_id=user_id,
+                                    matchdict=matchdict)
         self._callFUT(context, request)
         form = renderer._received.get('form', None)
         self.assert_(isinstance(form, AddIssueForm))
@@ -51,8 +55,10 @@ class TestAddIssue(TestCaseForViews):
         p = self._makeProject(name=u'p1')
         user_id = u'user1'
         self._makeUser(user_id, roles={p: ROLE_PROJECT_VIEWER})
-        context = self._makeModel(project_name=u'p1')
-        request = self._makeRequest(user_id=user_id)
+        context = self._makeModel()
+        matchdict = {'project_name': u'p1'}
+        request = self._makeRequest(user_id=user_id,
+                                    matchdict=matchdict)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '401 Unauthorized')
 
@@ -61,9 +67,11 @@ class TestAddIssue(TestCaseForViews):
         p = self._makeProject(name=u'p1')
         user_id = u'user1'
         self._makeUser(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
-        context = self._makeModel(project_name=u'p1')
-        post = dict(title=u'Issue title', text=u'Issue body')
-        request = self._makeRequest(user_id=user_id, post=post)
+        context = self._makeModel()
+        post = {'title': u'Issue title', 'text': u'Issue body'}
+        matchdict = {'project_name': u'p1'}
+        request = self._makeRequest(user_id=user_id, post=post,
+                                    matchdict=matchdict)
         response = self._callFUT(context, request)
         location = response.headers['location']
         self.assert_(location.endswith('%s/1' % p.name))
@@ -87,15 +95,19 @@ class TestAddIssue(TestCaseForViews):
         self._makeUser(user_id, roles={p1: ROLE_PROJECT_PARTICIPANT,
                                        p2: ROLE_PROJECT_PARTICIPANT})
 
-        context = self._makeModel(project_name=u'p1')
-        post = dict(title=u't', text=u't')
-        request = self._makeRequest(user_id=user_id, post=post)
+        context = self._makeModel()
+        post = {'title': u't', 'text': u't'}
+        matchdict = {'project_name': u'p1'}
+        request = self._makeRequest(user_id=user_id, post=post,
+                                    matchdict=matchdict)
         self._callFUT(context, request)
         self.assertEqual(p1.issues[0].ref, 1)
 
-        context = self._makeModel(project_name=u'p2')
-        post = dict(title=u't', text=u't')
-        request = self._makeRequest(user_id=user_id, post=post)
+        context = self._makeModel()
+        post = {'title': u't', 'text': u't'}
+        matchdict = {'project_name': u'p2'}
+        request = self._makeRequest(user_id=user_id, post=post,
+                                    matchdict=matchdict)
         self._callFUT(context, request)
         self.assertEqual(p2.issues[0].ref, 1)
 
@@ -104,8 +116,10 @@ class TestAddIssue(TestCaseForViews):
         ## 'p1.issues'.
         self.session.expunge(p1)
         p1 = self.session.query(Project).filter_by(name=u'p1').one()
-        context = self._makeModel(project_name=u'p1')
-        post = dict(title=u't', text=u't')
-        request = self._makeRequest(user_id=user_id, post=post)
+        context = self._makeModel()
+        post = {'title': u't', 'text': u't'}
+        matchdict = {'project_name': u'p1'}
+        request = self._makeRequest(user_id=user_id, post=post,
+                                    matchdict=matchdict)
         self._callFUT(context, request)
         self.assertEqual(p1.issues[1].ref, 2)

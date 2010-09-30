@@ -17,6 +17,7 @@
      />
   <route
      path="post_login"
+     request_method="POST"
      name="post_login"
      view=".views.login.post_login"
      />
@@ -38,15 +39,18 @@
          name="manage_admins_form"
          view=".views.site.manage_admins_form"/>
   <route path="control_panel/add_admin"
+         request_method="POST"
          name="add_admin"
          view=".views.site.add_admin"/>
   <route path="control_panel/delete_admin"
+         request_method="POST"
          name="delete_admin"
          view=".views.site.delete_admin"/>
   <route path="control_panel/manage_projects_form"
          name="manage_projects_form"
          view=".views.site.manage_projects_form"/>
   <route path="control_panel/delete_project"
+         request_method="POST"
          name="delete_project"
          view=".views.site.delete_project"/>
   <route path="ajax_render_ReST"
@@ -59,6 +63,7 @@
          name="add_project_form"
          view=".views.project.add_project_form"/>
   <route path="add_project"
+         request_method="POST"
          name="add_project"
          view=".views.project.add_project"/>
   <route path=":project_name"
@@ -70,12 +75,14 @@
          name="add_issue_form"
          view=".views.issue.add_issue_form"/>
   <route path=":project_name/add_issue"
+         request_method="POST"
          name="add_issue"
          view=".views.issue.add_issue"/>
   <route path=":project_name/:issue_ref"
          name="issue_view"
          view=".views.issue.issue_view"/>
   <route path=":project_name/:issue_ref/update"
+         request_method="POST"
          name="issue_update"
          view=".views.issue.issue_update"/>
 

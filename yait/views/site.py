@@ -39,8 +39,8 @@ def site_index(context, request):
     ## FIXME: we should probably also list open issues assigned to the
     ## logged-in users, here.
     return render_to_response('templates/site_index.pt',
-                              dict(api=api,
-                                   projects=projects))
+                              {'api': api,
+                               'projects': projects})
 
 
 def control_panel(context, request):
@@ -48,7 +48,7 @@ def control_panel(context, request):
         return HTTPUnauthorized()
     api = TemplateAPI(context, request)
     return render_to_response('templates/site_control_panel.pt',
-                              dict(api=api))
+                              {'api': api})
 
 
 def manage_admins_form(context, request):
@@ -59,9 +59,9 @@ def manage_admins_form(context, request):
     api = TemplateAPI(context, request)
     user_id = get_user_metadata(request)['uid']
     return render_to_response('templates/site_manage_admins_form.pt',
-                              dict(api=api,
-                                   current_user_id=user_id,
-                                   admins=admins))
+                              {'api': api,
+                               'current_user_id': user_id,
+                               'admins': admins})
 
 
 def add_admin(context, request):
@@ -118,8 +118,8 @@ def manage_projects_form(context, request):
     projects = session.query(Project).order_by(Project.title).all()
     api = TemplateAPI(context, request)
     return render_to_response('templates/site_manage_projects_form.pt',
-                              dict(api=api,
-                                   projects=projects))
+                              {'api': api,
+                               'projects': projects})
 
 
 def delete_project(context, request):
@@ -141,7 +141,7 @@ def not_found(context, request):
     api = TemplateAPI(context, request)
     response = render_to_response(
         'templates/notfound.pt',
-        value=dict(api=api,
-                   resource_url=request.url))
+        value={'api': api,
+               'resource_url': request.url})
     response.status = 404
     return response
