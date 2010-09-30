@@ -30,9 +30,9 @@ class TestCaseForViews(TestCase):
         self.session.remove()
 
     def _makeRenderer(self):
-        ## FIXME: could be replaced by return self.config.testing_add_template(self.template_under_test)
-        from repoze.bfg.testing import registerTemplateRenderer
-        return registerTemplateRenderer(self.template_under_test)
+        return self.config.testing_add_template(self.template_under_test)
+        #from repoze.bfg.testing import registerTemplateRenderer
+        #return registerTemplateRenderer(self.template_under_test)
 
     def _makeModel(self, *args, **kwargs):
         from repoze.bfg.testing import DummyModel
