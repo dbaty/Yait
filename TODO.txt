@@ -1,17 +1,14 @@
 Yait 0.2
 ========
 
-- switch to repoze.who 2
+- completion of the 'add issue' form
 
-- move to distribute
+- add a way to change the title: quick edit (cf. issue tracker Pilot),
+  or when adding a comment
 
-- PEP 8 naming, including in tests ('makeOne', etc.)
+- a checkbox to assign "to me"
 
-- find a new name: obal, peri, prao, aster, noria, falgo, tern, tuit
-
-
-Yait 0.3
-========
+- attachments
 
 - home page
 
@@ -22,15 +19,6 @@ Yait 0.3
   - "master tickets" (if feature is implemented)
 
 - relationships between issues : parent/child, blocker/blocked
-
-- completion of the 'add issue' form
-
-- add a way to change the title: quick edit (cf. issue tracker Pilot),
-  or when adding a comment
-
-- a checkbox to assign "to me"
-
-- attachments
 
 - project control panel : configure whether the public
   (customer-oriented) timing information is displayed ('time_billed'
@@ -71,6 +59,19 @@ Yait 0.3
 - anti-XSRF measures
 
 - add auto-complete widget for "assign issue to"
+
+
+
+Yait 0.3
+========
+- switch to repoze.who 2
+
+- move to distribute
+
+- PEP 8 naming, including in tests ('_makeRequst', etc.)
+
+- find a new name: obal, peri, prao, aster, noria, falgo, tern, tuit
+
 
 
 Yait 0.4

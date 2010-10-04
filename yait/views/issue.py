@@ -124,24 +124,33 @@ def issue_update(context, request):
     project_name = request.matchdict['project_name']
     issue_ref = int(request.matchdict['issue_ref'])
     session = DBSession()
-    project = session.query(Project).filter_by(name=project_name).one()
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        return not_found(context, request)
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
-    issue = session.query(Issue).filter_by(
-        project_id=project.id, ref=issue_ref).one()
-    userid = u'damien.baty' ## FIXME
+    try:
+        issue = session.query(Issue).filter_by(
+            project_id=project.id, ref=issue_ref).one()
+    except NoResultFound:
+        return not_found(context, request)
 
     form = AddChangeForm(request.POST)
     if not form.validate():
         return issue_view(context, request, form)
 
     now = datetime.now()
+    userid = u'damien.baty' ## FIXME
     changes = {}
     for attr in (
         'status', 'assignee', 'deadline', 'priority', 'kind',
         'time_estimated', 'time_billed'):
         old_v = getattr(issue, attr)
         new_v = getattr(form, attr).data
+        if attr.startswith('time_') and not new_v:
+            ## FIXME: probably nto the right way to do it
+            new_v = 0
         if old_v != new_v:
             changes[attr] = (old_v, new_v)
             setattr(issue, attr, new_v)
@@ -171,6 +180,8 @@ def issue_update(context, request):
         changes['time_spent_public'] = (None, change.time_spent_public)
 
     if not changes and not form.text.data:
+        ## FIXME: move this test above before we add 'Change' so we do
+        ## not have to rollback anything.
         ## FIXME: redisplay update form with an appropriate general
         ## error message.
         ## FIXME: and rollback changes made on 'issue' and 'change'!

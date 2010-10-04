@@ -31,8 +31,6 @@ class TestCaseForViews(TestCase):
 
     def _makeRenderer(self):
         return self.config.testing_add_template(self.template_under_test)
-        #from repoze.bfg.testing import registerTemplateRenderer
-        #return registerTemplateRenderer(self.template_under_test)
 
     def _makeModel(self, *args, **kwargs):
         from repoze.bfg.testing import DummyModel
@@ -73,3 +71,33 @@ class TestCaseForViews(TestCase):
         self.session.add(p)
         self.session.flush() # need to flush to have an id later
         return p
+
+    def _makeIssue(self, project, ref=1,
+                   title=u'Title', reporter=u'reporter', assignee=u'assignee',
+                   kind=None, priority=None, status=None,
+                   resolution=None, deadline=None,
+                   time_estimated=0, time_billed=0):
+        from yait.models import Issue
+        from yait.models import DEFAULT_ISSUE_KIND
+        from yait.models import DEFAULT_ISSUE_PRIORITY
+        from yait.models import DEFAULT_ISSUE_STATUS
+        if kind is None:
+            kind = DEFAULT_ISSUE_KIND
+        if priority is None:
+            priority = DEFAULT_ISSUE_PRIORITY
+        if status is None:
+            status = DEFAULT_ISSUE_STATUS
+        i = Issue(project_id=project.id,
+                  ref=ref,
+                  title=title,
+                  reporter=reporter,
+                  kind=kind,
+                  priority=priority,
+                  status=status,
+                  resolution=resolution,
+                  deadline=deadline,
+                  time_estimated=time_estimated,
+                  time_billed=time_billed)
+        self.session.add(i)
+        self.session.flush() # need to flush to have an id later
+        return i
