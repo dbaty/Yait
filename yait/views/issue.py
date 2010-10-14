@@ -149,7 +149,7 @@ def issue_update(context, request):
         old_v = getattr(issue, attr)
         new_v = getattr(form, attr).data
         if attr.startswith('time_') and not new_v:
-            ## FIXME: probably nto the right way to do it
+            ## FIXME: probably not the right way to do it
             new_v = 0
         if old_v != new_v:
             changes[attr] = (old_v, new_v)
