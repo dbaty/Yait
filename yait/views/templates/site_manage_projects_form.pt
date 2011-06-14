@@ -26,7 +26,7 @@
       <td tal:content="project.title"/>
       <td class="centered">
         <form class="ninja"
-              tal:attributes="action api.url_of('control_panel/deleteProject')"
+              tal:attributes="action api.url_of('control_panel/delete_project')"
               onsubmit="return window.confirm('Are you sure?');"
               method="POST">
           <input type="hidden" name="project_id"
