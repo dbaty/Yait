@@ -5,18 +5,20 @@ from setuptools import setup
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(HERE, 'docs', 'README.txt')).read()
-CHANGES = open(os.path.join(HERE, 'docs', 'CHANGES.txt')).read()
+README = open(os.path.join(HERE, 'README.rst')).read()
+CHANGES = open(os.path.join(HERE, 'CHANGES.rst')).read()
 
-# FIXME: update
-REQUIRES = ('pyramid',
-            'sqlalchemy',
+
+REQUIRES = ('docutils',
+            'pyramid',
             'pyramid_tm',
-            'zope.sqlalchemy',
-)#            'repoze.who',
-#            'docutils')
+            'sqlalchemy',
+            'wtforms',
+            'zope.sqlalchemy')
+# FIXME: repoze.who
 
-## FIXME: to be completed
+
+# FIXME: to be completed
 setup(name='Yait',
       version='0.1',
       description='Yait is an issue tracker.',
@@ -41,5 +43,5 @@ setup(name='Yait',
       test_suite="yait.tests",
       entry_points = """\
       [paste.app_factory]
-      main = yait.run:make_app
+      main = yait.app:make_app
       """)

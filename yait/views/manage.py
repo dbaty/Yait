@@ -19,7 +19,7 @@ def control_panel(request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     api = TemplateAPI(request)
-    return render_to_response('templates/site_control_panel.pt',
+    return render_to_response('../templates/site_control_panel.pt',
                               {'api': api})
 
 
@@ -30,7 +30,7 @@ def list_admins(request):
     admins = session.query(Admin).order_by(Admin.user_id).all()
     api = TemplateAPI(request)
     user_id = get_user_metadata(request)['uid']
-    return render_to_response('templates/site_manage_admins_form.pt',
+    return render_to_response('../templates/site_manage_admins_form.pt',
                               {'api': api,
                                'current_user_id': user_id,
                                'admins': admins})
@@ -89,7 +89,7 @@ def list_projects(request):
     session = DBSession()
     projects = session.query(Project).order_by(Project.title).all()
     api = TemplateAPI(request)
-    return render_to_response('templates/site_manage_projects_form.pt',
+    return render_to_response('../templates/site_manage_projects_form.pt',
                               {'api': api,
                                'projects': projects})
 

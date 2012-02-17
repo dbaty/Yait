@@ -86,7 +86,9 @@ Yait 0.2
 
 - make sure that use POST instead of 'request.params' when it is fit
 
-- anti-XSRF measures
+- anti-CSRF measures: http://wtforms.simplecodes.com/docs/dev/ext.html#module-wtforms.ext.csrf
+
+- anti-XSS measures
 
 - add auto-complete widget for "assign issue to"
 
