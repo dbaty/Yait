@@ -6,12 +6,6 @@ $Id$
 from datetime import datetime
 import re
 
-from docutils.core import publish_parts
-from docutils.writers.html4css1 import Writer
-
-
-DOCUTILS_SETTINGS = {'output_encoding': 'utf-8',
-                     'initial_header_level': 2}
 TIME_REGEXP = re.compile('(?:(\d+)w)?'
                          ' ?(?:(\d+)d)?'
                          ' ?(?:(\d+)h)?'
@@ -112,15 +106,3 @@ def str_to_date(s, format='dd/mm/yyyy'): ## FIXME: is it used anywhere?
     components = map(int, s.split('/'))
     components.reverse()
     return datetime(*components)
-
-
-def render_ReST(text):
-    """Render the given ``text`` through the reStructuredText engine.
-
-    >>> render_ReST('this is **bold**')
-    u'<p>this is <strong>bold</strong></p>'
-    """
-    writer = Writer()
-    parts = publish_parts(
-        text, writer=writer, settings_overrides=DOCUTILS_SETTINGS)
-    return parts['body'].strip()

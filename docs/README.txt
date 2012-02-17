@@ -6,7 +6,7 @@ Yait is an issue tracking software written in Python with
 and documented. It is fast. It has an attractive and straightforward
 user interface. It provides a very convenient feature that lets one
 create hierarchies of issues (tasks, sub-tasks and so on) that may
-also be used to manage milestones or versions.
+also be used to manage project milestones or software versions.
 
 FIXME: to be expanded/rewritten: i18n, relatively easy to install,
 etc.

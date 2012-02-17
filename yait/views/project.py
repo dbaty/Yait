@@ -1,12 +1,9 @@
-"""View related to projects.
+"""View related to projects."""
 
-$Id$
-"""
 
-from webob.exc import HTTPFound
-from webob.exc import HTTPUnauthorized
-
-from repoze.bfg.renderers import render_to_response
+from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPUnauthorized
+from pyramid.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -20,22 +17,22 @@ from yait.views.utils import PERM_VIEW_PROJECT
 from yait.views.utils import TemplateAPI
 
 
-def add_project_form(context, request, form=None):
+def add_project_form(request, form=None):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
-    api = TemplateAPI(context, request)
+    api = TemplateAPI(request)
     if form is None:
         form = AddProjectForm()
     return render_to_response('templates/project_add_form.pt',
                               {'api': api, 'form': form})
 
 
-def add_project(context, request):
+def add_project(request):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
     form = AddProjectForm(request.POST)
     if not form.validate():
-        return add_project_form(context, request, form)
+        return add_project_form(request, form)
 
     project = Project()
     form.populate_obj(project)
@@ -45,13 +42,13 @@ def add_project(context, request):
     return HTTPFound(location=url)
 
 
-def project_view(context, request):
+def project_home(request):
     project_name = request.matchdict['project_name']
     session = DBSession()
     try:
         project = session.query(Project).filter_by(name=project_name).one()
     except NoResultFound:
-        return not_found(context, request)
+        return not_found(request)
 
     ## FIXME:
     ## - list of issues assigned to the current user
@@ -62,7 +59,7 @@ def project_view(context, request):
 
     if not has_permission(request, PERM_VIEW_PROJECT, project):
         return HTTPUnauthorized()
-    api = TemplateAPI(context, request)
-    return render_to_response('templates/project_view.pt',
+    api = TemplateAPI(request)
+    return render_to_response('templates/project_home.pt',
                               {'api': api,
                                'project': project})

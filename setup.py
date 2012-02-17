@@ -1,17 +1,27 @@
 import os
 
-from setuptools import setup, find_packages
+from setuptools import find_packages
+from setuptools import setup
 
-here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'docs', 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'docs', 'CHANGES.txt')).read()
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+README = open(os.path.join(HERE, 'docs', 'README.txt')).read()
+CHANGES = open(os.path.join(HERE, 'docs', 'CHANGES.txt')).read()
+
+# FIXME: update
+REQUIRES = ('pyramid',
+            'sqlalchemy',
+            'pyramid_tm',
+            'zope.sqlalchemy',
+)#            'repoze.who',
+#            'docutils')
 
 ## FIXME: to be completed
 setup(name='Yait',
       version='0.1',
-      description='Yait',
+      description='Yait is an issue tracker.',
       long_description=README + '\n\n' +  CHANGES,
-      classifiers=[
+      classifiers=(
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
@@ -19,7 +29,7 @@ setup(name='Yait',
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+        ),
       author='',
       author_email='',
       url='',
@@ -27,21 +37,9 @@ setup(name='Yait',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires=[
-            'repoze.bfg',
-            'SQLAlchemy',
-            'repoze.tm2',
-            'repoze.who',
-            'repoze.who-friendlyform',
-            'docutils',
-            ],
-      tests_require=[
-            'repoze.bfg',
-            ],
-      test_suite="yait",
+      install_requires=REQUIRES,
+      test_suite="yait.tests",
       entry_points = """\
       [paste.app_factory]
-      app = yait.run:app
-      """
-      )
-
+      main = yait.run:make_app
+      """)

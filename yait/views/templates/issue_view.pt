@@ -15,6 +15,7 @@
   <a tal:attributes="href api.url_of(project.name)" tal:content="project.title"/>
 </metal:header>
 
+<!-- FIXME: move 'can_see_private_time_info' definition in the view function -->
 <metal:content metal:fill-slot="content"
                tal:define="can_see_private_time_info api.has_permission(
                          u'See private time information', project)">
@@ -57,9 +58,9 @@
           on <span tal:replace="change.date.strftime('%d %B %Y at %H:%M')"/>
         </h2>
         <div class="changeText"
-             tal:define="t change.get_rendered_text()"
-             tal:condition="t"
-             tal:content="structure t">
+             tal:define="change_text change.get_rendered_text()"
+             tal:condition="change_text"
+             tal:content="structure change_text">
         </div>
         <ul class="changeDetails"
             tal:condition="details">
@@ -121,7 +122,8 @@
     <li tal:condition="not issue.assignee" class="issueUnassigned">
       Unassigned
     </li>
-    <li>Watchers: FIXME <!-- FIXME: list and add button--></li>
+    <!-- FIXME: both link shows a dialog form with the list of issue subscribers + buttons to add/remove subscribers  -->
+    <li>Watchers: <a href="#">6</a></li>
   </ul>
 
   <h3>Dates and time</h3>

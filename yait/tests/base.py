@@ -16,7 +16,7 @@ def get_testing_db_session():
 class TestCaseForViews(TestCase):
 
     def setUp(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         self.config = Configurator()
         ## We need to register these templates since they are used in
         ## TemplateAPI which is in turn used in almost all views.
@@ -32,13 +32,9 @@ class TestCaseForViews(TestCase):
     def _makeRenderer(self):
         return self.config.testing_add_template(self.template_under_test)
 
-    def _makeModel(self, *args, **kwargs):
-        from repoze.bfg.testing import DummyModel
-        return DummyModel(*args, **kwargs)
-
     def _makeRequest(self, user_id=None, post=None, environ=None,
                      matchdict=None):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         if environ is None:
             environ = {}
         if user_id is not None:

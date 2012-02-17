@@ -16,7 +16,7 @@ from sqlalchemy.orm import sessionmaker
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
-from yait.utils import render_ReST
+from yait.text import render
 from yait.utils import time_to_str
 
 
@@ -198,7 +198,7 @@ class Change(Model):
         return '<Change %d (issue=%d)>' % (self.id, self.issue_id)
 
     def get_rendered_text(self):
-        return render_ReST(self.text)
+        return render(self.text, self.text_renderer)
 
     def get_details(self, include_private_time_info=False):
         """Return a list of changes as mappings."""
@@ -245,6 +245,7 @@ changes_table = Table(
     Column('time_spent_real', Integer),
     Column('time_spent_public', Integer),
     Column('text', Text),
+    Column('text_renderer', String(20)),
     Column('changes', PickleType(mutable=False))) ## FIXME: I think that we do need it to be mutable. To be checked.
 
 

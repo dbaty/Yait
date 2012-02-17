@@ -1,12 +1,41 @@
+- port to Pyramid
+
+- rename "run.py" as "app.py" (+ update "setup.py")
+
+- move "views/template/" to "templates/"
+
+- move "views/static" to "static/"
+
+- move users from LDAP to the RDBMS
+
+- use HTTPSeeOther to redirect after a POST (instead of HTTPFound)
+
+- review permission system: turn it into a Pyramid authorization
+  policy (?)
+
+
+
 Yait 0.2
 ========
 
-- completion of the 'add issue' form
+- review CSS:
+
+  - "Update by xxx" header should probably be smaller, or with a
+     background-color different from the text of the comment itself)
+
+  - move actions (add issue, search issue, configure project, etc.) in
+    an horizontal bar below the title header.
+
+  - move "meta" bar to the left column (?)
+
+- complete the 'add issue' form
 
 - add a way to change the title: quick edit (cf. issue tracker Pilot),
   or when adding a comment
 
-- a checkbox to assign "to me"
+- add a checkbox to assign "to me" in the extra fields of the add
+  issue/comment form. Easier: add a "to me" link near the label, which
+  will fill the field.
 
 - attachments
 
@@ -29,6 +58,7 @@ Yait 0.2
   not in the "extra" field set).
 
 - check "api.url_of()" when the URL looks like: domain.com/foo/yait
+  (should not be a problem if we use 'route_url()').
 
 - search form
 
@@ -60,10 +90,15 @@ Yait 0.2
 
 - add auto-complete widget for "assign issue to"
 
+- add auto-complete widget for "Parent issue"
+
+- remove "Child issue(s)" label from the extra fieldset
+
 
 
 Yait 0.3
 ========
+
 - switch to repoze.who 2
 
 - move to distribute
@@ -92,6 +127,8 @@ Yait 0.4
 
 Later
 =====
+
+- make status, priority and kind fields configurable.
 
 - allow other text formatting syntaxes:
 
@@ -135,6 +172,12 @@ Later
   - time spent (public): the time spent on this issue as it should be
     seen by the customer. It may be different than the time really
     spent, and relates to the time billed.
+
+  - try to make it more clear in the UI itself that "estimated time"
+    and "time billed" fields correspond to a total (that will replace
+    previous values), while "time spent" (private and public) will be
+    added (or possibly removed) to the total time already spent on
+    this issue.
 
 - validate HTML, CSS and Javascript (jslint).
 

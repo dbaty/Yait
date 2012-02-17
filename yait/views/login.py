@@ -5,30 +5,34 @@ $Id$
 
 from urllib import quote_plus
 
-from webob.exc import HTTPFound
-
-from repoze.bfg.renderers import render_to_response
+from pyramid.httpexceptions import HTTPFound
+from pyramid.renderers import render_to_response
 
 from yait.views.utils import TemplateAPI
 
 
-def login_form(context, request):
-    api = TemplateAPI(context, request)
-    came_from = request.params.get('came_from') or api.referrer or '/'
+# FIXME: to be reviewed. Check that using repoze.who is really useful.
+# FIXME: use HTTPSeeOther instead of HTTPFound
+
+def login_form(request):
+    api = TemplateAPI(request)
+    next = request.GET.get('next') or \
+        request.POST.get('next') or \
+        quote_plus(api.referrer or api.app_url)
     login_counter = request.environ.get('repoze.who.logins', 0)
     error_msg = None
     if login_counter != 0:
         error_msg = 'Wrong user name or password.'
     return render_to_response('templates/login.pt',
                               {'api': api,
-                               'came_from': came_from,
+                               'next': next,
                                'error_msg': error_msg,
                                'login_counter': login_counter})
 
 
-def post_login(context, request):
+def post_login(request):
     identity = request.environ.get('repoze.who.identity')
-    came_from = request.POST.get('came_from', '') or '/'
+    came_from = request.POST.get('next', '') or request.application_url
     if identity:
         destination = came_from
     else:
@@ -39,7 +43,7 @@ def post_login(context, request):
     return HTTPFound(location=destination)
 
 
-def post_logout(context, request):
+def post_logout(request):
     url = '%s?status_message=%s' % (
         request.application_url,
         quote_plus(u'You have been logged out.'))

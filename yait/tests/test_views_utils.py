@@ -9,7 +9,7 @@ from unittest import TestCase
 class TestTemplateAPI(TestCase):
 
     def setUp(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         self.config = Configurator()
         ## We need to register these templates since they are used in
         ## TemplateAPI.
@@ -20,18 +20,15 @@ class TestTemplateAPI(TestCase):
     def tearDown(self):
         self.config.end()
 
-    def _makeOne(self, context=None, request=None):
+    def _makeOne(self, request=None):
         from yait.views.utils import TemplateAPI
-        if context is None:
-            from repoze.bfg.testing import DummyModel
-            context = DummyModel()
         if request is None:
-            from repoze.bfg.testing import DummyRequest
+            from pyramid.testing import DummyRequest
             request = DummyRequest()
-        return TemplateAPI(context, request)
+        return TemplateAPI(request)
 
     def test_request_related_attributes(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest(
             environ={'HTTP_REFERER': 'http://referrer.com'})
         api = self._makeOne(request=request)
@@ -42,7 +39,7 @@ class TestTemplateAPI(TestCase):
         self.assert_(api.show_login_link)
 
     def test_status_message(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest(
             params={'status_message': 'A status message.'},
             environ={'HTTP_REFERER': 'http://example.com/foo'})
@@ -50,7 +47,7 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(api.status_message, 'A status message.')
 
     def test_error_message(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest(
             params={'error_message': 'An error message.'},
             environ={'HTTP_REFERER': 'http://example.com/foo'})
@@ -58,7 +55,7 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(api.error_message, 'An error message.')
 
     def test_status_message_foreign(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest(
             params={'status_message': 'A status message.'},
             environ={'HTTP_REFERER': 'http://other.com'})
@@ -66,7 +63,7 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(api.status_message, '')
 
     def test_error_message_foreign(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest(
             params={'error_message': 'An error message.'},
             environ={'HTTP_REFERER': 'http://other.com'})
@@ -74,7 +71,7 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(api.error_message, '')
 
     def test_no_login_link_in_login_form(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest(
             url='http://exemple.com/login_form?came_from=foo')
         api = self._makeOne(request=request)
@@ -86,7 +83,7 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(api.user_cn, None)
 
     def test_user_related_logged_in(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest(
             environ={'repoze.who.identity':
                          {'uid': u'john.smith',
@@ -96,7 +93,7 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(api.user_cn, u'John Smith')
 
     def test_user_related_no_cn(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest(
             environ={'repoze.who.identity':
                          {'uid': u'john.smith',
@@ -106,7 +103,7 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(api.user_cn, u'john.smith')
 
     def test_misc_attributes(self):
-        from repoze.bfg.testing import DummyRequest        
+        from pyramid.testing import DummyRequest        
         request = DummyRequest()
         api = self._makeOne(request=request)
         self.assertEqual(api.header_prefix, u'Yait')
@@ -115,7 +112,7 @@ class TestTemplateAPI(TestCase):
         self.assert_(getattr(api.form_macros, 'render', None) is not None)
 
     def test_url_of(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest()
         request.application_url = 'http://exemple.com'
         api = self._makeOne(request=request)
@@ -125,7 +122,7 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(api.url_of('foo/bar/'), 'http://exemple.com/foo/bar')
 
     def test_has_permission(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         def injected(request, *args):
             return request, args
         from yait.views import utils
@@ -144,12 +141,12 @@ class TestGetUserMetadata(TestCase):
         return get_user_metadata(*args, **kwargs)
 
     def test_anonymous(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         request = DummyRequest()
         self.assertEqual(self._callFUT(request), None)
 
     def test_authenticated(self):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         md = {'uid': u'john.smith', 'cn': u'John Smith'}
         request = DummyRequest(environ={'repoze.who.identity': md})
         self.assertEqual(self._callFUT(request), md)
@@ -169,7 +166,7 @@ class TestHasPermission(TestCase):
         return has_permission(*args, **kwargs)
 
     def _makeRequest(self, user_id=None):
-        from repoze.bfg.testing import DummyRequest
+        from pyramid.testing import DummyRequest
         environ = {}
         if user_id is not None:
             environ['repoze.who.identity'] = {'uid': user_id}

@@ -3,7 +3,7 @@
 $Id$
 """
 
-from repoze.bfg.renderers import get_renderer
+from pyramid.renderers import get_renderer
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -47,7 +47,7 @@ class TemplateAPI(object):
     """Provides a master template and various information and
     utilities that can be used in any template.
     """
-    def __init__(self, context, request):
+    def __init__(self, request):
         self.request = request
         self.app_url = request.application_url
         self.here_url = request.url
@@ -55,8 +55,8 @@ class TemplateAPI(object):
         self.header_prefix = HEADER_PREFIX
         self.html_title_prefix = HTML_TITLE_PREFIX
         if self.referrer.startswith(request.application_url):
-            self.status_message = request.params.get('status_message', '')
-            self.error_message = request.params.get('error_message', '')
+            self.status_message = request.GET.get('status_message', '')
+            self.error_message = request.GET.get('error_message', '')
         else:
             self.status_message = self.error_message = ''
         self.layout = get_renderer(
@@ -72,6 +72,7 @@ class TemplateAPI(object):
         if self.logged_in:
             self.user_cn = md.get('cn') or md.get('uid')
 
+    # rename as 'route_url()' and call 'request.route_url()'
     def url_of(self, path):
         return '/'.join((self.app_url, path)).strip('/')
 
@@ -139,6 +140,7 @@ def has_permission(request, permission, context=None):
     return permission in user_perms
 
 
+# FIXME: should not be needed anymore
 def rollback_transaction(environ, status, headers):
     """Returns whether the transaction machinery should cancel the
     transaction.
