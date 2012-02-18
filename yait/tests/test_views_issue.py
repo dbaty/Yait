@@ -1,7 +1,5 @@
-"""Test views related to issues.
+"""Test views related to issues."""
 
-$Id$
-"""
 
 from unittest import TestCase
 
@@ -10,94 +8,94 @@ from yait.tests.base import TestCaseForViews
 
 class TestIssueAddForm(TestCaseForViews):
 
-    template_under_test = 'templates/issue_add_form.pt'
+    template_under_test = '../templates/issue_add.pt'
 
-    def _callFUT(self, request):
+    def _call_fut(self, request):
         from yait.views.issue import add_issue_form
         return add_issue_form(request)
 
     def test_add_issue_form_unknown_project(self):
         matchdict = {'project_name': u'p1'}
-        request = self._makeRequest(matchdict=matchdict)
-        response = self._callFUT(request)
+        request = self._make_request(matchdict=matchdict)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_add_issue_form_reject_not_participant(self):
         from yait.views.utils import ROLE_PROJECT_VIEWER
-        p = self._makeProject(name=u'p1')
+        p = self._make_project(name=u'p1')
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_VIEWER})
+        self._make_user(user_id, roles={p: ROLE_PROJECT_VIEWER})
         matchdict = {'project_name': u'p1'}
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict)
-        response = self._callFUT(request)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_add_issue_form_allow_participant(self):
         from yait.forms import AddIssueForm
         from yait.views.utils import ROLE_PROJECT_PARTICIPANT
-        p = self._makeProject(name=u'p1')
+        p = self._make_project(name=u'p1')
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
-        renderer = self._makeRenderer()
+        self._make_user(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
+        renderer = self._make_renderer()
         matchdict = {'project_name': u'p1'}
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict)
-        self._callFUT(request)
+        self._call_fut(request)
         form = renderer._received.get('form', None)
-        self.assert_(isinstance(form, AddIssueForm))
+        self.assertIsInstance(form, AddIssueForm)
 
 
 class TestAddIssue(TestCaseForViews):
 
-    template_under_test = 'templates/issue_add_form.pt'
+    template_under_test = '../templates/issue_add.pt'
 
-    def _callFUT(self, request):
+    def _call_fut(self, request):
         from yait.views.issue import add_issue
         return add_issue(request)
 
     def test_add_issue_unknown_project(self):
         matchdict = {'project_name': u'p1'}
-        request = self._makeRequest(matchdict=matchdict)
-        response = self._callFUT(request)
+        request = self._make_request(matchdict=matchdict)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_add_issue_reject_not_participant(self):
         from yait.views.utils import ROLE_PROJECT_VIEWER
-        p = self._makeProject(name=u'p1')
+        p = self._make_project(name=u'p1')
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_VIEWER})
+        self._make_user(user_id, roles={p: ROLE_PROJECT_VIEWER})
         matchdict = {'project_name': u'p1'}
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict)
-        response = self._callFUT(request)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_add_issue_invalid_form(self):
         from yait.views.utils import ROLE_PROJECT_PARTICIPANT
-        p = self._makeProject(name=u'p1')
+        p = self._make_project(name=u'p1')
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
+        self._make_user(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
         post = {'title': u'Issue title', 'text': u''}
         matchdict = {'project_name': u'p1'}
-        request = self._makeRequest(user_id=user_id, post=post,
+        request = self._make_request(user_id=user_id, post=post,
                                     matchdict=matchdict)
-        renderer = self._makeRenderer()
-        self._callFUT(request)
+        renderer = self._make_renderer()
+        self._call_fut(request)
         self.assertEqual(
             renderer._received.get('form').errors.keys(), ['text'])
         self.assertEqual(len(p.issues), 0)
 
     def test_add_issue_allow_participant(self):
         from yait.views.utils import ROLE_PROJECT_PARTICIPANT
-        p = self._makeProject(name=u'p1')
+        p = self._make_project(name=u'p1')
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
+        self._make_user(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
         post = {'title': u'Issue title', 'text': u'Issue body'}
         matchdict = {'project_name': u'p1'}
-        request = self._makeRequest(user_id=user_id, post=post,
+        request = self._make_request(user_id=user_id, post=post,
                                     matchdict=matchdict)
-        response = self._callFUT(request)
+        response = self._call_fut(request)
         location = response.headers['location']
         self.assert_(location.endswith('%s/1' % p.name))
         self.assertEqual(len(p.issues), 1)
@@ -114,24 +112,24 @@ class TestAddIssue(TestCaseForViews):
     def test_add_issue_check_references(self):
         from yait.models import Project
         from yait.views.utils import ROLE_PROJECT_PARTICIPANT
-        p1 = self._makeProject(name=u'p1')
-        p2 = self._makeProject(name=u'p2')
+        p1 = self._make_project(name=u'p1')
+        p2 = self._make_project(name=u'p2')
         user_id = u'user1'
-        self._makeUser(user_id, roles={p1: ROLE_PROJECT_PARTICIPANT,
-                                       p2: ROLE_PROJECT_PARTICIPANT})
+        self._make_user(user_id, roles={p1: ROLE_PROJECT_PARTICIPANT,
+                                        p2: ROLE_PROJECT_PARTICIPANT})
 
         post = {'title': u't', 'text': u't'}
         matchdict = {'project_name': u'p1'}
-        request = self._makeRequest(user_id=user_id, post=post,
+        request = self._make_request(user_id=user_id, post=post,
                                     matchdict=matchdict)
-        self._callFUT(request)
+        self._call_fut(request)
         self.assertEqual(p1.issues[0].ref, 1)
 
         post = {'title': u't', 'text': u't'}
         matchdict = {'project_name': u'p2'}
-        request = self._makeRequest(user_id=user_id, post=post,
+        request = self._make_request(user_id=user_id, post=post,
                                     matchdict=matchdict)
-        self._callFUT(request)
+        self._call_fut(request)
         self.assertEqual(p2.issues[0].ref, 1)
 
         ## We need to detach 'p1' from the session, otherwise
@@ -141,122 +139,122 @@ class TestAddIssue(TestCaseForViews):
         p1 = self.session.query(Project).filter_by(name=u'p1').one()
         post = {'title': u't', 'text': u't'}
         matchdict = {'project_name': u'p1'}
-        request = self._makeRequest(user_id=user_id, post=post,
+        request = self._make_request(user_id=user_id, post=post,
                                     matchdict=matchdict)
-        self._callFUT(request)
+        self._call_fut(request)
         self.assertEqual(p1.issues[1].ref, 2)
 
 
 class TestViewIssue(TestCaseForViews):
 
-    template_under_test = 'templates/issue_view.pt'
+    template_under_test = '../templates/issue.pt'
 
-    def _callFUT(self, request):
+    def _call_fut(self, request):
         from yait.views.issue import issue_view
         return issue_view(request)
 
     def test_issue_view_unknown_project(self):
         matchdict = {'project_name': u'p1', 'issue_ref': u'1'}
-        request = self._makeRequest(matchdict=matchdict)
-        response = self._callFUT(request)
+        request = self._make_request(matchdict=matchdict)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_issue_view_reject_not_participant(self):
-        self._makeProject(name=u'p1')
+        self._make_project(name=u'p1')
         user_id = u'user1'
         matchdict = {'project_name': u'p1', 'issue_ref': u'1'}
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict)
-        response = self._callFUT(request)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_issue_view_unknown_issue(self):
         from yait.views.utils import ROLE_PROJECT_VIEWER
-        p = self._makeProject(name=u'p1')
+        p = self._make_project(name=u'p1')
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_VIEWER})
+        self._make_user(user_id, roles={p: ROLE_PROJECT_VIEWER})
         matchdict = {'project_name': u'p1', 'issue_ref': u'1'}
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict)
-        response = self._callFUT(request)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_issue_view_project_viewer(self):
         from yait.forms import AddChangeForm
         from yait.views.utils import ROLE_PROJECT_VIEWER
-        p = self._makeProject(name=u'p1')
-        issue = self._makeIssue(project=p)
+        p = self._make_project(name=u'p1')
+        issue = self._make_issue(project=p)
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_VIEWER})
+        self._make_user(user_id, roles={p: ROLE_PROJECT_VIEWER})
         matchdict = {'project_name': u'p1', 'issue_ref': str(issue.ref)}
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict)
-        renderer = self._makeRenderer()
-        self._callFUT(request)
+        renderer = self._make_renderer()
+        self._call_fut(request)
         renderer.assert_(project=p)
         renderer.assert_(issue=issue)
-        self.assert_(isinstance(renderer._received.get('form'),
-                                AddChangeForm))
+        self.assertIsInstance(renderer._received.get('form'),
+                              AddChangeForm)
         self.assertEqual(renderer._received.get('form').errors, {})
 
 
 class TestUpdateIssue(TestCaseForViews):
 
-    template_under_test = 'templates/issue_view.pt'
+    template_under_test = '../templates/issue.pt'
 
-    def _callFUT(self, request):
+    def _call_fut(self, request):
         from yait.views.issue import issue_update
         return issue_update(request)
 
     def test_issue_update_unknown_project(self):
         matchdict = {'project_name': u'p1', 'issue_ref': u'1'}
-        request = self._makeRequest(matchdict=matchdict)
-        response = self._callFUT(request)
+        request = self._make_request(matchdict=matchdict)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_issue_update_reject_not_viewer(self):
-        self._makeProject(name=u'p1')
+        self._make_project(name=u'p1')
         user_id = u'user1'
         matchdict = {'project_name': u'p1', 'issue_ref': u'1'}
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict)
-        response = self._callFUT(request)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_issue_update_reject_not_participant(self):
         from yait.views.utils import ROLE_PROJECT_VIEWER
-        p = self._makeProject(name=u'p1')
+        p = self._make_project(name=u'p1')
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_VIEWER})
+        self._make_user(user_id, roles={p: ROLE_PROJECT_VIEWER})
         matchdict = {'project_name': u'p1', 'issue_ref': u'1'}
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict)
-        response = self._callFUT(request)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_issue_update_unknown_issue(self):
         from yait.views.utils import ROLE_PROJECT_PARTICIPANT
-        p = self._makeProject(name=u'p1')
+        p = self._make_project(name=u'p1')
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
+        self._make_user(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
         matchdict = {'project_name': u'p1', 'issue_ref': u'1'}
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict)
-        response = self._callFUT(request)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_issue_update_project_viewer(self):
         from yait.views.utils import ROLE_PROJECT_PARTICIPANT
-        p = self._makeProject(name=u'p1')
-        issue = self._makeIssue(project=p)
+        p = self._make_project(name=u'p1')
+        issue = self._make_issue(project=p)
         user_id = u'user1'
-        self._makeUser(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
+        self._make_user(user_id, roles={p: ROLE_PROJECT_PARTICIPANT})
         matchdict = {'project_name': u'p1', 'issue_ref': str(issue.ref)}
         post = {'text': u'comment', 'assignee': u'user2', }
-        request = self._makeRequest(user_id=user_id,
+        request = self._make_request(user_id=user_id,
                                     matchdict=matchdict,
                                     post=post)
-        response = self._callFUT(request)
+        response = self._call_fut(request)
         self.assertEqual(response.status, '302 Found')
         location = response.headers['location'].split('?')[0]
         self.assert_(location.endswith('%s/%d' % (p.name, issue.ref)))
@@ -268,20 +266,22 @@ class TestUpdateIssue(TestCaseForViews):
 
 class TestAjaxRenderReST(TestCase):
 
-    def _callFUT(self, request):
-        from yait.views.issue import ajax_render_ReST
-        return ajax_render_ReST(request)
+    def _call_fut(self, request):
+        from yait.views.issue import ajax_render_text
+        return ajax_render_text(request)
 
-    def _makeRequest(self, params=None):
+    def _make_request(self, post=None):
         from pyramid.testing import DummyRequest
-        return DummyRequest(params=params)
+        return DummyRequest(post=post)
 
     def test_ajax_render_rest(self):
+        request = self._make_request(post={'text': '**bold**',
+                                           'renderer_name': 'rest'})
         self.assertEqual(
-            self._callFUT(self._makeRequest({'text': '**bold**'})),
+            self._call_fut(request),
             {'rendered': '<p><strong>bold</strong></p>'})
 
     def test_ajax_render_rest_empty_text(self):
-        self.assertEqual(self._callFUT(self._makeRequest()),
-                         {'rendered': ''})
-
+        request = self._make_request(post={'text': '',
+                                           'renderer_name': 'rest'})
+        self.assertEqual(self._call_fut(request), {'rendered': ''})

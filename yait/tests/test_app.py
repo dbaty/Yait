@@ -1,7 +1,5 @@
-"""Test the ``run`` module.
+"""Test the ``app`` module."""
 
-$Id$
-"""
 
 from unittest import TestCase
 
@@ -12,6 +10,6 @@ class TestApp(TestCase):
         from pyramid.router import Router
         from yait.app import make_app
         global_settings = {}
-        settings = {'db_url': 'sqlite://'}
+        settings = {'yait.db_url': 'sqlite://'}
         wsgi_app = make_app(global_settings, **settings)
-        self.assert_(isinstance(wsgi_app, Router))
+        self.assertIsInstance(wsgi_app, Router)

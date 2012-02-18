@@ -44,26 +44,26 @@ class TestLDAPAttributesPlugin(TestCase):
 
     def test_init(self):
         plugin = self._makeOne()
-        self.assert_(isinstance(plugin, self._getTargetClass()))
+        self.assertIsInstance(plugin, self._getTargetClass())
 
     def test_init_attributes_as_string(self):
         plugin = self._makeOne(attributes='cn mail')
-        self.assert_(isinstance(plugin, self._getTargetClass()))
+        self.assertIsInstance(plugin, self._getTargetClass())
 
     def test_init_attributes_as_seq(self):
         plugin = self._makeOne(attributes=('cn', 'mail'))
-        self.assert_(isinstance(plugin, self._getTargetClass()))
+        self.assertIsInstance(plugin, self._getTargetClass())
 
     def test_init_attributes_invalid(self):
         self.assertRaises(ValueError, self._makeOne, attributes=1)
 
     def test_init_flatten_attributes_as_string(self):
         plugin = self._makeOne(flatten_attributes='cn mail')
-        self.assert_(isinstance(plugin, self._getTargetClass()))
+        self.assertIsInstance(plugin, self._getTargetClass())
 
     def test_init_flatten_attributes_as_seq(self):
         plugin = self._makeOne(flatten_attributes=('cn', 'mail'))
-        self.assert_(isinstance(plugin, self._getTargetClass()))
+        self.assertIsInstance(plugin, self._getTargetClass())
 
     def test_init_flatten_attributes_invalid(self):
         self.assertRaises(ValueError, self._makeOne, flatten_attributes=1)
@@ -96,7 +96,7 @@ class TestLDAPAttributesPlugin(TestCase):
         plugin.add_metadata(environ, identity)
         self.assertEqual(environ['repoze.who.logger'].messages,
                          ['Cannot add metadata: Search failed!'])
-        self.assert_('cn' not in identity)
+        self.assertNotIn('cn', identity)
 
     def test_cache(self):
         ldap_connection = FakeLDAPConnection(cn=['John Smith'])
@@ -119,4 +119,4 @@ class TestLDAPAttributesPlugin(TestCase):
         environ = {'repoze.who.logger': self._makeFakeLogger()}
         identity = {'repoze.who.userid': 'jsmith'}
         plugin.add_metadata(environ, identity)
-        self.assert_('cn' not in identity)
+        self.assertNotIn('cn', identity)

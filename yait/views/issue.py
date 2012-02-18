@@ -3,9 +3,9 @@
 
 from datetime import datetime
 
-from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import HTTPUnauthorized
+from pyramid.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -37,10 +37,10 @@ def add_issue_form(request, form=None):
     api = TemplateAPI(request)
     if form is None:
         form = AddIssueForm()
-    return render_template_to_response('templates/issue_add_form.pt',
-                                       api=api,
-                                       project=project,
-                                       form=form)
+    return render_to_response('../templates/issue_add.pt',
+                              {'api': api,
+                               'project': project,
+                               'form': form})
 
 
 def add_issue(request):
@@ -110,12 +110,12 @@ def issue_view(request, form=None):
                              time_billed=issue.time_billed,
                              title=issue.title)
     api = TemplateAPI(request)
-    return render_template_to_response('templates/issue_view.pt',
-                                       api=api,
-                                       project=project,
-                                       issue=issue,
-                                       form=form,
-                                       now=datetime.now())
+    return render_to_response('../templates/issue.pt',
+                              {'api': api,
+                               'project': project,
+                               'issue': issue,
+                               'form': form,
+                               'now': datetime.now()})
 
 def issue_update(request):
     project_name = request.matchdict['project_name']

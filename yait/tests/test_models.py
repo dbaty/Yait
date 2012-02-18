@@ -1,7 +1,5 @@
-"""Test models.
+"""Test models."""
 
-$Id$
-"""
 
 from unittest import TestCase
 

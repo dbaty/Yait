@@ -30,7 +30,7 @@ def home(request):
 
     ## FIXME: we should probably also list open issues assigned to the
     ## logged-in user, here.
-    return render_to_response('templates/site_index.pt',
+    return render_to_response('../templates/home.pt',
                               {'api': api,
                                'projects': projects})
 
@@ -38,7 +38,7 @@ def home(request):
 def not_found(request):
     api = TemplateAPI(request)
     response = render_to_response(
-        'templates/notfound.pt',
+        '../templates/notfound.pt',
         value={'api': api,
                'resource_url': request.url})
     response.status = 404

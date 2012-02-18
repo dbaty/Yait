@@ -29,7 +29,8 @@ if RENDERERS['rest']:
         """Render the given ``text`` through the reStructuredText
         engine.
 
-        >>> render_ReST('this is **bold**')
+        FIXME: move to a unit test
+        >>> render_rest('this is **bold**')
         u'<p>this is <strong>bold</strong></p>'
         """
         writer = Writer()

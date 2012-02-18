@@ -23,7 +23,7 @@ def add_project_form(request, form=None):
     api = TemplateAPI(request)
     if form is None:
         form = AddProjectForm()
-    return render_to_response('templates/project_add_form.pt',
+    return render_to_response('../templates/project_add.pt',
                               {'api': api, 'form': form})
 
 
@@ -60,6 +60,6 @@ def project_home(request):
     if not has_permission(request, PERM_VIEW_PROJECT, project):
         return HTTPUnauthorized()
     api = TemplateAPI(request)
-    return render_to_response('templates/project_home.pt',
+    return render_to_response('../templates/project.pt',
                               {'api': api,
                                'project': project})

@@ -23,7 +23,7 @@ def login_form(request):
     error_msg = None
     if login_counter != 0:
         error_msg = 'Wrong user name or password.'
-    return render_to_response('templates/login.pt',
+    return render_to_response('../templates/login.pt',
                               {'api': api,
                                'next': next,
                                'error_msg': error_msg,
@@ -32,14 +32,14 @@ def login_form(request):
 
 def post_login(request):
     identity = request.environ.get('repoze.who.identity')
-    came_from = request.POST.get('next', '') or request.application_url
+    next = request.POST.get('next', '') or request.application_url
     if identity:
-        destination = came_from
+        destination = next
     else:
         login_counter = request.environ['repoze.who.logins'] + 1
-        came_from = quote_plus(came_from)
-        destination = '/login_form?came_from=%s&__logins=%s' % (
-            came_from, login_counter)
+        next = quote_plus(next)
+        destination = '/login_form?next=%s&__logins=%s' % (
+            next, login_counter)
     return HTTPFound(location=destination)
 
 

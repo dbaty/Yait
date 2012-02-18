@@ -54,15 +54,16 @@ class TemplateAPI(object):
         self.referrer = request.environ.get('HTTP_REFERER', '')
         self.header_prefix = HEADER_PREFIX
         self.html_title_prefix = HTML_TITLE_PREFIX
+        # FIXME: use flash message (included in Pyramid)
         if self.referrer.startswith(request.application_url):
             self.status_message = request.GET.get('status_message', '')
             self.error_message = request.GET.get('error_message', '')
         else:
             self.status_message = self.error_message = ''
         self.layout = get_renderer(
-            'templates/master.pt').implementation()
+            '../templates/layout.pt').implementation()
         self.form_macros = get_renderer(
-            'templates/form_macros.pt').implementation().macros
+            '../templates/form_macros.pt').implementation().macros
         self.show_login_link = True
         if self.here_url.split('?')[0].endswith('login_form'):
             self.show_login_link = False

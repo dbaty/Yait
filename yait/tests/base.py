@@ -5,6 +5,8 @@ $Id$
 
 from unittest import TestCase
 
+from pyramid import testing
+
 
 def get_testing_db_session():
     from yait.models import DBSession
@@ -16,24 +18,23 @@ def get_testing_db_session():
 class TestCaseForViews(TestCase):
 
     def setUp(self):
-        from pyramid.configuration import Configurator
-        self.config = Configurator()
-        ## We need to register these templates since they are used in
-        ## TemplateAPI which is in turn used in almost all views.
+        self.config = testing.setUp()
+        # FIXME: check that it is still true
+        # We need to register these templates since they are used in
+        # TemplateAPI which is in turn used in almost all views.
         self.config.testing_add_template('templates/form_macros.pt')
         self.config.testing_add_template('templates/master.pt')
-        self.config.begin()
         self.session = get_testing_db_session()
 
     def tearDown(self):
-        self.config.end()
+        testing.tearDown()
         self.session.remove()
 
-    def _makeRenderer(self):
-        return self.config.testing_add_template(self.template_under_test)
+    def _make_renderer(self):
+        return self.config.testing_add_renderer(self.template_under_test)
 
-    def _makeRequest(self, user_id=None, post=None, environ=None,
-                     matchdict=None):
+    def _make_request(self, user_id=None, post=None, environ=None,
+                      matchdict=None):
         from pyramid.testing import DummyRequest
         if environ is None:
             environ = {}
@@ -47,13 +48,13 @@ class TestCaseForViews(TestCase):
             request.matchdict = matchdict
         return request
 
-    def _makeSiteAdmin(self, user_id):
+    def _make_site_admin(self, user_id):
         from yait.models import Admin
         a = Admin(user_id=user_id)
         self.session.add(a)
         return a
 
-    def _makeUser(self, user_id, roles=None):
+    def _make_user(self, user_id, roles=None):
         from yait.models import Role
         if roles is None:
             roles = {}
@@ -61,18 +62,18 @@ class TestCaseForViews(TestCase):
             r = Role(user_id=user_id, project_id=project.id, role=role)
             self.session.add(r)
 
-    def _makeProject(self, name=u'name', title=u'title', public=False):
+    def _make_project(self, name=u'name', title=u'title', public=False):
         from yait.models import Project
         p = Project(name=name, title=title, public=public)
         self.session.add(p)
-        self.session.flush() # need to flush to have an id later
+        self.session.flush()  # need to flush to have an id later
         return p
 
-    def _makeIssue(self, project, ref=1,
-                   title=u'Title', reporter=u'reporter', assignee=u'assignee',
-                   kind=None, priority=None, status=None,
-                   resolution=None, deadline=None,
-                   time_estimated=0, time_billed=0):
+    def _make_issue(self, project, ref=1,
+                    title=u'Title', reporter=u'reporter', assignee=u'assignee',
+                    kind=None, priority=None, status=None,
+                    resolution=None, deadline=None,
+                    time_estimated=0, time_billed=0):
         from yait.models import Issue
         from yait.models import DEFAULT_ISSUE_KIND
         from yait.models import DEFAULT_ISSUE_PRIORITY
@@ -95,5 +96,5 @@ class TestCaseForViews(TestCase):
                   time_estimated=time_estimated,
                   time_billed=time_billed)
         self.session.add(i)
-        self.session.flush() # need to flush to have an id later
+        self.session.flush()  # need to flush to have an id later
         return i
