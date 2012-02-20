@@ -21,10 +21,10 @@ class TestProjectAddForm(TestCaseForViews):
 
     def test_add_project_form_allow_admin(self):
         from yait.forms import AddProjectForm
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login, is_admin=True)
         renderer = self._make_renderer()
-        request = self._make_request(user_id=user_id)
+        request = self._make_request(user=login)
         self._call_fut(request)
         form = renderer._received.get('form', None)
         self.assertIsInstance(form, AddProjectForm)
@@ -45,11 +45,11 @@ class TestAddProject(TestCaseForViews):
 
     def test_add_project_incomplete_form(self):
         from yait.forms import AddProjectForm
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login, is_admin=True)
         renderer = self._make_renderer()
         post = {'name': u'p1', 'title': u''}
-        request = self._make_request(user_id=user_id, post=post)
+        request = self._make_request(user=login, post=post)
         self._call_fut(request)
         form = renderer._received.get('form', None)
         self.assertIsInstance(form, AddProjectForm)
@@ -57,12 +57,12 @@ class TestAddProject(TestCaseForViews):
 
     def test_add_project_name_already_taken(self):
         from yait.forms import AddProjectForm
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login, is_admin=True)
         renderer = self._make_renderer()
         self._make_project(name=u'p1')
         post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
-        request = self._make_request(user_id=user_id, post=post)
+        request = self._make_request(user=login, post=post)
         self._call_fut(request)
         form = renderer._received.get('form', None)
         self.assertIsInstance(form, AddProjectForm)
@@ -70,10 +70,10 @@ class TestAddProject(TestCaseForViews):
 
     def test_add_project_allow_admin(self):
         from yait.models import Project
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login, is_admi=True)
         post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
-        request = self._make_request(user_id=user_id, post=post)
+        request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assert_(location.endswith('/p1'))
@@ -115,11 +115,10 @@ class TestProjectHome(TestCaseForViews):
     def test_project_view_allowed_user(self):
         from yait.views.utils import ROLE_PROJECT_VIEWER
         p = self._make_project(name=u'p1')
-        user_id = u'user1'
-        self._make_user(user_id, roles={p: ROLE_PROJECT_VIEWER})
+        login = u'user1'
+        self._make_user(login, roles={p: ROLE_PROJECT_VIEWER})
         renderer = self._make_renderer()
         matchdict = {'project_name': u'p1'}
-        request = self._make_request(user_id=user_id,
-                                     matchdict=matchdict)
+        request = self._make_request(user=login, matchdict=matchdict)
         self._call_fut(request)
         renderer.assert_(project=p)

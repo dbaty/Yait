@@ -15,9 +15,9 @@ class TestSiteControlPanel(TestCaseForViews):
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_control_panel_allow_admin(self):
-        user_id = u'admin'
-        self._make_site_admin(user_id)
-        request = self._make_request(user_id=user_id)
+        login = u'admin'
+        self._make_user(login, is_admin=True)
+        request = self._make_request(user=login)
         response = self._call_fut(request)
         self.assertEqual(response.status, '200 OK')
 
@@ -36,14 +36,14 @@ class TestListAdmin(TestCaseForViews):
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_list_admins_allow_admin(self):
-        user_id = u'admin'
-        admin = self._make_site_admin(user_id)
-        a3 = self._make_site_admin('admin3')
-        a2 = self._make_site_admin('admin2')
+        login = u'admin'
+        admin = self._make_user(login, is_admin=True)
+        a3 = self._make_user('admin3', is_admin=True)
+        a2 = self._make_user('admin2', is_admin=True)
         renderer = self._make_renderer()
-        request = self._make_request(user_id=user_id)
+        request = self._make_request(user=login)
         self._call_fut(request)
-        renderer.assert_(current_user_id=user_id)
+        renderer.assert_(current_user_id=admin.id)
         renderer.assert_(admins=[admin, a2, a3])
 
 
@@ -59,29 +59,29 @@ class TestAddAdmin(TestCaseForViews):
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_add_admin_no_user_id(self):
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login, is_admin=True)
         post = {'admin_id': u''}
-        request = self._make_request(user_id=user_id, post=post)
+        request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('error_message', location)
 
     def test_add_admin_already_admin(self):
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login)
         post = {'admin_id': u'admin'}
-        request = self._make_request(user_id=user_id, post=post)
+        request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('error_message', location)
 
     def test_add_admin_success(self):
         from yait.models import Admin
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login, is_admin=True)
         post = {'admin_id': u'admin2'}
-        request = self._make_request(user_id=user_id, post=post)
+        request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('status_message', location)
@@ -102,30 +102,30 @@ class TestDeleteAdmin(TestCaseForViews):
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_delete_admin_himself(self):
-        user_id = u'admin'
-        self._make_site_admin(user_id)
-        post = {'admin_id': user_id}
-        request = self._make_request(user_id=user_id, post=post)
+        login = u'admin'
+        admin = self._make_user(login, is_admin=True)
+        post = {'admin_id': admin.id}
+        request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('error_message', location)
 
     def test_delete_admin_no_user_id(self):
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login, is_admin=True)
         post = {'admin_id': u''}
-        request = self._make_request(user_id=user_id, post=post)
+        request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('error_message', location)
 
     def test_delete_admin_success(self):
         from yait.models import Admin
-        user_id = u'admin'
-        admin = self._make_site_admin(user_id)
-        self._make_site_admin(u'admin2')
-        post = {'admin_id': u'admin2'}
-        request = self._make_request(user_id=user_id, post=post)
+        login = u'admin'
+        admin = self._make_user(login, is_admin=True)
+        admin2 = self._make_user(u'admin2', is_admin=True)
+        post = {'admin_id': admin2.id}
+        request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('status_message', location)
@@ -146,13 +146,13 @@ class TestListProjects(TestCaseForViews):
         self.assertEqual(response.status, '401 Unauthorized')
 
     def test_list_projects_allow_admin(self):
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login)
         p1 = self._make_project(u'p1', u'p1')
         p3 = self._make_project(u'p3', u'p3')
         p2 = self._make_project(u'p2', u'p2')
         renderer = self._make_renderer()
-        request = self._make_request(user_id=user_id)
+        request = self._make_request(user=login)
         self._call_fut(request)
         renderer.assert_(projects=[p1, p2, p3])
 
@@ -171,10 +171,10 @@ class TestDeleteProject(TestCaseForViews):
     def test_delete_project(self):
         from yait.models import Project
         p = self._make_project(u'p1', u'p1')
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login)
         post = {'project_id': p.id}
-        request = self._make_request(user_id=user_id, post=post)
+        request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('status_message', location)

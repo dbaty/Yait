@@ -1,3 +1,5 @@
+from cryptacular.bcrypt import BCRYPTPasswordManager
+
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import create_engine
@@ -9,6 +11,7 @@ from sqlalchemy import PickleType
 from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy import Table
+from sqlalchemy import Unicode
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import scoped_session
@@ -65,8 +68,9 @@ metadata = MetaData()
 
 class Model(object):
     def __init__(self, **kwargs):
-        ## We check that the attributes we want to initialize are
-        ## indeed columns of the table. It helps avoiding typos.
+        # FIXME: not needed. Remove checks (but keep setattr!).
+        # We check that the attributes we want to initialize are
+        # indeed columns of the table. It helps avoiding typos.
         allowed = dir(self)
         for attr, value in kwargs.items():
             if attr not in allowed:
@@ -90,7 +94,7 @@ projects_table = Table(
     metadata,
     Column('id', Integer, primary_key=True),
     Column('name', String, nullable=False, unique=True),
-    Column('title', String, nullable=False),
+    Column('title', Unicode, nullable=False),
     Column('public', Boolean, nullable=False))
 
 
@@ -171,19 +175,19 @@ issues_table = Table(
     Column('id', Integer, primary_key=True),
     Column('project_id', Integer, ForeignKey('projects.id')),
     Column('ref', Integer),
-    Column('title', String),
-    Column('reporter', String),
-    Column('assignee', String),
+    Column('title', Unicode),
+    Column('reporter', Unicode),
+    Column('assignee', Unicode),
     Column('kind', Integer), ## FIXME: could be an Enum
     Column('priority', Integer), ## FIXME: could be an Enum
-    Column('status', String),
+    Column('status', Unicode),
     ## FIXME: is 'resolution' useful?
     ## Update 1: Yes, it's useful.
     ## Update2: ok, perhaps it's useful, but there is no UI
     ## yet. Proposal: when the user selects the 'close' status, the
     ## resolution field shows up. Otherwise, it is hidden (and
     ## ignored in the form controller).
-    Column('resolution', String),
+    Column('resolution', Unicode),
     Column('date_created', DateTime),
     Column('date_edited', DateTime),
     Column('date_closed', DateTime),
@@ -240,7 +244,7 @@ changes_table = Table(
     metadata,
     Column('id', Integer, primary_key=True),
     Column('issue_id', Integer, ForeignKey('issues.id')),
-    Column('author', String),
+    Column('author', Integer, ForeignKey('users.id')),
     Column('date', DateTime),
     Column('time_spent_real', Integer),
     Column('time_spent_public', Integer),
@@ -260,15 +264,6 @@ issue_relationships_table = Table(
     Column('kind', Integer)) ## FIXME: could be an Enum
 
 
-class Admin(Model):
-    pass
-
-admins_table = Table(
-    'admins',
-    metadata,
-    Column('user_id', String, primary_key=True))
-
-
 class Role(Model):
     pass
 
@@ -276,9 +271,36 @@ roles_table = Table(
     'roles',
     metadata,
     ## FIXME: add a constraint: the triple should be unique.
-    Column('user_id', String),
+    Column('user_id', Integer, ForeignKey('users.id')),
     Column('project_id', Integer, ForeignKey('projects.id')),
     Column('role', Integer)) ## FIXME: could be an Enum
+
+
+
+_pwd_manager = BCRYPTPasswordManager()
+
+class User(Model):
+    def _get_password(self):
+        return self._password
+
+    def _set_password(self, plaintext):
+        self._password = _pwd_manager.encode(plaintext)
+
+    password = property(_get_password, _set_password)
+
+    def validate_password(self, plaintext):
+        return _pwd_manager.check(self.password, plaintext)
+
+users_table = Table(
+    'users',
+    metadata,
+    # FIXME: add constraints
+    Column('id', Integer, primary_key=True),
+    Column('login', Unicode, nullable=False, unique=True),
+    Column('password', String(80), nullable=False),
+    Column('fullname', Unicode(80), nullable=False),
+    Column('email', Unicode, nullable=False),
+    Column('is_admin', Boolean, nullable=False))
 #####################################################################
 
 
@@ -298,10 +320,10 @@ issue_relationships_mapper = mapper(
     primary_key=(issue_relationships_table.c.source_id,
                  issue_relationships_table.c.target_id,
                  issue_relationships_table.c.kind))
-admins_mapper = mapper(Admin, admins_table)
 roles_mapper = mapper(
     Role, roles_table,
     primary_key=(roles_table.c.user_id, roles_table.c.project_id))
+users_mapper = mapper(User, users_table)
 #####################################################################
 
 

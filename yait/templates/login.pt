@@ -11,13 +11,18 @@
 </tal:block>
 <tal:block metal:fill-slot="content">
 
-  <div tal:condition="'manual' not in api.request.params"
-       tal:content="error_msg or 'You must log in to access that page (%s).' % next"
-       class="errorMessage"/>
+  <p tal:condition="failed" class="error-msg" i18n:translate="">
+    Wrong login or password. Please try again.
+  </p>
 
-  <form action="/login?next=${next}&amp;__logins=${login_counter}"
+  <p tal:condition="needs_login" class="error-msg" i18n:translate="">
+    You need to log in to access this resource.
+  </p>
+
+  <form action="/login"
         id="loginForm"
         method="post">
+    <input type="hidden" name="next" tal:attributes="value next"/>
 
     <fieldset>
       <div class="formRow">

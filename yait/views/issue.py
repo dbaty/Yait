@@ -17,7 +17,6 @@ from yait.models import Issue
 from yait.models import Project
 from yait.text import render
 from yait.views.site import not_found
-from yait.views.utils import get_user_metadata
 from yait.views.utils import has_permission
 from yait.views.utils import PERM_PARTICIPATE_IN_PROJECT
 from yait.views.utils import PERM_VIEW_PROJECT
@@ -31,16 +30,15 @@ def add_issue_form(request, form=None):
     try:
         project = session.query(Project).filter_by(name=project_name).one()
     except NoResultFound:
-        return not_found(request)        
+        return not_found(request)
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         return HTTPUnauthorized()
-    api = TemplateAPI(request)
     if form is None:
         form = AddIssueForm()
-    return render_to_response('../templates/issue_add.pt',
-                              {'api': api,
-                               'project': project,
-                               'form': form})
+    bindings = {'api': TemplateAPI(request),
+                'project': project,
+                'form': form}
+    return render_to_response('../templates/issue_add.pt', bindings)
 
 
 def add_issue(request):
@@ -62,7 +60,7 @@ def add_issue(request):
     if last_ref is None:
         last_ref = 0
     ref = last_ref + 1
-    reporter = get_user_metadata(request)['uid']
+    reporter = request.user.id
     now = datetime.now()
     issue = Issue(project_id=project.id,
                   date_created=now,
@@ -78,8 +76,8 @@ def add_issue(request):
                     changes={})
     form.populate_obj(change)
     session.add(change)
-    url = '%s/%s/%d' % (
-        request.application_url, project.name, issue.ref)
+    # FIXME: use 'request.route_url()'
+    url = '%s/%s/%d' % (request.application_url, project.name, issue.ref)
     return HTTPFound(location=url)
 
 
@@ -109,13 +107,13 @@ def issue_view(request, form=None):
                              time_estimated=issue.time_estimated,
                              time_billed=issue.time_billed,
                              title=issue.title)
-    api = TemplateAPI(request)
-    return render_to_response('../templates/issue.pt',
-                              {'api': api,
-                               'project': project,
-                               'issue': issue,
-                               'form': form,
-                               'now': datetime.now()})
+    bindings = {'api': TemplateAPI(request),
+                'project': project,
+                'issue': issue,
+                'form': form,
+                'now': datetime.now()}
+    return render_to_response('../templates/issue.pt', bindings)
+
 
 def issue_update(request):
     project_name = request.matchdict['project_name']
@@ -187,6 +185,7 @@ def issue_update(request):
     change.changes = changes
     session.add(change)
     session.flush()
+    # FIXME: use 'request.route_url()'
     url = '%s/%s/%d?issue_updated=1#issue_updated' % (
         request.application_url, project.name, issue.ref)
     return HTTPFound(location=url)

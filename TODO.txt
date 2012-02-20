@@ -1,13 +1,3 @@
-- port to Pyramid
-
-- rename "run.py" as "app.py" (+ update "setup.py")
-
-- move "views/template/" to "templates/"
-
-- move "views/static" to "static/"
-
-- move users from LDAP to the RDBMS
-
 - use HTTPSeeOther to redirect after a POST (instead of HTTPFound)
 
 - review permission system: turn it into a Pyramid authorization
@@ -82,7 +72,7 @@ Yait 0.2
 
 - i18n
 
-- sanitize user input comments (remove iframe, Javascript, etc.)
+- sanitize user input comments (remove iframe, Javascript, etc.) : https://github.com/jsocol/bleach ?
 
 - make sure that use POST instead of 'request.params' when it is fit
 
@@ -129,6 +119,11 @@ Yait 0.4
 
 Later
 =====
+
+- ability to guess links to issues in comments, for example::
+
+      See issue #123 and issue #project-something:123. This is our
+      priority ##1.
 
 - make status, priority and kind fields configurable.
 

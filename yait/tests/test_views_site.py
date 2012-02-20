@@ -35,10 +35,10 @@ class TestSiteHome(TestCaseForViews):
             name=u'public', title=u'public', public=True)
         p1 = self._make_project(name=u'p1', title=u'p1')
         self._make_project(name=u'p2', title=u'p2')
-        user_id = u'user'
-        self._make_user(user_id, roles={p1: ROLE_PROJECT_VIEWER})
+        login = u'user'
+        self._make_user(login, roles={p1: ROLE_PROJECT_VIEWER})
         renderer = self._make_renderer()
-        request = self._make_request(user_id=user_id)
+        request = self._make_request(user=login)
         self._call_fut(request)
         renderer.assert_(projects=[p1, public_project])
 
@@ -47,10 +47,10 @@ class TestSiteHome(TestCaseForViews):
             name=u'public', title=u'p3', public=True)
         p1 = self._make_project(name=u'p1', title=u'p1')
         p2 = self._make_project(name=u'p2', title=u'p2')
-        user_id = u'admin'
-        self._make_site_admin(user_id)
+        login = u'admin'
+        self._make_user(login, is_admin=True)
         renderer = self._make_renderer()
-        request = self._make_request(user_id=user_id)
+        request = self._make_request(user=login)
         self._call_fut(request)
         renderer.assert_(projects=[p1, p2, public_project])
 

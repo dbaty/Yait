@@ -33,33 +33,39 @@ class TestCaseForViews(TestCase):
     def _make_renderer(self):
         return self.config.testing_add_renderer(self.template_under_test)
 
-    def _make_request(self, user_id=None, post=None, environ=None,
+    # FIXME: when do we provide a custom 'environ'?
+    def _make_request(self, user=None, post=None, environ=None,
                       matchdict=None):
+        from pyramid.decorator import reify
         from pyramid.testing import DummyRequest
-        if environ is None:
-            environ = {}
-        if user_id is not None:
-            environ['repoze.who.identity'] = {'uid': user_id}
+        from yait.auth import _get_user
+        from yait.models import User
         if post is not None:
             from webob.multidict import MultiDict
             post = MultiDict(post)
         request = DummyRequest(environ=environ, post=post)
+        request.user = reify(_get_user)
+        if user:
+            if isinstance(user, unicode):
+                user = self.session.query(User).filter_by(login=user).one().id
+            environ = {'REMOTE_USER': user}
+        else:
+            request.environ = {}
         if matchdict is not None:
             request.matchdict = matchdict
         return request
 
-    def _make_site_admin(self, user_id):
-        from yait.models import Admin
-        a = Admin(user_id=user_id)
-        self.session.add(a)
-        return a
-
-    def _make_user(self, user_id, roles=None):
+    def _make_user(self, login, is_admin=False, roles=None):
         from yait.models import Role
+        from yait.models import User
         if roles is None:
             roles = {}
+        user = User(login=login, password='foo', fullname='',
+                    email='', is_admin=is_admin)
+        self.session.add(user)
+        self.session.flush()
         for project, role in roles.items():
-            r = Role(user_id=user_id, project_id=project.id, role=role)
+            r = Role(user_id=user.id, project_id=project.id, role=role)
             self.session.add(r)
 
     def _make_project(self, name=u'name', title=u'title', public=False):

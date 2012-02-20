@@ -1,7 +1,7 @@
 """View related to projects."""
 
 
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPSeeOther
 from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.renderers import render_to_response
 
@@ -20,11 +20,11 @@ from yait.views.utils import TemplateAPI
 def add_project_form(request, form=None):
     if not has_permission(request, PERM_ADMIN_SITE):
         return HTTPUnauthorized()
-    api = TemplateAPI(request)
     if form is None:
         form = AddProjectForm()
-    return render_to_response('../templates/project_add.pt',
-                              {'api': api, 'form': form})
+    bindings = {'api': TemplateAPI(request),
+                'form': form}
+    return render_to_response('../templates/project_add.pt', bindings)
 
 
 def add_project(request):
@@ -33,13 +33,13 @@ def add_project(request):
     form = AddProjectForm(request.POST)
     if not form.validate():
         return add_project_form(request, form)
-
     project = Project()
     form.populate_obj(project)
     session = DBSession()
     session.add(project)
+    # FIXME: use 'request.route_url()'
     url = '%s/%s' % (request.application_url, project.name)
-    return HTTPFound(location=url)
+    return HTTPSeeOther(location=url)
 
 
 def project_home(request):
@@ -59,7 +59,6 @@ def project_home(request):
 
     if not has_permission(request, PERM_VIEW_PROJECT, project):
         return HTTPUnauthorized()
-    api = TemplateAPI(request)
-    return render_to_response('../templates/project.pt',
-                              {'api': api,
-                               'project': project})
+    bindings = {'api': TemplateAPI(request),
+                'project': project}
+    return render_to_response('../templates/project.pt', bindings)

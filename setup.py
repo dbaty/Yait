@@ -9,7 +9,8 @@ README = open(os.path.join(HERE, 'README.rst')).read()
 CHANGES = open(os.path.join(HERE, 'CHANGES.rst')).read()
 
 
-REQUIRES = ('docutils',
+REQUIRES = ('cryptacular',
+            'docutils',
             'pyramid',
             'pyramid_tm',
             'sqlalchemy',

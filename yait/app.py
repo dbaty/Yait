@@ -1,6 +1,8 @@
+from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPNotFound
 
+from yait.auth import AuthorizationPolicy
 from yait.models import initialize_sql
 
 
@@ -10,27 +12,19 @@ def make_app(global_settings, **settings):
     db_verbose = settings.get('yait.db_verbose', 'false').lower() == 'true'
     initialize_sql(settings['yait.db_url'], echo=db_verbose)
 
-    # FIXME: check routes (with 'proutes'?)
+    # Request properties
+    config.set_request_property('yait.auth._get_user', name='user', reify=True)
 
-    # Authentication and authorization
-    # FIXME
-#   <remoteuserauthenticationpolicy
-#      environ_key="REMOTE_USER"/>
-#   <route
-#      path="login_form"
-#      name="login_form"
-#      view=".views.login.login_form"
-#      />
-#   <route
-#      path="post_login"
-#      name="post_login"
-#      view=".views.login.post_login"
-#      />
-#   <route
-#      path="post_logout"
-#      name="post_logout"
-#      view=".views.login.post_logout"
-#      />
+    # Authentication and authorization policies
+    reissue_time = int(settings['yait.auth.timeout']) / 10
+    auth_policy = AuthTktAuthenticationPolicy(
+        secret=settings['yait.auth.secret'],
+        secure=settings['yait.auth.secure_only'],
+        timeout=int(settings['yait.auth.timeout']),
+        reissue_time=int(reissue_time))
+    config.set_authentication_policy(auth_policy)
+    authz_policy = AuthorizationPolicy()
+    config.set_authorization_policy(authz_policy)
 
     # FIXME: how to have routes not conflict with future project
     # names: "/meta/<route>", "/_/<route>", "_<route>", etc. ?

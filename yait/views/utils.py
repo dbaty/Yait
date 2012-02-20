@@ -7,7 +7,6 @@ from pyramid.renderers import get_renderer
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from yait.models import Admin
 from yait.models import DBSession
 from yait.models import Role
 
@@ -49,12 +48,16 @@ class TemplateAPI(object):
     """
     def __init__(self, request):
         self.request = request
+        # FIXME: is this useful?
         self.app_url = request.application_url
+        # FIXME: is this useful?
         self.here_url = request.url
+        # FIXME: is this used?
         self.referrer = request.environ.get('HTTP_REFERER', '')
+        # FIXME: is this useful at all?
         self.header_prefix = HEADER_PREFIX
         self.html_title_prefix = HTML_TITLE_PREFIX
-        # FIXME: use flash message (included in Pyramid)
+        # FIXME: use flash messages (included in Pyramid)
         if self.referrer.startswith(request.application_url):
             self.status_message = request.GET.get('status_message', '')
             self.error_message = request.GET.get('error_message', '')
@@ -65,26 +68,19 @@ class TemplateAPI(object):
         self.form_macros = get_renderer(
             '../templates/form_macros.pt').implementation().macros
         self.show_login_link = True
-        if self.here_url.split('?')[0].endswith('login_form'):
+        if self.here_url.split('?')[0].endswith('login'):
             self.show_login_link = False
-        md = get_user_metadata(request)
-        self.logged_in = md is not None
+        self.logged_in = request.user.id is not None
         self.user_cn = None
-        if self.logged_in:
-            self.user_cn = md.get('cn') or md.get('uid')
 
-    # rename as 'route_url()' and call 'request.route_url()'
-    def url_of(self, path):
-        return '/'.join((self.app_url, path)).strip('/')
+    def route_url(self, route_name):
+        return self.request.route_url(route_name)
 
     def has_permission(self, *args, **kwargs):
         return has_permission(self.request, *args, **kwargs)
 
 
-def get_user_metadata(request):
-    return request.environ.get('repoze.who.identity', None)
-
-
+# FIXME: this should probably be moved to the 'auth' module
 def has_permission(request, permission, context=None):
     """Return whether the current user is granted the given
     ``permission`` in this ``context``.
@@ -115,17 +111,17 @@ def has_permission(request, permission, context=None):
     if getattr(request, cache_key, None) is not None:
         return permission in getattr(request, cache_key)
 
-    ## Shortcuts for public projects and anonymous users
+    # Shortcuts for public projects and anonymous users
     if context is not None and context.public and \
             permission == PERM_VIEW_PROJECT:
         return True
-    user_id = (get_user_metadata(request) or {}).get('uid', None)
+    user_id = request.user.id
     if not user_id:
         return False
 
     session = DBSession()
     user_perms = ()
-    if session.query(Admin).filter_by(user_id=user_id).first():
+    if request.user.is_admin:
         user_perms = PERMISSIONS_FOR_ROLE[ROLE_SITE_ADMIN]
         setattr(request, cache_key_admin, True)
     elif context is not None:
