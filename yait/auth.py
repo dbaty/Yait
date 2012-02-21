@@ -14,6 +14,7 @@ from yait.models import User
 class _AnonymousUser(object):
     def __init__(self):
         self.id = None
+        self.is_admin = False
 
 
 def _get_user(request):

@@ -6,6 +6,8 @@ $Id$
 from unittest import TestCase
 
 from pyramid import testing
+from pyramid.authentication import CallbackAuthenticationPolicy
+from pyramid.decorator import reify
 
 
 def get_testing_db_session():
@@ -15,15 +17,44 @@ def get_testing_db_session():
     return DBSession
 
 
+class DummyAuthenticationPolicy(CallbackAuthenticationPolicy):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    # Handy method used by our tests, not by the application itself.
+    @staticmethod
+    def fake_login(request, user_id):
+        request._dummy_auth_id = user_id
+
+    def unauthenticated_userid(self, request):
+        return getattr(request, '_dummy_auth_id', None)
+
+# A simplified version of 'pyramid.util.InstancePropertyMixin.set_property'
+def _set_property(request, name, callable, do_reify=False):
+    func = lambda this: callable(this)
+    func.__name__ = name
+    if do_reify:
+        func = reify(func)
+    attrs = {name: func}
+    parent = request.__class__
+    cls = type(parent.__name__, (parent, object), attrs)
+    request.__class__ = cls
+
+
 class TestCaseForViews(TestCase):
 
     def setUp(self):
+        from yait.app import _set_auth_policies
         self.config = testing.setUp()
         # FIXME: check that it is still true
         # We need to register these templates since they are used in
         # TemplateAPI which is in turn used in almost all views.
         self.config.testing_add_template('templates/form_macros.pt')
         self.config.testing_add_template('templates/master.pt')
+        _set_auth_policies(self.config, {'yait.auth.timeout': 10,
+                                         'yait.auth.secret': 'secret',
+                                         'yait.auth.secure_only': False},
+                           DummyAuthenticationPolicy)
         self.session = get_testing_db_session()
 
     def tearDown(self):
@@ -36,7 +67,6 @@ class TestCaseForViews(TestCase):
     # FIXME: when do we provide a custom 'environ'?
     def _make_request(self, user=None, post=None, environ=None,
                       matchdict=None):
-        from pyramid.decorator import reify
         from pyramid.testing import DummyRequest
         from yait.auth import _get_user
         from yait.models import User
@@ -44,13 +74,11 @@ class TestCaseForViews(TestCase):
             from webob.multidict import MultiDict
             post = MultiDict(post)
         request = DummyRequest(environ=environ, post=post)
-        request.user = reify(_get_user)
+        _set_property(request, 'user', _get_user, do_reify=True)
         if user:
             if isinstance(user, unicode):
                 user = self.session.query(User).filter_by(login=user).one().id
-            environ = {'REMOTE_USER': user}
-        else:
-            request.environ = {}
+            DummyAuthenticationPolicy.fake_login(request, user)
         if matchdict is not None:
             request.matchdict = matchdict
         return request
@@ -60,19 +88,20 @@ class TestCaseForViews(TestCase):
         from yait.models import User
         if roles is None:
             roles = {}
-        user = User(login=login, password='foo', fullname='',
-                    email='', is_admin=is_admin)
+        user = User(login=login, password=u'secret', fullname=u'',
+                    email=u'', is_admin=is_admin)
         self.session.add(user)
-        self.session.flush()
+        self.session.flush()  # sets id
         for project, role in roles.items():
             r = Role(user_id=user.id, project_id=project.id, role=role)
             self.session.add(r)
+        return user
 
     def _make_project(self, name=u'name', title=u'title', public=False):
         from yait.models import Project
         p = Project(name=name, title=title, public=public)
         self.session.add(p)
-        self.session.flush()  # need to flush to have an id later
+        self.session.flush()  # sets id
         return p
 
     def _make_issue(self, project, ref=1,

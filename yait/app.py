@@ -6,6 +6,22 @@ from yait.auth import AuthorizationPolicy
 from yait.models import initialize_sql
 
 
+def _set_auth_policies(config, settings,
+                       _auth_policy=AuthTktAuthenticationPolicy):
+    """Set up authentication and authorization policies.
+
+    ``_auth_policy`` is only used for tests.
+    """
+    authz_policy = AuthorizationPolicy()
+    config.set_authorization_policy(authz_policy)
+    reissue_time = int(settings['yait.auth.timeout']) / 10
+    auth_policy = _auth_policy(
+        secret=settings['yait.auth.secret'],
+        secure=settings['yait.auth.secure_only'],
+        timeout=int(settings['yait.auth.timeout']),
+        reissue_time=int(reissue_time))
+    config.set_authentication_policy(auth_policy)
+
 def make_app(global_settings, **settings):
     """Set up and return the WSGI application."""
     config = Configurator(settings=settings)
@@ -16,18 +32,14 @@ def make_app(global_settings, **settings):
     config.set_request_property('yait.auth._get_user', name='user', reify=True)
 
     # Authentication and authorization policies
-    reissue_time = int(settings['yait.auth.timeout']) / 10
-    auth_policy = AuthTktAuthenticationPolicy(
-        secret=settings['yait.auth.secret'],
-        secure=settings['yait.auth.secure_only'],
-        timeout=int(settings['yait.auth.timeout']),
-        reissue_time=int(reissue_time))
-    config.set_authentication_policy(auth_policy)
-    authz_policy = AuthorizationPolicy()
-    config.set_authorization_policy(authz_policy)
+    _set_auth_policies(config, settings)
 
-    # FIXME: how to have routes not conflict with future project
-    # names: "/meta/<route>", "/_/<route>", "_<route>", etc. ?
+    # FIXME: how to have internal routes ('control-panel', 'search',
+    # etc.) not conflict with future project names: "/meta/<route>",
+    # "/_/<route>", "_<route>", or rather use a specific prefix for
+    # projects ('/p/<project_name>') and possibly users too
+    # ('/u/<login>')?
+
     # Regular views:
     #   - site / general purpose views / static assets
     config.add_static_view('static', 'static')

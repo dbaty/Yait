@@ -16,6 +16,7 @@ from sqlalchemy.orm import mapper
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import synonym
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
@@ -297,7 +298,7 @@ users_table = Table(
     # FIXME: add constraints
     Column('id', Integer, primary_key=True),
     Column('login', Unicode, nullable=False, unique=True),
-    Column('password', String(80), nullable=False),
+    Column('password', String(60), nullable=False),
     Column('fullname', Unicode(80), nullable=False),
     Column('email', Unicode, nullable=False),
     Column('is_admin', Boolean, nullable=False))
@@ -323,7 +324,9 @@ issue_relationships_mapper = mapper(
 roles_mapper = mapper(
     Role, roles_table,
     primary_key=(roles_table.c.user_id, roles_table.c.project_id))
-users_mapper = mapper(User, users_table)
+users_mapper = mapper(User, users_table,
+                      properties={'password': synonym('_password',
+                                                      map_column=True)})
 #####################################################################
 
 

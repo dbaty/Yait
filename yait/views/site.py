@@ -8,16 +8,13 @@ from pyramid.renderers import render_to_response
 from yait.models import DBSession
 from yait.models import Project
 from yait.models import Role
-from yait.views.utils import has_permission
-from yait.views.utils import PERM_ADMIN_SITE
 from yait.views.utils import TemplateAPI
 
 
 def home(request):
     """Index page of Yait."""
     session = DBSession()
-    is_admin = has_permission(request, PERM_ADMIN_SITE)
-    if is_admin:
+    if request.user.is_admin:
         projects = session.query(Project)
     elif request.user.id:
         public = session.query(Project).filter_by(public=True)

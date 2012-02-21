@@ -3,7 +3,7 @@
 
 <div class="errorMessage" i18n:translate="">It was impossible
   to find the following resource:
-  <tt i18n:name="url" tal:content="api.request.url"/></div>
+  <code i18n:name="url" tal:content="api.request.url"/></div>
 
 </metal:content>
 </layout>
