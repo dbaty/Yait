@@ -177,8 +177,8 @@ issues_table = Table(
     Column('project_id', Integer, ForeignKey('projects.id')),
     Column('ref', Integer),
     Column('title', Unicode),
-    Column('reporter', Unicode),
-    Column('assignee', Unicode),
+    Column('reporter', Integer, ForeignKey('users.id')),
+    Column('assignee', Integer, ForeignKey('users.id')),
     Column('kind', Integer), ## FIXME: could be an Enum
     Column('priority', Integer), ## FIXME: could be an Enum
     Column('status', Unicode),

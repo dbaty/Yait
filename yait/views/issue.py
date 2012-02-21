@@ -3,8 +3,9 @@
 
 from datetime import datetime
 
+from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPFound
-from pyramid.httpexceptions import HTTPUnauthorized
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -16,7 +17,6 @@ from yait.models import DBSession
 from yait.models import Issue
 from yait.models import Project
 from yait.text import render
-from yait.views.site import not_found
 from yait.views.utils import has_permission
 from yait.views.utils import PERM_PARTICIPATE_IN_PROJECT
 from yait.views.utils import PERM_VIEW_PROJECT
@@ -30,9 +30,9 @@ def add_issue_form(request, form=None):
     try:
         project = session.query(Project).filter_by(name=project_name).one()
     except NoResultFound:
-        return not_found(request)
+        raise HTTPNotFound()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
-        return HTTPUnauthorized()
+        raise HTTPForbidden()
     if form is None:
         form = AddIssueForm()
     bindings = {'api': TemplateAPI(request),
@@ -47,9 +47,9 @@ def add_issue(request):
     try:
         project = session.query(Project).filter_by(name=project_name).one()
     except NoResultFound:
-        return not_found(request)
+        raise HTTPNotFound()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
-        return HTTPUnauthorized()
+        raise HTTPForbidden()
     form = AddIssueForm(request.POST)
     if not form.validate():
         return add_issue_form(request, form)
@@ -88,14 +88,14 @@ def issue_view(request, form=None):
     try:
         project = session.query(Project).filter_by(name=project_name).one()
     except NoResultFound:
-        return not_found(request)
+        raise HTTPNotFound()
     if not has_permission(request, PERM_VIEW_PROJECT, project):
-        return HTTPUnauthorized()
+        raise HTTPForbidden()
     try:
         issue = session.query(Issue).filter_by(
             project_id=project.id, ref=issue_ref).one()
     except NoResultFound:
-        return not_found(request)
+        raise HTTPNotFound()
     if form is None:
         form = AddChangeForm(assignee=issue.assignee,
                              children=issue.get_children(),
@@ -122,14 +122,14 @@ def issue_update(request):
     try:
         project = session.query(Project).filter_by(name=project_name).one()
     except NoResultFound:
-        return not_found(request)
+        raise HTTPNotFound()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
-        return HTTPUnauthorized()
+        raise HTTPForbidden()
     try:
         issue = session.query(Issue).filter_by(
             project_id=project.id, ref=issue_ref).one()
     except NoResultFound:
-        return not_found(request)
+        raise HTTPNotFound()
 
     form = AddChangeForm(request.POST)
     if not form.validate():

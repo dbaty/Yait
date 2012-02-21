@@ -125,6 +125,12 @@ Later
       See issue #123 and issue #project-something:123. This is our
       priority ##1.
 
+- ability to deactivate a user: such a user will not be able to login
+  anymore, be assigned an issue nor receive any e-mail
+  notifications. Perhaps we could store an history pickle in a
+  separate table that logs account creation, deactivation and
+  reactivation.
+
 - make status, priority and kind fields configurable.
 
 - allow other text formatting syntaxes:
