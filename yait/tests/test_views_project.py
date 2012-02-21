@@ -15,9 +15,9 @@ class TestProjectAddForm(TestCaseForViews):
         return add_project_form(request)
 
     def test_add_project_form_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_add_project_form_allow_admin(self):
         from yait.forms import AddProjectForm
@@ -39,9 +39,9 @@ class TestAddProject(TestCaseForViews):
         return add_project(*args, **kwargs)
 
     def test_add_project_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_add_project_incomplete_form(self):
         from yait.forms import AddProjectForm
@@ -71,7 +71,7 @@ class TestAddProject(TestCaseForViews):
     def test_add_project_allow_admin(self):
         from yait.models import Project
         login = u'admin'
-        self._make_user(login, is_admi=True)
+        self._make_user(login, is_admin=True)
         post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
         request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
@@ -92,17 +92,17 @@ class TestProjectHome(TestCaseForViews):
         return project_home(request)
 
     def test_project_view_unknowproject(self):
+        from pyramid.httpexceptions import HTTPNotFound
         matchdict = {'project_name': u'unknown'}
         request = self._make_request(matchdict=matchdict)
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '404 Not Found')
+        self.assertRaises(HTTPNotFound, self._call_fut, request)
 
     def test_project_view_disallowed(self):
+        from pyramid.httpexceptions import HTTPForbidden
         self._make_project(name=u'p1')
         matchdict = {'project_name': u'p1'}
         request = self._make_request(matchdict=matchdict)
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_project_view_public_project(self):
         p = self._make_project(name=u'p1', public=True)

@@ -1,8 +1,9 @@
 """View related to projects."""
 
 
+from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPSeeOther
-from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -10,7 +11,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from yait.forms import AddProjectForm
 from yait.models import DBSession
 from yait.models import Project
-from yait.views.site import not_found
 from yait.views.utils import has_permission
 from yait.views.utils import PERM_ADMIN_SITE
 from yait.views.utils import PERM_VIEW_PROJECT
@@ -19,7 +19,7 @@ from yait.views.utils import TemplateAPI
 
 def add_project_form(request, form=None):
     if not has_permission(request, PERM_ADMIN_SITE):
-        return HTTPUnauthorized()
+        raise HTTPForbidden()
     if form is None:
         form = AddProjectForm()
     bindings = {'api': TemplateAPI(request),
@@ -29,7 +29,7 @@ def add_project_form(request, form=None):
 
 def add_project(request):
     if not has_permission(request, PERM_ADMIN_SITE):
-        return HTTPUnauthorized()
+        raise HTTPForbidden()
     form = AddProjectForm(request.POST)
     if not form.validate():
         return add_project_form(request, form)
@@ -48,7 +48,7 @@ def project_home(request):
     try:
         project = session.query(Project).filter_by(name=project_name).one()
     except NoResultFound:
-        return not_found(request)
+        raise HTTPNotFound()
 
     ## FIXME:
     ## - list of issues assigned to the current user
@@ -58,7 +58,7 @@ def project_home(request):
     ## anything else?
 
     if not has_permission(request, PERM_VIEW_PROJECT, project):
-        return HTTPUnauthorized()
+        raise HTTPForbidden()
     bindings = {'api': TemplateAPI(request),
                 'project': project}
     return render_to_response('../templates/project.pt', bindings)

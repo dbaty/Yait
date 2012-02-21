@@ -3,6 +3,7 @@
 - review permission system: turn it into a Pyramid authorization
   policy (?)
 
+- speed up tests
 
 
 Yait 0.2
