@@ -1,22 +1,23 @@
 from yait.tests.base import TestCaseForViews
 
 
-class TestSiteControlPanel(TestCaseForViews):
+class TestControlPanelHome(TestCaseForViews):
 
-    template_under_test = '../templates/site_control_panel.pt'
+    template_under_test = '../templates/control_panel.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import control_panel
         return control_panel(request)
 
     def test_control_panel_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_control_panel_allow_admin(self):
         login = u'admin'
         self._make_user(login, is_admin=True)
+        self._make_renderer()
         request = self._make_request(user=login)
         response = self._call_fut(request)
         self.assertEqual(response.status, '200 OK')
@@ -31,15 +32,15 @@ class TestListAdmin(TestCaseForViews):
         return list_admins(request)
 
     def test_list_admins_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_list_admins_allow_admin(self):
         login = u'admin'
-        admin = self._make_user(login, is_admin=True)
-        a3 = self._make_user('admin3', is_admin=True)
-        a2 = self._make_user('admin2', is_admin=True)
+        admin = self._make_user(login, u'Admin 1', is_admin=True)
+        a3 = self._make_user(u'admin3', u'Admin 3', is_admin=True)
+        a2 = self._make_user(u'admin2', u'Admin 2', is_admin=True)
         renderer = self._make_renderer()
         request = self._make_request(user=login)
         self._call_fut(request)
@@ -54,14 +55,14 @@ class TestAddAdmin(TestCaseForViews):
         return add_admin(request)
 
     def test_add_admin_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_add_admin_no_user_id(self):
         login = u'admin'
         self._make_user(login, is_admin=True)
-        post = {'admin_id': u''}
+        post = {'user_id': u''}
         request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
@@ -69,25 +70,26 @@ class TestAddAdmin(TestCaseForViews):
 
     def test_add_admin_already_admin(self):
         login = u'admin'
-        self._make_user(login)
-        post = {'admin_id': u'admin'}
+        admin = self._make_user(login, is_admin=True)
+        post = {'user_id': admin.id}
         request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('error_message', location)
 
     def test_add_admin_success(self):
-        from yait.models import Admin
+        from yait.models import User
         login = u'admin'
         self._make_user(login, is_admin=True)
-        post = {'admin_id': u'admin2'}
+        user = self._make_user(u'user')
+        post = {'user_id': user.id}
         request = self._make_request(user=login, post=post)
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('status_message', location)
-        admins = [a.user_id for a in \
-                      self.session.query(Admin).order_by('user_id').all()]
-        self.assertEqual(admins, [u'admin', u'admin2'])
+        admins = self.session.query(User).filter_by(is_admin=True).all()
+        admins = sorted([a.login for a in admins])
+        self.assertEqual(admins, [u'admin', u'user'])
 
 
 class TestDeleteAdmin(TestCaseForViews):
@@ -97,9 +99,9 @@ class TestDeleteAdmin(TestCaseForViews):
         return delete_admin(request)
 
     def test_delete_admin_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_delete_admin_himself(self):
         login = u'admin'
@@ -120,7 +122,7 @@ class TestDeleteAdmin(TestCaseForViews):
         self.assertIn('error_message', location)
 
     def test_delete_admin_success(self):
-        from yait.models import Admin
+        from yait.models import User
         login = u'admin'
         admin = self._make_user(login, is_admin=True)
         admin2 = self._make_user(u'admin2', is_admin=True)
@@ -129,7 +131,8 @@ class TestDeleteAdmin(TestCaseForViews):
         response = self._call_fut(request)
         location = response.headers['Location']
         self.assertIn('status_message', location)
-        self.assertEqual(self.session.query(Admin).all(), [admin])
+        admins = self.session.query(User).filter_by(is_admin=True).all()
+        self.assertEqual(admins, [admin])
 
 
 class TestListProjects(TestCaseForViews):
@@ -141,13 +144,13 @@ class TestListProjects(TestCaseForViews):
         return list_projects(request)
 
     def test_list_projects_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_list_projects_allow_admin(self):
         login = u'admin'
-        self._make_user(login)
+        self._make_user(login, is_admin=True)
         p1 = self._make_project(u'p1', u'p1')
         p3 = self._make_project(u'p3', u'p3')
         p2 = self._make_project(u'p2', u'p2')
@@ -164,15 +167,15 @@ class TestDeleteProject(TestCaseForViews):
         return delete_project(request)
 
     def test_delete_project_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_delete_project(self):
         from yait.models import Project
         p = self._make_project(u'p1', u'p1')
         login = u'admin'
-        self._make_user(login)
+        self._make_user(login, is_admin=True)
         post = {'project_id': p.id}
         request = self._make_request(user=login, post=post)
         response = self._call_fut(request)

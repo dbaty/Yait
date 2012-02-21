@@ -5,6 +5,9 @@
 
 - speed up tests
 
+- check "Add admin" interface. It should just provide a selection
+  widget to pick an existing user.
+
 
 Yait 0.2
 ========
