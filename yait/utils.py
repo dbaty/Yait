@@ -1,8 +1,3 @@
-"""Various utilities.
-
-$Id$
-"""
-
 from datetime import datetime
 import re
 

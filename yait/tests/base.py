@@ -1,7 +1,5 @@
-"""Base utilities and classes for our tests.
+"""Base utilities and classes for our tests."""
 
-$Id$
-"""
 
 from unittest import TestCase
 
@@ -51,9 +49,9 @@ class TestCaseForViews(TestCase):
         # TemplateAPI which is in turn used in almost all views.
         self.config.testing_add_template('templates/form_macros.pt')
         self.config.testing_add_template('templates/master.pt')
-        _set_auth_policies(self.config, {'yait.auth.timeout': 10,
+        _set_auth_policies(self.config, {'yait.auth.timeout': '10',
                                          'yait.auth.secret': 'secret',
-                                         'yait.auth.secure_only': False},
+                                         'yait.auth.secure_only': 'false'},
                            DummyAuthenticationPolicy)
         self.session = get_testing_db_session()
 
@@ -76,6 +74,7 @@ class TestCaseForViews(TestCase):
         request = DummyRequest(environ=environ, post=post)
         _set_property(request, 'user', _get_user, do_reify=True)
         if user:
+            # 'user' may be the user id or the login.
             if isinstance(user, unicode):
                 user = self.session.query(User).filter_by(login=user).one().id
             DummyAuthenticationPolicy.fake_login(request, user)

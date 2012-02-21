@@ -1,7 +1,4 @@
-"""Views related to the site.
-
-$Id$
-"""
+"""General purpose views: home page, not found, etc."""
 
 from pyramid.renderers import render_to_response
 

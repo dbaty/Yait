@@ -1,7 +1,4 @@
-"""View utilities.
-
-$Id$
-"""
+"""View utilities."""
 
 from pyramid.renderers import get_renderer
 
@@ -43,8 +40,8 @@ PERMISSIONS_FOR_ROLE = {
 
 
 class TemplateAPI(object):
-    """Provides a master template and various information and
-    utilities that can be used in any template.
+    """Provide a master template and various information and utilities
+    that can be used in any template.
     """
     def __init__(self, request):
         self.request = request
@@ -135,18 +132,3 @@ def has_permission(request, permission, context=None):
 
     setattr(request, cache_key, user_perms)
     return permission in user_perms
-
-
-# FIXME: should not be needed anymore
-def rollback_transaction(environ, status, headers):
-    """Returns whether the transaction machinery should cancel the
-    transaction.
-
-    This hook is called by ``repoze.tm2`` to know whether it should
-    roll back or commit the db transaction: if this methods returns
-    ``True``, the transaction is cancelled; otherwise, it is
-    committed.
-    """
-    if environ['REQUEST_METHOD'] == 'GET':
-        return True
-    return status.startswith('4') or status.startswith('5')

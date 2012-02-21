@@ -1,7 +1,4 @@
-"""Test views related to the site.
-
-$Id$
-"""
+"""Test views related to the site."""
 
 from yait.tests.base import TestCaseForViews
 

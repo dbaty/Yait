@@ -6,12 +6,12 @@ from unittest import TestCase
 class TestModelConstructor(TestCase):
 
     def test_model_init(self):
-        from yait.models import Admin
-        Admin(user_id=u'admin')
+        from yait.models import User
+        User(login=u'user')
 
     def test_model_init_unknown_column(self):
-        from yait.models import Admin
-        self.assertRaises(AttributeError, Admin, foo='bar')
+        from yait.models import User
+        self.assertRaises(AttributeError, User, foo='bar')
 
 
 class TestProject(TestCase):
@@ -44,7 +44,7 @@ class TestChange(TestCase):
 class TestIssueRelationship(TestCase):
 
     ## FIXME: enable later
-    def _test_model_change(self):
+    def _test_model_issue_relationship(self):
         from yait.models import IssueRelationship
         r = IssueRelationship(source_id=1, target_id=2, kind=3)
         self.assertEqual(
