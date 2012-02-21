@@ -17,9 +17,12 @@ from yait.views.utils import TemplateAPI
 
 
 def login_form(request, failed=False):
+    next = request.GET.get('next') or request.route_url('home')
     bindings = {'api': TemplateAPI(request),
-                'failed': failed}
-    return render_to_response('../templates/forbidden.pt', bindings)
+                'next': next,
+                'failed': failed,
+                'needs_login': request.GET.get('needs_login')}
+    return render_to_response('../templates/login.pt', bindings)
 
 
 def login(request):
@@ -28,9 +31,10 @@ def login(request):
         quote_plus(request.get('HTTP_REFERER') or request.route_url('home'))
     login = request.POST.get('login', '')
     password = request.POST.get('password', '')
-    if not check_password(login, password):
+    user = check_password(login, password)
+    if user is None:
         return login_form(request, failed=True)
-    headers = remember(request, login)
+    headers = remember(request, user.id)
     return HTTPSeeOther(location=next, headers=headers)
 
 

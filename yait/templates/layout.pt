@@ -7,11 +7,13 @@
     <metal:title metal:define-slot="title"></metal:title>
   </title>
   <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
-  <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"/>
-  <link rel="stylesheet" type="text/css" href="/static/css/main.css"/>
-  <link rel="stylesheet" type="text/css" href="/static/css/buttons.css"/>
-  <script type="text/javascript" src="/static/js/jquery-1.4.2.min.js"></script>
-  <script type="text/javascript" src="/static/js/utils.js"></script>
+  <link rel="icon" tal:attributes="href api.static_url('static/img/favicon.ico')" type="image/x-icon"/>
+  <link rel="stylesheet" type="text/css"
+        tal:attributes="href api.static_url('static/css/main.css')"/>
+  <link rel="stylesheet" type="text/css"
+        tal:attributes="href api.static_url('static/css/buttons.css')"/>
+  <script tal:attributes="src api.static_url('static/js/jquery-1.7.1.min.js')"></script>
+  <script tal:attributes="src api.static_url('static/js/utils.js')"></script>
   <metal:html-head metal:define-slot="html-head"/>
 </head>
 <body>
@@ -36,17 +38,19 @@
     </div>
     <ul id="footerActions">
       <li tal:condition="not api.logged_in and api.show_login_link">
-        <a tal:attributes="href api.route_url('login_form')">log in</a>
+        <a tal:attributes="href api.route_url('login')">log in</a>
       </li>
       <li tal:condition="api.logged_in">
-        <span tal:replace="api.user_cn"/>
+        <span tal:replace="api.request.user.fullname"/>
         (<a tal:attributes="href api.route_url('logout')">log out</a>)
       </li>
+<!-- FIXME
       <li tal:condition="api.logged_in">
-        <a tal:attributes="href api.route_url('preferences')">preferences</a>
+        <a tal:attributes="href api.route_url('profile')">profile</a>
       </li>
-      <li tal:condition="api.has_permission(u'Administer site')">
-        <a tal:attributes="href api.route_url('control_panel')">site control panel</a>
+-->
+      <li tal:condition="api.is_admin">
+        <a tal:attributes="href api.route_url('control_panel')">control panel</a>
       </li>
     </ul>
   </div>

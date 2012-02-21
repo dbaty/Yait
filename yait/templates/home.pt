@@ -6,13 +6,13 @@ FIXME
 <ul>
   <li tal:repeat="project projects">
     <a tal:content="project.title"
-       tal:attributes="href api.url_of(project.name)">
+       tal:attributes="href api.route_url('project_home', project_name=project.name)">
     </a>
   </li>
 </ul>
 
-<a tal:condition="api.has_permission(u'Administer site')"
-   tal:attributes="href api.url_of('add_project_form')">add a new project</a>
+<a tal:condition="api.is_admin"
+   tal:attributes="href api.route_url('add_project')">add a new project</a>
 
 </metal:content>
 </layout>

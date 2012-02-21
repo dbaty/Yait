@@ -17,7 +17,7 @@ from yait.views.utils import PERM_VIEW_PROJECT
 from yait.views.utils import TemplateAPI
 
 
-def add_project_form(request, form=None):
+def add_form(request, form=None):
     if not has_permission(request, PERM_ADMIN_SITE):
         raise HTTPForbidden()
     if form is None:
@@ -27,12 +27,12 @@ def add_project_form(request, form=None):
     return render_to_response('../templates/project_add.pt', bindings)
 
 
-def add_project(request):
+def add(request):
     if not has_permission(request, PERM_ADMIN_SITE):
         raise HTTPForbidden()
     form = AddProjectForm(request.POST)
     if not form.validate():
-        return add_project_form(request, form)
+        return add_form(request, form)
     project = Project()
     form.populate_obj(project)
     session = DBSession()
@@ -42,7 +42,7 @@ def add_project(request):
     return HTTPSeeOther(location=url)
 
 
-def project_home(request):
+def home(request):
     project_name = request.matchdict['project_name']
     session = DBSession()
     try:
@@ -62,3 +62,9 @@ def project_home(request):
     bindings = {'api': TemplateAPI(request),
                 'project': project}
     return render_to_response('../templates/project.pt', bindings)
+
+
+def configure_form(request):
+    # FIXME
+    from pyramid.response import Response
+    return Response('configuration form (to do)')

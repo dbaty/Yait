@@ -24,7 +24,7 @@ from yait.views.utils import PERM_SEE_PRIVATE_TIMING_INFO
 from yait.views.utils import TemplateAPI
 
 
-def add_issue_form(request, form=None):
+def add_form(request, form=None):
     session = DBSession()
     project_name = request.matchdict['project_name']
     try:
@@ -41,7 +41,7 @@ def add_issue_form(request, form=None):
     return render_to_response('../templates/issue_add.pt', bindings)
 
 
-def add_issue(request):
+def add(request):
     session = DBSession()
     project_name = request.matchdict['project_name']
     try:
@@ -52,7 +52,7 @@ def add_issue(request):
         raise HTTPForbidden()
     form = AddIssueForm(request.POST)
     if not form.validate():
-        return add_issue_form(request, form)
+        return add_form(request, form)
 
     last_ref = session.execute(
         'SELECT MAX(ref) FROM issues '
@@ -81,7 +81,7 @@ def add_issue(request):
     return HTTPFound(location=url)
 
 
-def issue_view(request, form=None):
+def view(request, form=None):
     project_name = request.matchdict['project_name']
     issue_ref = int(request.matchdict['issue_ref'])
     session = DBSession()
@@ -115,7 +115,7 @@ def issue_view(request, form=None):
     return render_to_response('../templates/issue.pt', bindings)
 
 
-def issue_update(request):
+def update(request):
     project_name = request.matchdict['project_name']
     issue_ref = int(request.matchdict['issue_ref'])
     session = DBSession()
@@ -133,7 +133,7 @@ def issue_update(request):
 
     form = AddChangeForm(request.POST)
     if not form.validate():
-        return issue_view(request, form)
+        return view(request, form)
 
     now = datetime.now()
     userid = u'damien.baty' ## FIXME

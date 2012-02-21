@@ -11,8 +11,8 @@ class TestIssueAddForm(TestCaseForViews):
     template_under_test = '../templates/issue_add.pt'
 
     def _call_fut(self, request):
-        from yait.views.issue import add_issue_form
-        return add_issue_form(request)
+        from yait.views.issue import add_form
+        return add_form(request)
 
     def test_add_issue_form_unknown_project(self):
         from pyramid.httpexceptions import HTTPNotFound
@@ -49,8 +49,8 @@ class TestAddIssue(TestCaseForViews):
     template_under_test = '../templates/issue_add.pt'
 
     def _call_fut(self, request):
-        from yait.views.issue import add_issue
-        return add_issue(request)
+        from yait.views.issue import add
+        return add(request)
 
     def test_add_issue_unknown_project(self):
         from pyramid.httpexceptions import HTTPNotFound
@@ -145,8 +145,8 @@ class TestViewIssue(TestCaseForViews):
     template_under_test = '../templates/issue.pt'
 
     def _call_fut(self, request):
-        from yait.views.issue import issue_view
-        return issue_view(request)
+        from yait.views.issue import view
+        return view(request)
 
     def test_issue_view_unknown_project(self):
         from pyramid.httpexceptions import HTTPNotFound
@@ -195,8 +195,8 @@ class TestUpdateIssue(TestCaseForViews):
     template_under_test = '../templates/issue.pt'
 
     def _call_fut(self, request):
-        from yait.views.issue import issue_update
-        return issue_update(request)
+        from yait.views.issue import update
+        return update(request)
 
     def test_issue_update_unknown_project(self):
         from pyramid.httpexceptions import HTTPNotFound

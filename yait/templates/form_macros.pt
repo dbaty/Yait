@@ -23,7 +23,7 @@
                            class 'required' in field.flags and 'required'">
       <span tal:replace="field.label.text"/>
       <img tal:condition="'required' in field.flags" 
-           tal:attributes="src api.url_of('static/img/required.png')"
+           tal:attributes="src api.static_url('static/img/required.png')"
            width="4" height="4" alt="(required)"/>
     </label>
     <div tal:condition="field.description" tal:content="field.description"
@@ -52,11 +52,11 @@
          class="noUnderline"
          title="preview comment"
          tal:attributes="href 'javascript: togglePreviewPane(\'%s\')' % 
-                         api.url_of('ajax-render-text')"
-         ><img tal:attributes="src api.url_of('static/img/preview.png')"
+                         api.route_url('ajax_render_text')"
+         ><img tal:attributes="src api.route_url('static/img/preview.png')"
                height="16" width="16" alt="preview comment"/></a>
       <div id="previewSpinner" class="hidden">
-        <img tal:attributes="src api.url_of('static/img/spinner.gif')"
+        <img tal:attributes="src api.route_url('static/img/spinner.gif')"
              width="16" height="16" alt="loading, please wait..."/>
         Loading, please wait&hellip;
       </div>

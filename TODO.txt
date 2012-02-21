@@ -8,6 +8,8 @@
 - check "Add admin" interface. It should just provide a selection
   widget to pick an existing user.
 
+- add a command-line tool to add a new user
+
 
 Yait 0.2
 ========
@@ -40,6 +42,9 @@ Yait 0.2
   - last 10 added or updated issues;
 
   - "master tickets" (if feature is implemented)
+
+  - reorganize "add issue" and "configure project" buttons (move to
+    the action bar below the title?)
 
 - relationships between issues : parent/child, blocker/blocked
 

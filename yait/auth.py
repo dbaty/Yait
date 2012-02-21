@@ -39,13 +39,17 @@ def _get_user(request):
 
 
 def check_password(login, password):
-    """Return whether the credentials match one of our user's."""
+    """Return the corresponding user if the given credentials are
+    correct.
+    """
     session = DBSession()
     try:
         user = session.query(User).filter_by(login=login).one()
     except NoResultFound:
-        return False
-    return user.validate_password(password)
+        return None
+    if not user.validate_password(password):
+        return None
+    return user
 
 
 class AuthorizationPolicy(object):

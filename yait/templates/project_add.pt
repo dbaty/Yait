@@ -5,7 +5,7 @@
       id="addProjectForm"
       tal:define="renderField api.form_macros['renderField'];
                   field_options {}"
-      tal:attributes="action api.url_of('add_project')">
+      tal:attributes="action api.route_url('add_project')">
 
   <fieldset>
     <legend>Add a new project</legend>
@@ -28,7 +28,7 @@
 
     <div class="buttons">
       <button type="submit" class="positive">
-        <img tal:attributes="src api.url_of('static/img/tick.png')" alt=""/>
+        <img tal:attributes="src api.static_url('static/img/tick.png')" alt=""/>
         Add project
       </button>
     </div>

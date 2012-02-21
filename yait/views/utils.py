@@ -68,10 +68,15 @@ class TemplateAPI(object):
         if self.here_url.split('?')[0].endswith('login'):
             self.show_login_link = False
         self.logged_in = request.user.id is not None
-        self.user_cn = None
+        self.is_admin = request.user.is_admin
 
-    def route_url(self, route_name):
-        return self.request.route_url(route_name)
+    def route_url(self, route_name, *elements, **kw):
+        return self.request.route_url(route_name, *elements, **kw)
+
+    def static_url(self, path, **kw):
+        if ':' not in path:
+            path = 'yait:%s' % path
+        return self.request.static_url(path, **kw)
 
     def has_permission(self, *args, **kwargs):
         return has_permission(self.request, *args, **kwargs)

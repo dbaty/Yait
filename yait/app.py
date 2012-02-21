@@ -41,11 +41,19 @@ def make_app(global_settings, **settings):
     # projects ('/p/<project_name>') and possibly users too
     # ('/u/<login>')?
 
-    # Regular views:
-    #   - site / general purpose views / static assets
+    # Regular routes and views:
+    #   - site / general purpose views / login / static assets
     config.add_static_view('static', 'static')
     config.add_route('home', '/')
-    config.add_view('yait.views.site.home', route_name='home')
+    config.add_view('.views.site.home', route_name='home')
+    config.add_route('login', '/login')
+    config.add_view('.views.auth.login_form', route_name='login',
+                    request_method='GET')
+    config.add_view('.views.auth.login', route_name='login',
+                    request_method='POST')
+    config.add_route('logout', '/logout')
+    config.add_view('.views.auth.logout', route_name='logout')
+
     #   - global admin
     config.add_route('control_panel', '/control-panel')
     config.add_view('.views.manage.control_panel', route_name='control_panel')
@@ -71,22 +79,25 @@ def make_app(global_settings, **settings):
     config.add_view('.views.issue.ajax_render_text',
                     route_name='ajax_render_text', renderer='json')
     config.add_route('add_project', '/add-project')
-    config.add_view('.views.project.add_project_form',
-                    route_name='add_project', request_method='GET')
-    config.add_view('.views.project.add_project',
-                    route_name='add_project', request_method='POST')
+    config.add_view('.views.project.add_form', route_name='add_project',
+                    request_method='GET')
+    config.add_view('.views.project.add', route_name='add_project',
+                    request_method='POST')
     config.add_route('project_home', '/{project_name}')
-    config.add_view('.views.project.project_home', route_name='project_home')
+    config.add_view('.views.project.home', route_name='project_home')
+    config.add_route('project_configure', '/{project_name}/configure')
+    config.add_view('.views.project.configure_form',
+                    route_name='project_configure')
     #  - issues
     config.add_route('add_issue', '/{project_name}/add-issue')
-    config.add_view('.views.issue.add_issue_form', route_name='add_issue',
+    config.add_view('.views.issue.add_form', route_name='add_issue',
                     request_method='GET')
-    config.add_view('.views.issue.add_issue', route_name='add_issue',
+    config.add_view('.views.issue.add', route_name='add_issue',
                     request_method='POST')
     config.add_route('issue_view', '/{project_name}/{issue_ref}')
-    config.add_view('.views.issue.issue_view', route_name='issue_view')
+    config.add_view('.views.issue.view', route_name='issue_view')
     config.add_route('issue_update', '/{project_name}/{issue_ref}/update')
-    config.add_view('.views.issue.issue_update', route_name='issue_update',
+    config.add_view('.views.issue.update', route_name='issue_update',
                     request_method='POST')
     # Special views
     #   - not found

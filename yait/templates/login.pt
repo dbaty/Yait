@@ -35,7 +35,7 @@
       </div>
       <div class="buttons">
         <button type="submit" class="positive">
-          <img tal:attributes="src api.url_of('static/img/tick.png')" alt=""/>
+          <img tal:attributes="src api.static_url('static/img/tick.png')" alt=""/>
           Log in
         </button>
       </div>

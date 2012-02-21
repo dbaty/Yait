@@ -8,8 +8,8 @@ class TestProjectAddForm(TestCaseForViews):
     template_under_test = '../templates/project_add.pt'
 
     def _call_fut(self, request):
-        from yait.views.project import add_project_form
-        return add_project_form(request)
+        from yait.views.project import add_form
+        return add_form(request)
 
     def test_add_project_form_reject_not_admin(self):
         from pyramid.httpexceptions import HTTPForbidden
@@ -32,8 +32,8 @@ class TestAddProject(TestCaseForViews):
     template_under_test = '../templates/project_add.pt'
 
     def _call_fut(self, *args, **kwargs):
-        from yait.views.project import add_project
-        return add_project(*args, **kwargs)
+        from yait.views.project import add
+        return add(*args, **kwargs)
 
     def test_add_project_reject_not_admin(self):
         from pyramid.httpexceptions import HTTPForbidden
@@ -85,8 +85,8 @@ class TestProjectHome(TestCaseForViews):
     template_under_test = '../templates/project.pt'
 
     def _call_fut(self, request):
-        from yait.views.project import project_home
-        return project_home(request)
+        from yait.views.project import home
+        return home(request)
 
     def test_project_view_unknowproject(self):
         from pyramid.httpexceptions import HTTPNotFound
