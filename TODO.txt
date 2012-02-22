@@ -1,8 +1,6 @@
 Yait 0.2
 ========
 
-- use HTTPSeeOther to redirect after a POST (instead of HTTPFound)
-
 - review permission system: turn it into a Pyramid authorization
   policy (?)
 

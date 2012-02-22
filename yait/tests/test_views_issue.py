@@ -245,7 +245,7 @@ class TestUpdateIssue(TestCaseForViews):
         request = self._make_request(user=login, matchdict=matchdict,
                                      post=post)
         response = self._call_fut(request)
-        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.status, '303 See Other')
         location = response.headers['location'].split('?')[0]
         self.assert_(location.endswith('%s/%d' % (p.name, issue.ref)))
         self.assertEqual(len(issue.changes), 1)

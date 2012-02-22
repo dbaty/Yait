@@ -4,8 +4,8 @@
 from datetime import datetime
 
 from pyramid.httpexceptions import HTTPForbidden
-from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPSeeOther
 from pyramid.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -81,7 +81,7 @@ def add(request):
     session.add(change)
     # FIXME: use 'request.route_url()'
     url = '%s/%s/%d' % (request.application_url, project.name, issue.ref)
-    return HTTPFound(location=url)
+    return HTTPSeeOther(location=url)
 
 
 def view(request, form=None):
@@ -193,7 +193,7 @@ def update(request):
     # FIXME: use 'request.route_url()'
     url = '%s/%s/%d?issue_updated=1#issue_updated' % (
         request.application_url, project.name, issue.ref)
-    return HTTPFound(location=url)
+    return HTTPSeeOther(location=url)
 
 
 def ajax_render_text(request):
