@@ -8,6 +8,13 @@ from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.decorator import reify
 
 
+# Do not let bcrypt slow down our tests.
+from cryptacular.bcrypt import BCRYPTPasswordManager
+_check = lambda self, encoded, password: (encoded == self.encode(password))
+BCRYPTPasswordManager.encode = lambda self, s: (s + 60 * '*')[:60]
+BCRYPTPasswordManager.check = _check
+
+
 def get_testing_db_session():
     from yait.models import DBSession
     from yait.models import initialize_sql

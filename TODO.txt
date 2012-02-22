@@ -6,8 +6,6 @@ Yait 0.2
 - review permission system: turn it into a Pyramid authorization
   policy (?)
 
-- speed up tests
-
 - check "Add admin" interface. It should just provide a selection
   widget to pick an existing user.
 
@@ -140,6 +138,8 @@ Yait 0.4
 
 Later
 =====
+
+- speed up tests
 
 - ability to guess links to issues in comments, for example::
 
