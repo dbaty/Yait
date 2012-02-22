@@ -116,7 +116,8 @@ class TestAddIssue(TestCaseForViews):
                                       p2: ROLE_PROJECT_PARTICIPANT})
         post = {'title': u't', 'text': u't'}
         matchdict = {'project_name': u'p1'}
-        request = self._make_request(user=login, post=post, matchdict=matchdict)
+        request = self._make_request(user=login, post=post,
+                                     matchdict=matchdict)
         self._call_fut(request)
         self.assertEqual(p1.issues[0].ref, 1)
 
@@ -259,18 +260,18 @@ class TestAjaxRenderReST(TestCase):
         from yait.views.issue import ajax_render_text
         return ajax_render_text(request)
 
-    def _make_request(self, post=None):
+    def _make_request(self, get=None):
         from pyramid.testing import DummyRequest
-        return DummyRequest(post=post)
+        return DummyRequest(params=get)
 
     def test_ajax_render_rest(self):
-        request = self._make_request(post={'text': '**bold**',
-                                           'renderer_name': 'rest'})
+        request = self._make_request(get={'text': '**bold**',
+                                          'text_renderer': 'rest'})
         self.assertEqual(
             self._call_fut(request),
             {'rendered': '<p><strong>bold</strong></p>'})
 
     def test_ajax_render_rest_empty_text(self):
-        request = self._make_request(post={'text': '',
-                                           'renderer_name': 'rest'})
+        request = self._make_request(get={'text': '',
+                                          'text_renderer': 'rest'})
         self.assertEqual(self._call_fut(request), {'rendered': ''})

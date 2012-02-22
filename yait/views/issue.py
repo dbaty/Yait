@@ -35,9 +35,12 @@ def add_form(request, form=None):
         raise HTTPForbidden()
     if form is None:
         form = AddIssueForm()
+    can_see_priv = has_permission(
+        request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     bindings = {'api': TemplateAPI(request),
                 'project': project,
-                'form': form}
+                'form': form,
+                'can_see_private_time_info': can_see_priv}
     return render_to_response('../templates/issue_add.pt', bindings)
 
 
@@ -107,11 +110,13 @@ def view(request, form=None):
                              time_estimated=issue.time_estimated,
                              time_billed=issue.time_billed,
                              title=issue.title)
+    can_see_priv = has_permission(
+        request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     bindings = {'api': TemplateAPI(request),
                 'project': project,
                 'issue': issue,
                 'form': form,
-                'now': datetime.now()}
+                'can_see_private_time_info': can_see_priv}
     return render_to_response('../templates/issue.pt', bindings)
 
 
@@ -136,7 +141,7 @@ def update(request):
         return view(request, form)
 
     now = datetime.now()
-    userid = u'damien.baty' ## FIXME
+    userid = u'damien.baty'  # FIXME
     changes = {}
     for attr in (
         'status', 'assignee', 'deadline', 'priority', 'kind',
@@ -144,13 +149,13 @@ def update(request):
         old_v = getattr(issue, attr)
         new_v = getattr(form, attr).data
         if attr.startswith('time_') and not new_v:
-            ## FIXME: probably not the right way to do it
+            # FIXME: probably not the right way to do it
             new_v = 0
         if old_v != new_v:
             changes[attr] = (old_v, new_v)
             setattr(issue, attr, new_v)
 
-    ## FIXME: to be implemented
+    # FIXME: to be implemented
 #     current_parent = issue.getParent()
 #     new_parent = form.values['parent']
 #     if current_parent != new_parent:
@@ -175,11 +180,11 @@ def update(request):
         changes['time_spent_public'] = (None, change.time_spent_public)
 
     if not changes and not form.text.data:
-        ## FIXME: move this test above before we add 'Change' so we do
-        ## not have to rollback anything.
-        ## FIXME: redisplay update form with an appropriate general
-        ## error message.
-        ## FIXME: and rollback changes made on 'issue' and 'change'!
+        # FIXME: move this test above before we add 'Change' so we do
+        # not have to rollback anything.
+        # FIXME: redisplay update form with an appropriate general
+        # error message.
+        # FIXME: and rollback changes made on 'issue' and 'change'!
         raise NotImplementedError
 
     change.changes = changes
@@ -193,6 +198,6 @@ def update(request):
 
 def ajax_render_text(request):
     """Render reStructuredText (called via AJAX)."""
-    text = request.POST['text']
-    renderer_name = request.POST['renderer_name']
+    text = request.GET['text']
+    renderer_name = request.GET['text_renderer']
     return {'rendered': render(text, renderer_name)}

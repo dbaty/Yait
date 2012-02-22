@@ -11,7 +11,7 @@
 </tal:block>
 <tal:block metal:fill-slot="content">
 
-  <p tal:condition="failed" class="error-msg" i18n:translate="">
+  <p tal:condition="login_failed" class="error-msg" i18n:translate="">
     Wrong login or password. Please try again.
   </p>
 

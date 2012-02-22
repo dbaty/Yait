@@ -78,6 +78,8 @@ class TemplateAPI(object):
             path = 'yait:%s' % path
         return self.request.static_url(path, **kw)
 
+    # FIXME: not sure this is a good idea to provide this shortcut. We
+    # should probably not call 'has_permission()' from the templates.
     def has_permission(self, *args, **kwargs):
         return has_permission(self.request, *args, **kwargs)
 

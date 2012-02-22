@@ -12,13 +12,10 @@
 </metal:title>
 <metal:header metal:fill-slot="header">
   &mdash;
-  <a tal:attributes="href api.url_of(project.name)" tal:content="project.title"/>
+  <a tal:attributes="href api.route_url('project_home', project_name=project.name)" tal:content="project.title"/>
 </metal:header>
 
-<!-- FIXME: move 'can_see_private_time_info' definition in the view function -->
-<metal:content metal:fill-slot="content"
-               tal:define="can_see_private_time_info api.has_permission(
-                         u'See private time information', project)">
+<metal:content metal:fill-slot="content">
 
 <div id="content">
   <h1>
@@ -26,9 +23,9 @@
        tal:attributes="href '#change-%d' % issue.changes[-1].id"
        class="scrollToLastComment"
        title="scroll to last comment...">&darr;</a>
-    <a tal:attributes="href api.url_of('%s/%d' % (project.name, issue.id))"
+    <a tal:attributes="href api.request.url"
        class="permalink" title="issue permalink">#</a>
-     #<span tal:replace="issue.ref"/> &mdash;
+    #<span tal:replace="issue.ref"/> &mdash;
     <span tal:replace="issue.title"/>
   </h1>
 
@@ -51,7 +48,7 @@
                    include_private_time_info=can_see_private_time_info)">
         <h2 class="changeHeader"
             tal:attributes="id 'change-%d' % change.id">
-          <a tal:attributes="href api.url_of('%s/%d#change-%d' % (project.name, issue.id, change.id))"
+          <a tal:attributes="href '%s#change-%d' % (api.request.url, change.id)"
              title="comment permalink"
              class="permalink">#</a>
           Update by <span tal:replace="change.author"/>
@@ -78,8 +75,7 @@
 
   <form method="post"
         tal:condition="api.has_permission(u'Participate in project', project)"
-        tal:attributes="action api.url_of(
-                            '%s/%s/update' % (project.name, issue.ref))"
+        tal:attributes="action api.route_url('issue_update', project_name=project.name, issue_ref=issue.ref)"
         tal:define="renderField api.form_macros['renderField'];
                     field_options {}">
     <fieldset>
@@ -93,7 +89,7 @@
 
     <div class="buttons">
       <button type="submit" class="positive">
-        <img tal:attributes="src api.url_of('static/img/tick.png')" alt=""/>
+        <img tal:attributes="src api.static_url('static/img/tick.png')" alt=""/>
         Update
       </button>
     </div>
@@ -168,26 +164,26 @@
 
 <ul id="issueViewActions">
   <li tal:condition="api.has_permission(u'Participate in project', project)"
-      tal:define="action_url api.url_of('%s/add_issue_form' % project.name)">
+      tal:define="action_url api.route_url('issue_add', project_name=project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.url_of('static/img/add.png')"
+       ><img tal:attributes="src api.static_url('static/img/add.png')"
              width="32" height="32" alt="add issue"/></a>
     <a tal:attributes="href action_url">add issue</a>
   </li>
-  <li tal:define="action_url api.url_of('%s/search' % project.name)">
+  <li tal:define="action_url api.route_url('project_search', project_name=project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.url_of('static/img/search.png')"
+       ><img tal:attributes="src api.static_url('static/img/search.png')"
              width="32" height="32" alt="search issues"/></a>
     <a tal:attributes="href action_url">search issues</a>
   </li>
   <li tal:condition="api.has_permission(u'Administer project', project)"
-      tal:define="action_url api.url_of('%s/control_panel' % project.name)">
+      tal:define="action_url api.route_url('project_configure', project_name=project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.url_of('static/img/configure.png')"
-             width="32" height="32" alt="add issue"/></a>
+       ><img tal:attributes="src api.static_url('static/img/configure.png')"
+             width="32" height="32" alt="configure project"/></a>
     <a tal:attributes="href action_url">configure project</a>
   </li>
 </ul>

@@ -91,16 +91,26 @@ class ExtraFieldset:
         choices=zip(ISSUE_KIND_VALUES, ISSUE_KIND_LABELS),
         default=DEFAULT_ISSUE_KIND,
         validators=[required()])
-    parent = TextField(label=u'Parent issue') ## FIXME: use an auto-complete widget
-    children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput) ## FIXME: need ork on UI
+    # FIXME: use an auto-complete widget
+    parent = TextField(label=u'Parent issue')
+    # FIXME: need work on UI
+    children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput)
+
+
+def text_renderer_field_factory():
+    return SelectField(label=u'Text format',
+                       choices=(('rest', 'reStructuredText'), ),
+                       default='rest',
+                       validators=[required()])
 
 
 class AddIssueForm(BaseForm, ExtraFieldset):
     title = TextField(label=u'Title', validators=[required()])
     text = TextAreaField(label=u'Text', validators=[required()])
+    text_renderer = text_renderer_field_factory()
 
 
 class AddChangeForm(BaseForm, ExtraFieldset):
     """A form used to comment (change) an issue."""
     text = TextAreaField(label=u'Text')
-
+    text_renderer = text_renderer_field_factory()

@@ -5,7 +5,7 @@
       id="addProjectForm"
       tal:define="renderField api.form_macros['renderField'];
                   field_options {}"
-      tal:attributes="action api.route_url('add_project')">
+      tal:attributes="action api.route_url('project_add')">
 
   <fieldset>
     <legend>Add a new project</legend>

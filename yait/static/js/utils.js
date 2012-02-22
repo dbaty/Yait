@@ -1,7 +1,7 @@
 // Toggle extra fieldset in several forms (add/edit issue, add/edit comment)
 function toggleExtraFieldset() {
     var elm = document.getElementById('extraFieldset');
-    if (elm.className == 'hidden') {
+    if (elm.className === 'hidden') {
         elm.className = '';
     } else {
         elm.className = 'hidden';
@@ -13,12 +13,13 @@ function toggleExtraFieldset() {
 function togglePreviewPane(url) {
     var preview_pane = document.getElementById('previewPane');
     var text_area = document.getElementById('text');
+    var text_renderer = document.getElementById('text_renderer');
     var preview_spinner = document.getElementById('previewSpinner');
-    if (preview_pane.className == 'hidden') {
+    if (preview_pane.className === 'hidden') {
         text_area.className = 'hidden';
         preview_spinner.className = '';
         $.getJSON(url,
-                  {text: text_area.value},
+                  {text: text_area.value, text_renderer: text_renderer.value},
                   function(data) {
                       preview_pane.className = '';
                       preview_pane.innerHTML = data.rendered;

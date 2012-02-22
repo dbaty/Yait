@@ -44,6 +44,8 @@
   Parameters: none
 </tal:comment>
 <metal:issue-text-field metal:define-macro="issue-text-field">
+  <metal:field tal:define="field_name 'text_renderer'"
+               metal:use-macro="renderField"/>
   <metal:field tal:define="field_name 'text';
                            field_options {'rows': 10, 'cols': 80}"
                metal:use-macro="renderField">
@@ -53,10 +55,10 @@
          title="preview comment"
          tal:attributes="href 'javascript: togglePreviewPane(\'%s\')' % 
                          api.route_url('ajax_render_text')"
-         ><img tal:attributes="src api.route_url('static/img/preview.png')"
+         ><img tal:attributes="src api.static_url('static/img/preview.png')"
                height="16" width="16" alt="preview comment"/></a>
       <div id="previewSpinner" class="hidden">
-        <img tal:attributes="src api.route_url('static/img/spinner.gif')"
+        <img tal:attributes="src api.static_url('static/img/spinner.gif')"
              width="16" height="16" alt="loading, please wait..."/>
         Loading, please wait&hellip;
       </div>
@@ -121,7 +123,6 @@
       </tal:if>
       <!-- FIXME: use an auto-complete widget -->
       <metal:field tal:define="field_name 'parent'" metal:use-macro="renderField"/>
-      <!-- FIXME: we need a special widget here -->
       <metal:field tal:define="field_name 'children'" metal:use-macro="renderField"/>
     </div>
   </fieldset>

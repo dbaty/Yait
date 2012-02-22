@@ -24,6 +24,19 @@ Yait 0.2
 
   - move "meta" bar to the left column (?)
 
+- add "Cancel" button in forms
+
+- change the CSS of the header so that it looks more like a breadcrumb
+
+- review "Text renderer" field: we could move it to a hidden field and
+  have a custom drop-down menu on the right of the "Text label", like
+  this:
+
+    Text (using reStructuredText v)
+
+  But this is too soon to spend time on this, as we have only one
+  renderer for now. We should rather find a half-way solution
+
 - complete the 'add issue' form
 
 - add a way to change the title: quick edit (cf. issue tracker Pilot),
@@ -79,7 +92,7 @@ Yait 0.2
 
   ProjectSubscription: project_id, user_id
 
-- i18n
+- i18n (and update Trove classifier in 'setup.py')
 
 - sanitize user input comments (remove iframe, Javascript, etc.) : https://github.com/jsocol/bleach ?
 

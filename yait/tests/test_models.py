@@ -1,7 +1,7 @@
 """Test models."""
 
-
 from unittest import TestCase
+
 
 class TestModelConstructor(TestCase):
 

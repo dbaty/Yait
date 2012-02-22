@@ -1,7 +1,7 @@
 <layout metal:use-macro="api.layout">
 <metal:header metal:fill-slot="header">
   &mdash;
-  <a tal:attributes="href api.url_of('control_panel')">Site control panel</a>
+  <a tal:attributes="href api.route_url('control_panel')">Site control panel</a>
   &mdash; Manage projects
 </metal:header>
 
@@ -21,18 +21,18 @@
         tal:attributes="class repeat['project'].odd and 'odd' or 'even'">
       <td>
           <a tal:content="project.name"
-             tal:attributes="href api.url_of(project.name)"/>
+             tal:attributes="href api.route_url('project_home', project_name=project.name)"/>
       </td>
       <td tal:content="project.title"/>
       <td class="centered">
         <form class="ninja"
-              tal:attributes="action api.url_of('control_panel/delete_project')"
+              tal:attributes="action api.route_url('project_delete')"
               onsubmit="return window.confirm('Are you sure?');"
               method="POST">
           <input type="hidden" name="project_id"
                  tal:attributes="value project.id"/>
           <input type="image" width="16" height="16" alt="delete project"
-                 tal:attributes="src api.url_of('static/img/delete.png')"/>
+                 tal:attributes="src api.static_url('static/img/delete.png')"/>
         </form>
       </td>
     </tr>
@@ -41,10 +41,10 @@
 
 
 <ul id="actions">
-  <li tal:define="action_url api.url_of('add_project_form')">
+  <li tal:define="action_url api.route_url('project_add')">
     <a tal:attributes="href action_url"
        class="noUnderline"
-       ><img tal:attributes="src api.url_of('static/img/add.png')"
+       ><img tal:attributes="src api.static_url('static/img/add.png')"
              width="32" height="32" alt="add a new project"/></a>
     <a tal:attributes="href action_url">add a new project</a>
   </li>

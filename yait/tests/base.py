@@ -27,6 +27,7 @@ class DummyAuthenticationPolicy(CallbackAuthenticationPolicy):
     def unauthenticated_userid(self, request):
         return getattr(request, '_dummy_auth_id', None)
 
+
 # A simplified version of 'pyramid.util.InstancePropertyMixin.set_property'
 def _set_property(request, name, callable, do_reify=False):
     func = lambda this: callable(this)
@@ -62,16 +63,14 @@ class TestCaseForViews(TestCase):
     def _make_renderer(self):
         return self.config.testing_add_renderer(self.template_under_test)
 
-    # FIXME: when do we provide a custom 'environ'?
-    def _make_request(self, user=None, post=None, environ=None,
-                      matchdict=None):
+    def _make_request(self, user=None, post=None, get=None, matchdict=None):
         from pyramid.testing import DummyRequest
         from yait.auth import _get_user
         from yait.models import User
         if post is not None:
             from webob.multidict import MultiDict
             post = MultiDict(post)
-        request = DummyRequest(environ=environ, post=post)
+        request = DummyRequest(params=get, post=post)
         _set_property(request, 'user', _get_user, do_reify=True)
         if user:
             # 'user' may be the user id or the login.

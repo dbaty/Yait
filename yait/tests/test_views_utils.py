@@ -103,7 +103,7 @@ from yait.tests.base import TestCaseForViews
 #         self.assertEqual(api.user_cn, u'john.smith')
 
 #     def test_misc_attributes(self):
-#         from pyramid.testing import DummyRequest        
+#         from pyramid.testing import DummyRequest
 #         request = DummyRequest()
 #         api = self._make_one(request=request)
 #         self.assertEqual(api.header_prefix, u'Yait')
@@ -114,12 +114,12 @@ from yait.tests.base import TestCaseForViews
 #     def test_url_of(self):
 #         from pyramid.testing import DummyRequest
 #         request = DummyRequest()
-#         request.application_url = 'http://exemple.com'
+#         request.application_url = 'http://baz.com'
 #         api = self._make_one(request=request)
-#         self.assertEqual(api.url_of(''), 'http://exemple.com')
-#         self.assertEqual(api.url_of('foo'), 'http://exemple.com/foo')
-#         self.assertEqual(api.url_of('foo/bar'), 'http://exemple.com/foo/bar')
-#         self.assertEqual(api.url_of('foo/bar/'), 'http://exemple.com/foo/bar')
+#         self.assertEqual(api.url_of(''), 'http://baz.com')
+#         self.assertEqual(api.url_of('foo'), 'http://baz.com/foo')
+#         self.assertEqual(api.url_of('foo/bar'), 'http://baz.com/foo/bar')
+#         self.assertEqual(api.url_of('foo/bar/'), 'http://baz.com/foo/bar')
 
 #     def test_has_permission(self):
 #         from pyramid.testing import DummyRequest

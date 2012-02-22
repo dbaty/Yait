@@ -16,33 +16,33 @@ REQUIRES = ('cryptacular',
             'sqlalchemy',
             'wtforms',
             'zope.sqlalchemy')
-# FIXME: repoze.who
 
 
-# FIXME: to be completed
 setup(name='Yait',
       version='0.1',
       description='Yait is an issue tracker.',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description='\n\n'.join((README, CHANGES)),
       classifiers=(
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers",
-        "Programming Language :: Python",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-        "Topic :: Internet :: WWW/HTTP :: WSGI",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        'Development Status :: 3 - Alpha',
+        'Environment :: Web Environment',
+        'Framework :: Pylons',
+        'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
+        'Topic :: Software Development :: Bug Tracking'
         ),
-      author='',
-      author_email='',
-      url='',
-      keywords='web wsgi bfg zope',
+      author='Damien Baty',
+      author_email='damien.baty.remove@gmail.com',
+      url='FIXME',
+      keywords='web bug issue tracker pyramid',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
       install_requires=REQUIRES,
-      test_suite="yait.tests",
-      entry_points = """\
+      test_suite='yait.tests',
+      entry_points='''\
       [paste.app_factory]
       main = yait.app:make_app
-      """)
+      ''')

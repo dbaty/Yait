@@ -97,7 +97,7 @@ def delete_admin(request):
     url = '%s/control_panel/manage_admins_form?status_message=%s' % (
         request.application_url, msg)
     return HTTPSeeOther(location=url)
-    
+
 
 def list_projects(request):
     if not request.user.is_admin:
@@ -119,7 +119,7 @@ def delete_project(request):
     session.delete(project)
     msg = quote_plus(u'Project "%s" ("%s") has been deleted.' % (
             name, title))
-    # FIXME: use 'request.route_url()'    
+    # FIXME: use 'request.route_url()'
     url = '%s/control_panel/manage_projects_form?status_message=%s' % (
         request.application_url, msg)
     return HTTPSeeOther(location=url)

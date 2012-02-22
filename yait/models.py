@@ -67,6 +67,7 @@ RELATIONSHIP_KINDS = (u'is child of',
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 metadata = MetaData()
 
+
 class Model(object):
     def __init__(self, **kwargs):
         # FIXME: not needed. Remove checks (but keep setattr!).
@@ -127,16 +128,16 @@ class Issue(Model):
         return ISSUE_PRIORITY_LABELS[self.priority - 1]
 
     def get_parent(self):
-        pass ## FIXME
+        pass  # FIXME
 
     def get_children(self):
-        pass ## FIXME
+        pass  # FIXME
 
     def get_blocked_by(self):
-        pass ## FIXME
+        pass  # FIXME
 
     def get_blocking(self):
-        pass ## FIXME
+        pass  # FIXME
 
     def get_time_info(self, include_private_info):
         """Return a dictionary of time-related information for this
@@ -179,15 +180,15 @@ issues_table = Table(
     Column('title', Unicode),
     Column('reporter', Integer, ForeignKey('users.id')),
     Column('assignee', Integer, ForeignKey('users.id')),
-    Column('kind', Integer), ## FIXME: could be an Enum
-    Column('priority', Integer), ## FIXME: could be an Enum
+    Column('kind', Integer),  # FIXME: should be an Enum
+    Column('priority', Integer),  # FIXME: should be an Enum
     Column('status', Unicode),
-    ## FIXME: is 'resolution' useful?
-    ## Update 1: Yes, it's useful.
-    ## Update2: ok, perhaps it's useful, but there is no UI
-    ## yet. Proposal: when the user selects the 'close' status, the
-    ## resolution field shows up. Otherwise, it is hidden (and
-    ## ignored in the form controller).
+    # FIXME: is 'resolution' useful?
+    # Update 1: Yes, it's useful.
+    # Update2: ok, perhaps it's useful, but there is no UI
+    # yet. Proposal: when the user selects the 'close' status, the
+    # resolution field shows up. Otherwise, it is hidden (and
+    # ignored in the form controller).
     Column('resolution', Unicode),
     Column('date_created', DateTime),
     Column('date_edited', DateTime),
@@ -251,7 +252,8 @@ changes_table = Table(
     Column('time_spent_public', Integer),
     Column('text', Text),
     Column('text_renderer', String(20)),
-    Column('changes', PickleType(mutable=False))) ## FIXME: I think that we do need it to be mutable. To be checked.
+    # FIXME: I think that we do need it to be mutable. To be checked.
+    Column('changes', PickleType(mutable=False)))
 
 
 class IssueRelationship(Model):
@@ -262,7 +264,7 @@ issue_relationships_table = Table(
     metadata,
     Column('source_id', Integer, ForeignKey('issues.id')),
     Column('target_id', Integer, ForeignKey('issues.id')),
-    Column('kind', Integer)) ## FIXME: could be an Enum
+    Column('kind', Integer))  # FIXME: should be an Enum
 
 
 class Role(Model):
@@ -271,14 +273,14 @@ class Role(Model):
 roles_table = Table(
     'roles',
     metadata,
-    ## FIXME: add a constraint: the triple should be unique.
+    # FIXME: add a constraint: the triple should be unique.
     Column('user_id', Integer, ForeignKey('users.id')),
     Column('project_id', Integer, ForeignKey('projects.id')),
-    Column('role', Integer)) ## FIXME: could be an Enum
-
+    Column('role', Integer))  # FIXME: could be an Enum
 
 
 _pwd_manager = BCRYPTPasswordManager()
+
 
 class User(Model):
     def _get_password(self):
@@ -305,7 +307,6 @@ users_table = Table(
 #####################################################################
 
 
-
 #####################################################################
 ## Mappers
 ##########
@@ -328,7 +329,6 @@ users_mapper = mapper(User, users_table,
                       properties={'password': synonym('_password',
                                                       map_column=True)})
 #####################################################################
-
 
 
 #####################################################################

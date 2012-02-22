@@ -68,3 +68,9 @@ def configure_form(request):
     # FIXME
     from pyramid.response import Response
     return Response('configuration form (to do)')
+
+
+def search_form(request):
+    # FIXME
+    from pyramid.response import Response
+    return Response('search form (to do)')

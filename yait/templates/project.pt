@@ -11,7 +11,7 @@
 
 <ul id="actions">
   <li tal:condition="api.has_permission(u'Participate in project', project)"
-      tal:define="action_url api.route_url('add_issue', project_name=project.name)">
+      tal:define="action_url api.route_url('issue_add', project_name=project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
        ><img tal:attributes="src api.static_url('static/img/add.png')"

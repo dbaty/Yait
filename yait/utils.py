@@ -5,6 +5,8 @@ TIME_REGEXP = re.compile('(?:(\d+)w)?'
                          ' ?(?:(\d+)d)?'
                          ' ?(?:(\d+)h)?'
                          ' ?(?:(\d+)m)?')
+
+
 def str_to_time(s):
     """Convert a string to a number of minutes.
 
@@ -78,7 +80,7 @@ def time_to_str(t):
     return s
 
 
-def str_to_date(s, format='dd/mm/yyyy'): ## FIXME: is it used anywhere?
+def str_to_date(s, format='dd/mm/yyyy'):  # FIXME: is it used anywhere?
     """Convert a string to the date it respresents.
 
     Only one format is available: ``dd/mm/yyyy``.
