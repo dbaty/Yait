@@ -1,3 +1,6 @@
+Yait 0.2
+========
+
 - use HTTPSeeOther to redirect after a POST (instead of HTTPFound)
 
 - review permission system: turn it into a Pyramid authorization
@@ -9,10 +12,6 @@
   widget to pick an existing user.
 
 - add a command-line tool to add a new user
-
-
-Yait 0.2
-========
 
 - review CSS:
 
