@@ -92,9 +92,7 @@ class TestAddIssue(TestCaseForViews):
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, post=post,
                                      matchdict=matchdict)
-        response = self._call_fut(request)
-        location = response.headers['location']
-        self.assert_(location.endswith('%s/1' % p.name))
+        self._call_fut(request)
         self.assertEqual(len(p.issues), 1)
         issue = p.issues[0]
         self.assertEqual(issue.title, u'Issue title')
@@ -244,10 +242,7 @@ class TestUpdateIssue(TestCaseForViews):
         post = {'text': u'comment', 'assignee': u'user2', }
         request = self._make_request(user=login, matchdict=matchdict,
                                      post=post)
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '303 See Other')
-        location = response.headers['location'].split('?')[0]
-        self.assert_(location.endswith('%s/%d' % (p.name, issue.ref)))
+        self._call_fut(request)
         self.assertEqual(len(issue.changes), 1)
         self.assertEqual(issue.assignee, u'user2')
         self.assertEqual(issue.changes[0].changes,
