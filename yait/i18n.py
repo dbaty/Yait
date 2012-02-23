@@ -2,7 +2,12 @@
 preferences.
 """
 
+from pyramid.i18n import TranslationStringFactory
+
 from webob.acceptparse import NilAccept
+
+
+_ = TranslationStringFactory('yait')
 
 
 def locale_negotiator(request):

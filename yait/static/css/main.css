@@ -212,7 +212,7 @@ a img {
 /***********************************************************
 ** Error and status messages
 ****************************/
-div.statusMessage, div.errorMessage, div.formError {
+div.successMessage, div.errorMessage, div.formError {
     border-width: 1px 1px 1px 0.5em;
     border-style: solid;
     font-weight: bold;
@@ -221,7 +221,7 @@ div.statusMessage, div.errorMessage, div.formError {
     margin-bottom: 0.5em;
 }
 
-div.statusMessage {
+div.successMessage {
     border-color: #007D39;
     background-color: #F4FFFA;
 }

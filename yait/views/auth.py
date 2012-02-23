@@ -19,7 +19,9 @@ from yait.views.utils import TemplateAPI
 def login_form(request, login_failed=False):
     next = request.GET.get('next') or request.POST.get('next') or \
         request.route_url('home')
-    bindings = {'api': TemplateAPI(request),
+    api = TemplateAPI(request)
+    api.show_login_link = False
+    bindings = {'api': api,
                 'next': next,
                 'login_failed': login_failed,
                 'needs_login': 'needs_login' in request.GET}
@@ -54,7 +56,7 @@ def logout(request, _forget=forget):
 
 
 def forbidden(request):
-    if authenticated_userid(request):
+    if not authenticated_userid(request):
         # FIXME: the intention is good, but we should not try to
         # redirect to 'next' (after login) if this request is a
         # POST. The redirection will be a GET request, which may not

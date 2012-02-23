@@ -64,18 +64,18 @@ class TestAddAdmin(TestCaseForViews):
         self._make_user(login, is_admin=True)
         post = {'user_id': u''}
         request = self._make_request(user=login, post=post)
-        response = self._call_fut(request)
-        location = response.headers['Location']
-        self.assertIn('error_message', location)
+        self._call_fut(request)
+        self.assertEqual(len(request.get_flash('error')), 1)
+        self.assertEqual(len(request.get_flash('success')), 0)
 
     def test_add_admin_already_admin(self):
         login = u'admin'
         admin = self._make_user(login, is_admin=True)
         post = {'user_id': admin.id}
         request = self._make_request(user=login, post=post)
-        response = self._call_fut(request)
-        location = response.headers['Location']
-        self.assertIn('error_message', location)
+        self._call_fut(request)
+        self.assertEqual(len(request.get_flash('error')), 1)
+        self.assertEqual(len(request.get_flash('success')), 0)
 
     def test_add_admin_success(self):
         from yait.models import User
@@ -84,9 +84,9 @@ class TestAddAdmin(TestCaseForViews):
         user = self._make_user(u'user')
         post = {'user_id': user.id}
         request = self._make_request(user=login, post=post)
-        response = self._call_fut(request)
-        location = response.headers['Location']
-        self.assertIn('status_message', location)
+        self._call_fut(request)
+        self.assertEqual(len(request.get_flash('error')), 0)
+        self.assertEqual(len(request.get_flash('success')), 1)
         admins = self.session.query(User).filter_by(is_admin=True).all()
         admins = sorted([a.login for a in admins])
         self.assertEqual(admins, [u'admin', u'user'])
@@ -104,22 +104,25 @@ class TestDeleteAdmin(TestCaseForViews):
         self.assertRaises(HTTPForbidden, self._call_fut, request)
 
     def test_delete_admin_himself(self):
+        from yait.models import User
         login = u'admin'
         admin = self._make_user(login, is_admin=True)
         post = {'admin_id': admin.id}
         request = self._make_request(user=login, post=post)
-        response = self._call_fut(request)
-        location = response.headers['Location']
-        self.assertIn('error_message', location)
+        self._call_fut(request)
+        self.assertEqual(len(request.get_flash('error')), 1)
+        self.assertEqual(len(request.get_flash('success')), 0)
+        admins = self.session.query(User).filter_by(is_admin=True).all()
+        self.assertEqual(admins, [admin])
 
     def test_delete_admin_no_user_id(self):
         login = u'admin'
         self._make_user(login, is_admin=True)
         post = {'admin_id': u''}
         request = self._make_request(user=login, post=post)
-        response = self._call_fut(request)
-        location = response.headers['Location']
-        self.assertIn('error_message', location)
+        self._call_fut(request)
+        self.assertEqual(len(request.get_flash('error')), 1)
+        self.assertEqual(len(request.get_flash('success')), 0)
 
     def test_delete_admin_success(self):
         from yait.models import User
@@ -128,9 +131,9 @@ class TestDeleteAdmin(TestCaseForViews):
         admin2 = self._make_user(u'admin2', is_admin=True)
         post = {'admin_id': admin2.id}
         request = self._make_request(user=login, post=post)
-        response = self._call_fut(request)
-        location = response.headers['Location']
-        self.assertIn('status_message', location)
+        self._call_fut(request)
+        self.assertEqual(len(request.get_flash('error')), 0)
+        self.assertEqual(len(request.get_flash('success')), 1)
         admins = self.session.query(User).filter_by(is_admin=True).all()
         self.assertEqual(admins, [admin])
 
@@ -178,7 +181,7 @@ class TestDeleteProject(TestCaseForViews):
         self._make_user(login, is_admin=True)
         post = {'project_id': p.id}
         request = self._make_request(user=login, post=post)
-        response = self._call_fut(request)
-        location = response.headers['Location']
-        self.assertIn('status_message', location)
+        self._call_fut(request)
+        self.assertEqual(len(request.get_flash('error')), 0)
+        self.assertEqual(len(request.get_flash('success')), 1)
         self.assertEqual(self.session.query(Project).all(), [])

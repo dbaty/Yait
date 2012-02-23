@@ -23,12 +23,12 @@
   </div>
 
   <div id="container">
-    <div class="statusMessage"
-         tal:condition="api.status_message"
-         tal:content="api.status_message"/>
+    <div class="successMessage"
+         tal:repeat="notification api.notifications['success']"
+         tal:content="notification"/>
     <div class="errorMessage"
-         tal:condition="api.error_message"
-         tal:content="api.error_message"/>
+         tal:repeat="notification api.notifications['error']"
+         tal:content="notification"/>
     <metal:content metal:define-slot="content"></metal:content>
   </div>
 

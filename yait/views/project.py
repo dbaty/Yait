@@ -37,8 +37,7 @@ def add(request):
     form.populate_obj(project)
     session = DBSession()
     session.add(project)
-    # FIXME: use 'request.route_url()'
-    url = '%s/%s' % (request.application_url, project.name)
+    url = request.route_url('project_home', project_name=project.name)
     return HTTPSeeOther(location=url)
 
 

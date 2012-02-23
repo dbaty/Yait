@@ -1,7 +1,6 @@
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.config import Configurator
-from pyramid.httpexceptions import HTTPForbidden
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.session import UnencryptedCookieSessionFactoryConfig
 
 from yait.auth import AuthorizationPolicy
 from yait.models import initialize_sql
@@ -37,11 +36,10 @@ def make_app(global_settings, **settings):
     # Authentication and authorization policies
     _set_auth_policies(config, settings)
 
-    # FIXME: how to have internal routes ('control-panel', 'search',
-    # etc.) not conflict with future project names: "/meta/<route>",
-    # "/_/<route>", "_<route>", or rather use a specific prefix for
-    # projects ('/p/<project_name>') and possibly users too
-    # ('/u/<login>')?
+    # Sessions
+    session_secret = settings['yait.session.secret']
+    session_factory = UnencryptedCookieSessionFactoryConfig(session_secret)
+    config.set_session_factory(session_factory)
 
     # FIXME: route names are not consistent.
 
@@ -88,30 +86,29 @@ def make_app(global_settings, **settings):
                     request_method='GET')
     config.add_view('.views.project.add', route_name='project_add',
                     request_method='POST')
-    config.add_route('project_home', '/{project_name}')
+    config.add_route('project_home', '/p/{project_name}')
     config.add_view('.views.project.home', route_name='project_home')
-    config.add_route('project_configure', '/{project_name}/configure')
+    config.add_route('project_configure', '/p/{project_name}/configure')
     config.add_view('.views.project.configure_form',
                     route_name='project_configure')
-    config.add_route('project_search', '/{project_name}/search')
-    config.add_view('.views.project.search_form',
-                    route_name='project_search')
+    config.add_route('project_search', '/p/{project_name}/search')
+    config.add_view('.views.project.search_form', route_name='project_search')
 
     # - issues
-    config.add_route('issue_add', '/{project_name}/add')
+    config.add_route('issue_add', '/p/{project_name}/add')
     config.add_view('.views.issue.add_form', route_name='issue_add',
                     request_method='GET')
     config.add_view('.views.issue.add', route_name='issue_add',
                     request_method='POST')
-    config.add_route('issue_view', '/{project_name}/{issue_ref}')
+    config.add_route('issue_view', '/p/{project_name}/{issue_ref}')
     config.add_view('.views.issue.view', route_name='issue_view')
-    config.add_route('issue_update', '/{project_name}/{issue_ref}/update')
+    config.add_route('issue_update', '/p/{project_name}/{issue_ref}/update')
     config.add_view('.views.issue.update', route_name='issue_update',
                     request_method='POST')
 
     # - not found and forbidden
-    config.add_view('.views.site.not_found', context=HTTPNotFound)
-    config.add_view('.views.auth.forbidden', context=HTTPForbidden)
+    config.add_notfound_view('.views.site.not_found')
+    config.add_forbidden_view('.views.auth.forbidden')
 
     # Internationalization
     config.add_translation_dirs('yait:locale')

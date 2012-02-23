@@ -6,6 +6,7 @@ from unittest import TestCase
 from pyramid import testing
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.decorator import reify
+from pyramid.testing import DummyRequest as BaseRequest
 
 
 # Do not let bcrypt slow down our tests.
@@ -20,6 +21,17 @@ def get_testing_db_session():
     from yait.models import initialize_sql
     initialize_sql('sqlite://')
     return DBSession
+
+
+class DummyRequest(BaseRequest):
+    # Override 'route_url()' because the one in 'testing.DummyRequest'
+    # requires a route mapper to be registered.
+    def route_url(self, route_name, *elements, **kwargs):
+        return route_name
+
+    # A short cut to access flash messages in tests.
+    def get_flash(self, queue):
+        return self.session.get('_f_%s' % queue, [])
 
 
 class DummyAuthenticationPolicy(CallbackAuthenticationPolicy):
@@ -71,7 +83,6 @@ class TestCaseForViews(TestCase):
         return self.config.testing_add_renderer(self.template_under_test)
 
     def _make_request(self, user=None, post=None, get=None, matchdict=None):
-        from pyramid.testing import DummyRequest
         from yait.auth import _get_user
         from yait.models import User
         if post is not None:

@@ -54,20 +54,14 @@ class TemplateAPI(object):
         # FIXME: is this useful at all?
         self.header_prefix = HEADER_PREFIX
         self.html_title_prefix = HTML_TITLE_PREFIX
-        # FIXME: use flash messages (included in Pyramid)
-        if self.referrer.startswith(request.application_url):
-            self.status_message = request.GET.get('status_message', '')
-            self.error_message = request.GET.get('error_message', '')
-        else:
-            self.status_message = self.error_message = ''
-        self.layout = get_renderer(
-            '../templates/layout.pt').implementation()
+        self.notifications = {
+            'success': self.request.session.pop_flash('success'),
+            'error': self.request.session.pop_flash('error')}
+        self.layout = get_renderer('../templates/layout.pt').implementation()
         self.form_macros = get_renderer(
             '../templates/form_macros.pt').implementation().macros
-        self.show_login_link = True
-        if self.here_url.split('?')[0].endswith('login'):
-            self.show_login_link = False
         self.logged_in = request.user.id is not None
+        self.show_login_link = not self.logged_in
         self.is_admin = request.user.is_admin
 
     def route_url(self, route_name, *elements, **kw):

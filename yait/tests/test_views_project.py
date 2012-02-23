@@ -71,9 +71,7 @@ class TestAddProject(TestCaseForViews):
         self._make_user(login, is_admin=True)
         post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
         request = self._make_request(user=login, post=post)
-        response = self._call_fut(request)
-        location = response.headers['Location']
-        self.assert_(location.endswith('/p1'))
+        self._call_fut(request)
         projects = self.session.query(Project).all()
         self.assertEqual(len(projects), 1)
         self.assertEqual(projects[0].name, u'p1')

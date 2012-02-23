@@ -79,14 +79,20 @@ def add(request):
                     changes={})
     form.populate_obj(change)
     session.add(change)
-    # FIXME: use 'request.route_url()'
-    url = '%s/%s/%d' % (request.application_url, project.name, issue.ref)
+    route_args = {'project_name': project_name, 'issue_ref': issue.ref}
+    url = request.route_url('issue_view', **route_args)
     return HTTPSeeOther(location=url)
 
 
 def view(request, form=None):
     project_name = request.matchdict['project_name']
-    issue_ref = int(request.matchdict['issue_ref'])
+    try:
+        issue_ref = int(request.matchdict['issue_ref'])
+    except ValueError:
+        # 'issue_ref' is not an integer. The route connected to this
+        # view matched because no other route matched. This could be a
+        # typo, for example: '/p/project-foo/confgure'.
+        raise HTTPNotFound()
     session = DBSession()
     try:
         project = session.query(Project).filter_by(name=project_name).one()
@@ -190,9 +196,11 @@ def update(request):
     change.changes = changes
     session.add(change)
     session.flush()
-    # FIXME: use 'request.route_url()'
-    url = '%s/%s/%d?issue_updated=1#issue_updated' % (
-        request.application_url, project.name, issue.ref)
+    route_args = {'project_name': project_name,
+                  'issue_ref': issue.ref,
+                  '_query': {'issue_updated': 1},
+                  '_anchor': 'issue_updated'}
+    url = request.route_url('issue_view', **route_args)
     return HTTPSeeOther(location=url)
 
 

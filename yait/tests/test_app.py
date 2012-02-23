@@ -13,6 +13,7 @@ class TestApp(TestCase):
         settings = {'yait.db_url': 'sqlite://',
                     'yait.auth.secret': 'secret',
                     'yait.auth.secure_only': 'false',
-                    'yait.auth.timeout': '10'}
+                    'yait.auth.timeout': '10',
+                    'yait.session.secret': 'secret'}
         wsgi_app = make_app(global_settings, **settings)
         self.assertIsInstance(wsgi_app, Router)

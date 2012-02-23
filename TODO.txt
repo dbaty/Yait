@@ -64,9 +64,6 @@ Yait 0.2
   required. In this case, display the field below the text field (and
   not in the "extra" field set).
 
-- check "api.url_of()" when the URL looks like: domain.com/foo/yait
-  (should not be a problem if we use 'route_url()').
-
 - search form
 
 - e-mail notification:
@@ -107,12 +104,6 @@ Yait 0.2
 
 Yait 0.3
 ========
-
-- switch to repoze.who 2
-
-- move to distribute
-
-- PEP 8 naming, including in tests ('_makeRequst', etc.)
 
 - find a new name: obal, peri, prao, aster, noria, falgo, tern, tuit
 
@@ -246,17 +237,15 @@ Later
 
 - add favicon
 
+- add tags
+
 - add a "Component/category" field (à la Jira). Do we need that if we
   have tags?
-
-- add tags
 
 - show priority and deadline in different colors: orange if imminent,
   red if past.
 
 - add settings so that the JSON calls are not cached:
   http://stackoverflow.com/questions/264216/getjson-returning-cached-data-in-ie8
-
-- handle LDAP groups;
 
 - user guide
