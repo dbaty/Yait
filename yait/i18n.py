@@ -1,5 +1,5 @@
 """Define our own locale negotiator that looks at the browser
-preferences.
+preferences, as well as the ``_`` translation function.
 """
 
 from pyramid.i18n import TranslationStringFactory

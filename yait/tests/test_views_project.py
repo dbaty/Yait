@@ -1,5 +1,3 @@
-"""Test views related to projects."""
-
 from yait.tests.base import TestCaseForViews
 
 

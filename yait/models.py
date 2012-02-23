@@ -70,15 +70,7 @@ metadata = MetaData()
 
 class Model(object):
     def __init__(self, **kwargs):
-        # FIXME: not needed. Remove checks (but keep setattr!).
-        # We check that the attributes we want to initialize are
-        # indeed columns of the table. It helps avoiding typos.
-        allowed = dir(self)
         for attr, value in kwargs.items():
-            if attr not in allowed:
-                raise AttributeError(
-                    'Initializing "%s" with the "%s" unknown attribute.' % (
-                        self.__class__, attr))
             setattr(self, attr, value)
 
 

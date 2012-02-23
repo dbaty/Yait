@@ -1,6 +1,3 @@
-"""Test the ``app`` module."""
-
-
 from unittest import TestCase
 
 

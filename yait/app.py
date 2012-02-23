@@ -41,8 +41,6 @@ def make_app(global_settings, **settings):
     session_factory = UnencryptedCookieSessionFactoryConfig(session_secret)
     config.set_session_factory(session_factory)
 
-    # FIXME: route names are not consistent.
-
     # Routes and views:
     # - site / general purpose views / login / static assets
     config.add_static_view('static', 'static')
@@ -69,23 +67,16 @@ def make_app(global_settings, **settings):
                     request_method='POST')
     config.add_route('projects', '/control-panel/projects')
     config.add_view('.views.manage.list_projects', route_name='projects')
+    config.add_route('project_add', '/control-panel/add-project')
+    config.add_view('.views.project.add_form', route_name='project_add',
+                    request_method='GET')
+    config.add_view('.views.project.add', route_name='project_add',
+                    request_method='POST')
     config.add_route('project_delete', '/control-panel/delete-project')
     config.add_view('.views.manage.delete_project',
                     route_name='project_delete', request_method='POST')
 
     # - projects
-    # FIXME: should be move under the 'issues' section, but has to be
-    # defined before the 'project_home' route, otherwise it will never
-    # be picked up. This problem may be lifted if we add a prefix to
-    # such global views (see FIXME above).
-    config.add_route('ajax_render_text', '/ajax-render-text')
-    config.add_view('.views.issue.ajax_render_text',
-                    route_name='ajax_render_text', renderer='json')
-    config.add_route('project_add', '/add-project')
-    config.add_view('.views.project.add_form', route_name='project_add',
-                    request_method='GET')
-    config.add_view('.views.project.add', route_name='project_add',
-                    request_method='POST')
     config.add_route('project_home', '/p/{project_name}')
     config.add_view('.views.project.home', route_name='project_home')
     config.add_route('project_configure', '/p/{project_name}/configure')
@@ -100,6 +91,9 @@ def make_app(global_settings, **settings):
                     request_method='GET')
     config.add_view('.views.issue.add', route_name='issue_add',
                     request_method='POST')
+    config.add_route('ajax_render_text', '/ajax-render-text')
+    config.add_view('.views.issue.ajax_render_text',
+                    route_name='ajax_render_text', renderer='json')
     config.add_route('issue_view', '/p/{project_name}/{issue_ref}')
     config.add_view('.views.issue.view', route_name='issue_view')
     config.add_route('issue_update', '/p/{project_name}/{issue_ref}/update')

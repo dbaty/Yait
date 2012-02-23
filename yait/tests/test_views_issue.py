@@ -1,6 +1,3 @@
-"""Test views related to issues."""
-
-
 from unittest import TestCase
 
 from yait.tests.base import TestCaseForViews

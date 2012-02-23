@@ -8,11 +8,11 @@ from yait.models import DBSession
 from yait.models import Role
 
 
-## Template constants
+# Template constants
 HEADER_PREFIX = u'Yait'
 HTML_TITLE_PREFIX = HEADER_PREFIX
 
-## Permissions and roles
+# Permissions and roles
 PERM_ADMIN_SITE = u'Administer site'
 PERM_ADMIN_PROJECT = u'Administer project'
 PERM_VIEW_PROJECT = u'View project'
@@ -45,13 +45,10 @@ class TemplateAPI(object):
     """
     def __init__(self, request):
         self.request = request
-        # FIXME: is this useful?
-        self.app_url = request.application_url
-        # FIXME: is this useful?
-        self.here_url = request.url
-        # FIXME: is this used?
-        self.referrer = request.environ.get('HTTP_REFERER', '')
-        # FIXME: is this useful at all?
+        # FIXME: fix these titles. The HTML title prefix should be
+        # 'Yait - %(title)s' where title is given as a parameter to
+        # the constructor.
+        # As for the 'header_prefix', that should just be 'Yait'.
         self.header_prefix = HEADER_PREFIX
         self.html_title_prefix = HTML_TITLE_PREFIX
         self.notifications = {

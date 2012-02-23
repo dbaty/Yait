@@ -1,6 +1,3 @@
-"""Test authentication-related views (login, logout, forbidden)."""
-
-
 from yait.tests.base import TestCaseForViews
 
 

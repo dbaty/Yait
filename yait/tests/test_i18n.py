@@ -1,5 +1,3 @@
-"""Tests ``i18n`` module."""
-
 from unittest import TestCase
 
 

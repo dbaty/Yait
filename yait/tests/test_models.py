@@ -1,17 +1,4 @@
-"""Test models."""
-
 from unittest import TestCase
-
-
-class TestModelConstructor(TestCase):
-
-    def test_model_init(self):
-        from yait.models import User
-        User(login=u'user')
-
-    def test_model_init_unknown_column(self):
-        from yait.models import User
-        self.assertRaises(AttributeError, User, foo='bar')
 
 
 class TestProject(TestCase):

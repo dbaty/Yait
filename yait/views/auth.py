@@ -1,10 +1,9 @@
-"""Authentication- and authorization-related views.
+"""Login, logout and forbidden views.
 
 Policies are defined in the 'yait.auth' module, not here.
 """
 
 from urllib import quote_plus
-
 
 from pyramid.httpexceptions import HTTPSeeOther
 from pyramid.renderers import render_to_response
@@ -13,6 +12,7 @@ from pyramid.security import forget
 from pyramid.security import remember
 
 from yait.auth import check_password
+from yait.i18n import _
 from yait.views.utils import TemplateAPI
 
 
@@ -50,8 +50,9 @@ def logout(request, _forget=forget):
 
     ``_forget`` is only customized in tests.
     """
-    # FIXME: add confirmation message
     headers = _forget(request)
+    msg = _(u'You have been successfully logged out.')
+    request.session.flash(msg, 'success')
     return HTTPSeeOther(location=request.application_url, headers=headers)
 
 

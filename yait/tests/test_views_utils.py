@@ -1,5 +1,3 @@
-"""Test view utilities (``yait.views.utils``)."""
-
 from unittest import TestCase
 
 from pyramid import testing

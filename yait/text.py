@@ -28,10 +28,6 @@ if RENDERERS['rest']:
     def render_rest(text):
         """Render the given ``text`` through the reStructuredText
         engine.
-
-        FIXME: move to a unit test
-        >>> render_rest('this is **bold**')
-        u'<p>this is <strong>bold</strong></p>'
         """
         writer = Writer()
         parts = publish_parts(
