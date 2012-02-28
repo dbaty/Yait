@@ -2,27 +2,67 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:metal="http://xml.zope.org/namespaces/metal">
 <head>
-  <title>
-    <span tal:replace="api.html_title_prefix"/>
-    <metal:title metal:define-slot="title"></metal:title>
-  </title>
+  <title tal:content="api.html_title"/>
   <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
   <link rel="icon" tal:attributes="href api.static_url('static/img/favicon.ico')" type="image/x-icon"/>
   <link rel="stylesheet" type="text/css"
-        tal:attributes="href api.static_url('static/css/main.css')"/>
-  <link rel="stylesheet" type="text/css"
-        tal:attributes="href api.static_url('static/css/buttons.css')"/>
-  <script tal:attributes="src api.static_url('static/js/jquery-1.7.1.min.js')"></script>
-  <script tal:attributes="src api.static_url('static/js/utils.js')"></script>
+        tal:attributes="href api.static_url('static/css/style.css')"/>
   <metal:html-head metal:define-slot="html-head"/>
 </head>
 <body>
-  <div id="header">
-    <a tal:attributes="href api.route_url('home')" tal:content="api.header_prefix"/>
-    <metal:header metal:define-slot="header"></metal:header>
+  <div class="header">
+    <div class="login">
+      <a tal:condition="not api.logged_in and api.show_login_link"
+         tal:attributes="href api.route_url('login')">log in</a>
+      <tal:if tal:condition="api.logged_in">
+        <span tal:replace="api.request.user.fullname"/>
+        (<a tal:attributes="href api.route_url('logout')">log out</a>)
+      </tal:if>
+    </div>
+    <div class="search">
+      <form>
+        <input type="text" value="Search"/>
+      </form>
+    </div>
+    <ol class="breadcrumbs">
+      <li class="first">
+        <a class="home" tal:attributes="href api.route_url('home')">Yait</a>
+      </li>
+      <metal:breadcrumbs metal:define-slot="breadcrumbs"></metal:breadcrumbs>
+    </ol>
   </div>
+  <ol class="actions">
+    <li class="dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+        This project
+        <b class="caret"></b>
+      </a>
+      <ul class="dropdown-menu">
+        <!-- FIXME -->
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Search</a></li>
+        <li><a href="#">Configure</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <!-- FIXME -->
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+        Other projects
+        <b class="caret"></b>
+      </a>
+      <ul class="dropdown-menu">
+        <!-- FIXME -->
+        <li><a href="#">Project bar</a></li>
+        <li><a href="#">Project baz</a></li>
+      </ul>
+    </li>
+    <li tal:condition="can_participate | None"
+        class="add-new-issue">
+      <a tal:attributes="href api.route_url('issue_add', project_name=project.name)">Add new issue</a>
+    </li>
+  </ol>
 
-  <div id="container">
+  <div class="content">
     <div class="successMessage"
          tal:repeat="notification api.notifications['success']"
          tal:content="notification"/>
@@ -32,28 +72,16 @@
     <metal:content metal:define-slot="content"></metal:content>
   </div>
 
-  <div id="footer">
-    <div id="poweredBy">
-      Powered by <a href="http://code.noherring.com/yait" target="_blank">Yait</a>
-    </div>
-    <ul id="footerActions">
-      <li tal:condition="not api.logged_in and api.show_login_link">
-        <a tal:attributes="href api.route_url('login')">log in</a>
-      </li>
-      <li tal:condition="api.logged_in">
-        <span tal:replace="api.request.user.fullname"/>
-        (<a tal:attributes="href api.route_url('logout')">log out</a>)
-      </li>
-<!-- FIXME
-      <li tal:condition="api.logged_in">
-        <a tal:attributes="href api.route_url('profile')">profile</a>
-      </li>
--->
-      <li tal:condition="api.is_admin">
-        <a tal:attributes="href api.route_url('control_panel')">control panel</a>
-      </li>
-    </ul>
+  <div class="footer">
+    Powered by <a href="http://code.noherring.com/yait" target="_blank">Yait</a>.
   </div>
+
+  <script tal:attributes="src api.static_url('static/js/jquery-1.7.1.min.js')"></script>
+  <script tal:attributes="src api.static_url('static/js/bootstrap-dropdown.js')"></script>
+  <script tal:attributes="src api.static_url('static/js/utils.js')"></script>
+  <script>
+    $('.dropdown-toggle').dropdown();
+  </script>
 
 </body>
 </html>

@@ -26,6 +26,8 @@ class TestLoginForm(TestCaseForViews):
         renderer.assert_(login_failed=False)
         renderer.assert_(needs_login=False)
         renderer.assert_(next='/foo')
+        api = renderer.api
+        self.assert_(not api.show_login_link)
 
     def test_login_form_after_forbidden_when_anonymous(self):
         renderer = self._make_renderer()
@@ -85,8 +87,24 @@ class TestLogout(TestCaseForViews):
 
 
 class TestForbidden(TestCaseForViews):
-    def _call_fut(self, request, _forget):
-        from yait.views.auth import logout
-        return logout(request, _forget)
 
-    pass  # FIXME
+    template_under_test = '../templates/forbidden.pt'
+
+    def _call_fut(self, request):
+        from yait.views.auth import forbidden
+        return forbidden(request)
+
+    def test_not_logged_in_show_login_form(self):
+        request = self._make_request()
+        response = self._call_fut(request)
+        self.assertEqual(response.status, '303 See Other')
+        self.assertIn('login', response.location)
+
+    def test_logged_in_return_forbidden(self):
+        login = u'user1'
+        self._make_user(login)
+        renderer = self._make_renderer()
+        request = self._make_request(user=login)
+        request.url = '/forbidden'
+        self._call_fut(request)
+        renderer.assert_(forbidden_url=request.url)

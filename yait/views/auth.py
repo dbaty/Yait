@@ -19,7 +19,7 @@ from yait.views.utils import TemplateAPI
 def login_form(request, login_failed=False):
     next = request.GET.get('next') or request.POST.get('next') or \
         request.route_url('home')
-    api = TemplateAPI(request)
+    api = TemplateAPI(request, _(u'Log in'))
     api.show_login_link = False
     bindings = {'api': api,
                 'next': next,
@@ -58,30 +58,11 @@ def logout(request, _forget=forget):
 
 def forbidden(request):
     if not authenticated_userid(request):
-        # FIXME: the intention is good, but we should not try to
-        # redirect to 'next' (after login) if this request is a
-        # POST. The redirection will be a GET request, which may not
-        # match any route (or not the same as the original POST
-        # request).
-        #
-        # Possible solutions:
-        #
-        # 1. When submitting a form, a quick AJAX call checks whether
-        #    the user is still logged in (i.e. if the auth ticket is
-        #    still valid), which will have the nice side-effect to
-        #    renew the authentication ticket. If it is, the form is
-        #    submitted at once. Otherwise, a modal dialog is displayed
-        #    requesting the user to log in (which is done through
-        #    AJAX).
-        #
-        # 2. On each page, as soon as the page loads, we set up a
-        #    clock. When we are about to reach the auth ticket
-        #    timeout, a proheminent message is displayed asking to
-        #    login again (through AJAX).
         url = request.route_url('login',
                                 _query={'next': request.url,
                                         'needs_login': '1'})
         return HTTPSeeOther(location=url)
     # User is logged in but is not allowed to do what she tried.
-    bindings = {'api': TemplateAPI(request)}
+    bindings = {'api': TemplateAPI(request),
+                'forbidden_url': request.url}
     return render_to_response('../templates/forbidden.pt', bindings)

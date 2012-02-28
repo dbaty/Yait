@@ -25,7 +25,7 @@ class TestSiteHome(TestCaseForViews):
         renderer.assert_(projects=[public_project])
 
     def test_site_home_projects_for_logged_in_user(self):
-        from yait.views.utils import ROLE_PROJECT_VIEWER
+        from yait.auth import ROLE_PROJECT_VIEWER
         public_project = self._make_project(
             name=u'public', title=u'public', public=True)
         p1 = self._make_project(name=u'p1', title=u'p1')

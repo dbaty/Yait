@@ -12,7 +12,7 @@ tmp_env_dir = $(tmp_dir)/testing-env
 
 .PHONY: _default
 _default:
-	@echo "make clean|cov|coverage|doc|dist|distcheck|qa|test"
+	@echo "make clean|cov|coverage|doc|dist|distcheck|qa|sass|test"
 
 .PHONY: clean
 clean:
@@ -57,6 +57,10 @@ qa:
 	pep8 -r $(package_name) || true
 	pyflakes setup.py
 	pyflakes $(package_name)
+
+.PHONY: sass
+sass:
+	cd yait/static/css && sass --watch src:. --style compressed
 
 .PHONY: test
 test:

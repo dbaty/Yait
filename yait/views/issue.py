@@ -10,17 +10,19 @@ from pyramid.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
 
+from yait.auth import has_permission
+from yait.auth import PERM_ADMIN_PROJECT
+from yait.auth import PERM_PARTICIPATE_IN_PROJECT
+from yait.auth import PERM_SEE_PRIVATE_TIMING_INFO
+from yait.auth import PERM_VIEW_PROJECT
 from yait.forms import AddChangeForm
 from yait.forms import AddIssueForm
+from yait.i18n import _
 from yait.models import Change
 from yait.models import DBSession
 from yait.models import Issue
 from yait.models import Project
 from yait.text import render
-from yait.views.utils import has_permission
-from yait.views.utils import PERM_PARTICIPATE_IN_PROJECT
-from yait.views.utils import PERM_VIEW_PROJECT
-from yait.views.utils import PERM_SEE_PRIVATE_TIMING_INFO
 from yait.views.utils import TemplateAPI
 
 
@@ -37,7 +39,7 @@ def add_form(request, form=None):
         form = AddIssueForm()
     can_see_priv = has_permission(
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
-    bindings = {'api': TemplateAPI(request),
+    bindings = {'api': TemplateAPI(request, _(u'Add issue')),
                 'project': project,
                 'form': form,
                 'can_see_private_time_info': can_see_priv}
@@ -118,10 +120,15 @@ def view(request, form=None):
                              title=issue.title)
     can_see_priv = has_permission(
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
-    bindings = {'api': TemplateAPI(request),
+    can_participate = has_permission(
+        request, PERM_PARTICIPATE_IN_PROJECT, project)
+    can_admin_project = has_permission(request, PERM_ADMIN_PROJECT, project)
+    bindings = {'api': TemplateAPI(request, issue.title),
                 'project': project,
                 'issue': issue,
                 'form': form,
+                'can_participate': can_participate,
+                'can_admin_project': can_admin_project,
                 'can_see_private_time_info': can_see_priv}
     return render_to_response('../templates/issue.pt', bindings)
 

@@ -4,7 +4,7 @@ RENDERERS = {}
 try:
     import docutils  # pyflakes: ignore
     RENDERERS['rest'] = 'placeholder'
-except ImportError:
+except ImportError:  # pragma: no cover
     # FIXME: log info
     pass
 

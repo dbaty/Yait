@@ -64,11 +64,6 @@ class TestCaseForViews(TestCase):
     def setUp(self):
         from yait.app import _set_auth_policies
         self.config = testing.setUp()
-        # FIXME: check that it is still true
-        # We need to register these templates since they are used in
-        # TemplateAPI which is in turn used in almost all views.
-        self.config.testing_add_template('templates/form_macros.pt')
-        self.config.testing_add_template('templates/master.pt')
         _set_auth_policies(self.config, {'yait.auth.timeout': '10',
                                          'yait.auth.secret': 'secret',
                                          'yait.auth.secure_only': 'false'},

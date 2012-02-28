@@ -1,0 +1,23 @@
+.listing {
+    border-collapse:collapse;
+
+    th {
+        border-bottom: 1px solid #ccc;
+        padding: 0.2em;
+        text-align: left;
+        font-weight: normal;
+    }
+
+    tr.odd {
+        background-color: #f7f7f7;
+    }
+
+    td {
+        border-bottom: 1px solid #eee;
+        padding: 0.5em;
+    }
+
+    tfoot td {
+        border:0;
+    }
+}

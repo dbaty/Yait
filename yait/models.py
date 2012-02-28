@@ -9,8 +9,8 @@ from sqlalchemy import Integer
 from sqlalchemy import MetaData
 from sqlalchemy import PickleType
 from sqlalchemy import String
-from sqlalchemy import Text
 from sqlalchemy import Table
+from sqlalchemy import Text
 from sqlalchemy import Unicode
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm import relationship

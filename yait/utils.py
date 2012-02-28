@@ -2,39 +2,19 @@ from datetime import datetime
 import re
 
 TIME_REGEXP = re.compile('(?:(\d+)w)?'
-                         ' ?(?:(\d+)d)?'
-                         ' ?(?:(\d+)h)?'
-                         ' ?(?:(\d+)m)?')
+                         ' *(?:(\d+)d)?'
+                         ' *(?:(\d+)h)?'
+                         ' *(?:(\d+)m)?')
 
 
 def str_to_time(s):
     """Convert a string to a number of minutes.
 
     A day is supposed to have 8 hours. As well, a week has 5 days.
-
-    >>> str_to_time('1t')
-    Traceback (most recent call last):
-    ...
-    ValueError: Wrong time format: 1t
-    >>> str_to_time('')
-    0
-    >>> str_to_time('0')
-    0
-    >>> str_to_time('1m')
-    1
-    >>> str_to_time('1h 25m')
-    85
-    >>> str_to_time('1d')
-    480
-    >>> str_to_time('1d 1h')
-    540
-    >>> str_to_time('1d 1h 1m')
-    541
-    >>> str_to_time('1w')
-    2400
     """
     if s in (None, '', '0'):
         return 0
+    s = s.strip()
     matches = TIME_REGEXP.match(s).groups()
     if not any(matches):
         raise ValueError('Wrong time format: %s' % s)
@@ -46,29 +26,7 @@ def str_to_time(s):
 
 
 def time_to_str(t):
-    """Convert a number of minutes into a human-readable string.
-
-    >>> time_to_str(0)
-    ''
-    >>> time_to_str(1)
-    '1m'
-    >>> time_to_str(59)
-    '59m'
-    >>> time_to_str(60)
-    '1h'
-    >>> time_to_str(61)
-    '1h 1m'
-    >>> time_to_str(479)
-    '7h 59m'
-    >>> time_to_str(480)
-    '1d'
-    >>> time_to_str(541)
-    '1d 1h 1m'
-    >>> time_to_str(2399)
-    '4d 7h 59m'
-    >>> time_to_str(2401)
-    '1w 1m'
-    """
+    """Convert a number of minutes into a human-readable string."""
     s = ''
     for c, u in zip((2400, 480, 60, 1),
                     ('w', 'd', 'h', 'm')):

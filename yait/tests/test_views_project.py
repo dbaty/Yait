@@ -21,8 +21,7 @@ class TestProjectAddForm(TestCaseForViews):
         renderer = self._make_renderer()
         request = self._make_request(user=login)
         self._call_fut(request)
-        form = renderer._received.get('form', None)
-        self.assertIsInstance(form, AddProjectForm)
+        self.assertIsInstance(renderer.form, AddProjectForm)
 
 
 class TestAddProject(TestCaseForViews):
@@ -46,9 +45,8 @@ class TestAddProject(TestCaseForViews):
         post = {'name': u'p1', 'title': u''}
         request = self._make_request(user=login, post=post)
         self._call_fut(request)
-        form = renderer._received.get('form', None)
-        self.assertIsInstance(form, AddProjectForm)
-        self.assert_(len(form.errors))
+        self.assertIsInstance(renderer.form, AddProjectForm)
+        self.assert_(len(renderer.form.errors))
 
     def test_add_project_name_already_taken(self):
         from yait.forms import AddProjectForm
@@ -59,9 +57,8 @@ class TestAddProject(TestCaseForViews):
         post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
         request = self._make_request(user=login, post=post)
         self._call_fut(request)
-        form = renderer._received.get('form', None)
-        self.assertIsInstance(form, AddProjectForm)
-        self.assert_(len(form.errors.get('name')))
+        self.assertIsInstance(renderer.form, AddProjectForm)
+        self.assert_(len(renderer.form.errors.get('name')))
 
     def test_add_project_allow_admin(self):
         from yait.models import Project
@@ -106,7 +103,7 @@ class TestProjectHome(TestCaseForViews):
         renderer.assert_(project=p)
 
     def test_project_view_allowed_user(self):
-        from yait.views.utils import ROLE_PROJECT_VIEWER
+        from yait.auth import ROLE_PROJECT_VIEWER
         p = self._make_project(name=u'p1')
         login = u'user1'
         self._make_user(login, roles={p: ROLE_PROJECT_VIEWER})

@@ -1,9 +1,9 @@
 <layout metal:use-macro="api.layout">
-<metal:header metal:fill-slot="header">
-  &mdash;
-  <a tal:attributes="href api.route_url('control_panel')">Site control panel</a>
-  &mdash; Manage projects
-</metal:header>
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <a tal:attributes="href api.route_url('control_panel')">Site control panel</a></li>
+  <li>Manage projects</li>
+</metal:breadcrumbs>
 
 <metal:content metal:fill-slot="content">
 

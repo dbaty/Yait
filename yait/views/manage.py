@@ -16,7 +16,7 @@ from yait.views.utils import TemplateAPI
 def control_panel(request):
     if not request.user.is_admin:
         raise HTTPForbidden()
-    bindings = {'api': TemplateAPI(request)}
+    bindings = {'api': TemplateAPI(request, _(u'Control panel'))}
     return render_to_response('../templates/control_panel.pt', bindings)
 
 
@@ -26,7 +26,7 @@ def list_admins(request):
     session = DBSession()
     admins = session.query(User).filter_by(
         is_admin=True).order_by(User.fullname).all()
-    bindings = {'api': TemplateAPI(request),
+    bindings = {'api': TemplateAPI(request, _(u'Administrators')),
                 'current_user_id': request.user.id,
                 'admins': admins}
     return render_to_response('../templates/list_admins.pt', bindings)
@@ -97,7 +97,7 @@ def list_projects(request):
         raise HTTPForbidden()
     session = DBSession()
     projects = session.query(Project).order_by(Project.title).all()
-    bindings = {'api': TemplateAPI(request),
+    bindings = {'api': TemplateAPI(request, _(u'Projects')),
                 'projects': projects}
     return render_to_response('../templates/list_projects.pt', bindings)
 

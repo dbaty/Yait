@@ -6,14 +6,13 @@
     });
   </script>
 </metal:html-head>
-<metal:title metal:fill-slot="title">
-  &mdash; <span tal:replace="project.title"/>
-  &mdash; #<span tal:replace="issue.ref"/>: <span tal:replace="issue.title"/>
-</metal:title>
-<metal:header metal:fill-slot="header">
-  &mdash;
-  <a tal:attributes="href api.route_url('project_home', project_name=project.name)" tal:content="project.title"/>
-</metal:header>
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <a tal:attributes="href api.route_url('project_home',
+                                          project_name=project.name)"
+       tal:content="project.title"/>
+  </li>
+</metal:breadcrumbs>
 
 <metal:content metal:fill-slot="content">
 
@@ -75,7 +74,7 @@
   </ol>
 
   <form method="post"
-        tal:condition="api.has_permission(u'Participate in project', project)"
+        tal:condition="can_participate"
         tal:attributes="action api.route_url('issue_update', project_name=project.name, issue_ref=issue.ref)"
         tal:define="renderField api.form_macros['renderField'];
                     field_options {}">
@@ -164,7 +163,7 @@
 </div>
 
 <ul id="issueViewActions">
-  <li tal:condition="api.has_permission(u'Participate in project', project)"
+  <li tal:condition="can_participate"
       tal:define="action_url api.route_url('issue_add', project_name=project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"
@@ -179,7 +178,7 @@
              width="32" height="32" alt="search issues"/></a>
     <a tal:attributes="href action_url">search issues</a>
   </li>
-  <li tal:condition="api.has_permission(u'Administer project', project)"
+  <li tal:condition="can_admin_project"
       tal:define="action_url api.route_url('project_configure', project_name=project.name)">
     <a tal:attributes="href action_url"
        class="noUnderline"

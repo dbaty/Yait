@@ -1,11 +1,11 @@
 <layout metal:use-macro="api.layout">
-<metal:title metal:fill-slot="title">
-  &mdash; <span tal:replace="project.title"/>
-</metal:title>
-<metal:header metal:fill-slot="header">
-  &mdash;
-  <a tal:attributes="href api.route_url('project_home', project_name=project.name)" tal:content="project.title"/>
-</metal:header>
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <a tal:attributes="href api.route_url('project_home',
+                                          project_name=project.name)"
+       tal:content="project.title"/>
+  </li>
+</metal:breadcrumbs>
 
 <metal:content metal:fill-slot="content"
                tal:define="renderField api.form_macros['renderField']">

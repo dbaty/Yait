@@ -61,8 +61,6 @@ class AddProjectForm(BaseForm):
             raise ValidationError(u'This name is not available.')
         ## FIXME: check that the name contains only alphanumerical
         ## characters, underscores and dashes.
-        ## FIXME: check that the name does not clash with a view name
-        ## available on the site level.
 
 
 class ExtraFieldset:

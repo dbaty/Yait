@@ -1,8 +1,7 @@
 <layout metal:use-macro="api.layout">
-<metal:header metal:fill-slot="header">
-  &mdash;
-  Site control panel
-</metal:header>
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>Site control panel</li>
+</metal:breadcrumbs>
 
 <metal:content metal:fill-slot="content">
 

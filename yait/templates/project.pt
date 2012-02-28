@@ -1,38 +1,51 @@
 <layout metal:use-macro="api.layout">
-<metal:title metal:fill-slot="title">
-  &mdash; <span tal:replace="project.title"/>
-</metal:title>
-<metal:header metal:fill-slot="header">
-  &mdash;
-  <a tal:attributes="href api.request.url" tal:content="project.title"/>
-</metal:header>
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li tal:content="project.title"/>
+</metal:breadcrumbs>
 
 <metal:content metal:fill-slot="content">
 
-<ul id="actions">
-  <li tal:condition="api.has_permission(u'Participate in project', project)"
-      tal:define="action_url api.route_url('issue_add', project_name=project.name)">
-    <a tal:attributes="href action_url"
-       class="noUnderline"
-       ><img tal:attributes="src api.static_url('static/img/add.png')"
-             width="32" height="32" alt="add issue"/></a>
-    <a tal:attributes="href action_url">add issue</a>
-  </li>
-  <li tal:condition="api.has_permission(u'Administer project', project)"
-      tal:define="action_url api.route_url('project_configure', project_name=project.name)">
-    <a tal:attributes="href action_url"
-       class="noUnderline"
-       ><img tal:attributes="src api.static_url('static/img/configure.png')"
-             width="32" height="32" alt="configure project"/></a>
-    <a tal:attributes="href action_url">configure project</a>
-  </li>
-</ul>
+<h1>Assigned to me</h1>
+
+<table class="listing expanded">
+  <thead>
+    <tr>
+      <th i18n:translate="">Ref.</th>
+      <th i18n:translate="">Title</th>
+      <th i18n:translate="">Reporter</th>
+      <th i18n:translate="">Priority</th>
+      <th i18n:translate="">Deadline</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr tal:repeat="issue project.issues"
+        tal:attributes="class repeat['issue'].odd() and 'odd'">
+      <td>
+        <a tal:content="issue.ref"
+           tal:attributes="href api.route_url('issue_view', project_name=project.name, issue_ref=issue.ref)"/>
+      </td>
+      <td>
+        <a tal:content="issue.title"
+           tal:attributes="href api.route_url('issue_view', project_name=project.name, issue_ref=issue.ref)"/>
+        <!-- FIXME -->
+      <td tal:content="issue.reporter"/>
+      <td tal:content="issue.priority"/>
+      <td tal:content="issue.deadline"/>
+    </tr>
+  </tbody>
+</table>
+
+<h1>Watching (but not assigned to me)</h1>
+
+FIXME
+
+<h1>Recent activity</h1>
+
+FIXME
 
 <ul>
-  <li tal:repeat="issue project.issues">
-    <a tal:content="'%d: %s' % (issue.ref, issue.title)"
-       tal:attributes="href api.route_url('issue_view', project_name=project.name, issue_ref=issue.ref)">
-    </a>
+  <li>
+    
   </li>
 </ul>
 

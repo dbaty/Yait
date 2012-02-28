@@ -14,13 +14,19 @@ def _set_auth_policies(config, settings,
     """
     authz_policy = AuthorizationPolicy()
     config.set_authorization_policy(authz_policy)
-    reissue_time = int(settings['yait.auth.timeout']) / 10
+    timeout = settings['yait.auth.timeout']
+    if timeout == '0':
+        timeout = None
+        reissue_time = None
+    else:
+        timeout = int(timeout)
+        reissue_time = timeout / 10
     secure_only = settings['yait.auth.secure_only'].lower() in ('true', 'yes')
     auth_policy = _auth_policy(
         secret=settings['yait.auth.secret'],
         secure=secure_only,
-        timeout=int(settings['yait.auth.timeout']),
-        reissue_time=int(reissue_time))
+        timeout=timeout,
+        reissue_time=reissue_time)
     config.set_authentication_policy(auth_policy)
 
 
