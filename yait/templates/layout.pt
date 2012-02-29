@@ -63,10 +63,10 @@
   </ol>
 
   <div class="content">
-    <div class="successMessage"
+    <div class="notification-success"
          tal:repeat="notification api.notifications['success']"
          tal:content="notification"/>
-    <div class="errorMessage"
+    <div class="notification-error"
          tal:repeat="notification api.notifications['error']"
          tal:content="notification"/>
     <metal:content metal:define-slot="content"></metal:content>

@@ -1,6 +1,15 @@
+/* reset CSS */
 @import "reset";
+/* style for basic elements (body, p, table, etc.) and generic classes
+   (hidden, centered, etc.) */
 @import "base";
+/* notifications */
+@import "notifications";
+/* every class and element except those that are defined in stylesheets below */
 @import "layout";
+/* dropdown menus */
 @import "dropdown";
+/* form, field, fieldset, buttons, etc. */
 @import "forms";
+/* tables (duh!) */
 @import "tables";

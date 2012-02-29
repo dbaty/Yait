@@ -17,7 +17,7 @@
       widget
 </tal:comment>
 <metal:renderField metal:define-macro="renderField">
-  <div class="formRow"
+  <div class="form-row"
        tal:define="field getattr(form, field_name)">
     <label tal:attributes="for field_name;
                            class 'required' in field.flags and 'required'">
@@ -27,8 +27,8 @@
            width="4" height="4" alt="(required)"/>
     </label>
     <div tal:condition="field.description" tal:content="field.description"
-         class="formDescription"/>
-    <div class="formError"
+         class="form-description"/>
+    <div class="form-error"
          tal:condition="field_name in form.errors"
          tal:content="form.errors.get(field_name)[0]"/>
     <metal:before-input metal:define-slot="before-input"/>
@@ -50,19 +50,19 @@
                            field_options {'rows': 10, 'cols': 80}"
                metal:use-macro="renderField">
     <metal:before-input metal:fill-slot="before-input">
-      <a id="previewButton"
+      <a class="preview-button"
          class="noUnderline"
          title="preview comment"
          tal:attributes="href 'javascript: togglePreviewPane(\'%s\')' % 
                          api.route_url('ajax_render_text')"
          ><img tal:attributes="src api.static_url('static/img/preview.png')"
                height="16" width="16" alt="preview comment"/></a>
-      <div id="previewSpinner" class="hidden">
+      <div id="preview-spinner" class="hidden">
         <img tal:attributes="src api.static_url('static/img/spinner.gif')"
              width="16" height="16" alt="loading, please wait..."/>
         Loading, please wait&hellip;
       </div>
-      <div id="previewPane" class="hidden"></div>
+      <div id="preview-pane" class="hidden"></div>
     </metal:before-input>
   </metal:field>
 </metal:issue-text-field>
@@ -74,7 +74,7 @@
   Description: display 'show/hide extra...' link
 </tal:comment>
 <metal:link-extra-fieldset metal:define-macro="link-extra-fieldset">
-  <div id="showHideExtraFieldset">
+  <div class="show-hide-extra-fieldset">
     <a href="javascript: toggleExtraFieldset()">show/hide extra&hellip;</a>
   </div>
 </metal:link-extra-fieldset>
@@ -87,10 +87,10 @@
   Parameters: none
 </tal:comment>
 <metal:issue-extra-fieldset metal:define-macro="issue-extra-fieldset">
-  <fieldset id="extraFieldset"
+  <fieldset id="extra-fieldset"
             tal:attributes="class not form.errors and 'hidden' or ''">
 
-    <div class="floatableFormPanel">
+    <div class="floatable-form-panel">
 
       <metal:field tal:define="field_name 'status'" metal:use-macro="renderField"/>
       <!-- FIXME: use an auto-complete widget -->
@@ -101,7 +101,7 @@
       <metal:field tal:define="field_name 'kind'" metal:use-macro="renderField"/>
     </div>
 
-    <div class="floatableFormPanel lastFloatableFormPanel"
+    <div class="floatable-form-panel last-floatable-form-panel"
          tal:define="show_private_timing_info can_see_private_time_info;
                      show_public_timing_info True or 'FIXME: should be configurable per project'"
          tal:condition="show_public_timing_info or show_private_timing_info">

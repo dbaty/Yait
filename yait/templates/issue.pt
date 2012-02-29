@@ -1,11 +1,4 @@
 <layout metal:use-macro="api.layout">
-<metal:html-head metal:fill-slot="html-head">
-  <script type="text/javascript">
-    $(document).ready(function() {
-      pinMetaPanel();
-    });
-  </script>
-</metal:html-head>
 <metal:breadcrumbs metal:fill-slot="breadcrumbs">
   <li>
     <a tal:attributes="href api.route_url('project_home',
@@ -16,179 +9,150 @@
 
 <metal:content metal:fill-slot="content">
 
-<div id="content">
-  <h1>
-    <a tal:condition="len(issue.changes) > 1"
-       tal:attributes="href '#change-%d' % issue.changes[-1].id"
-       class="scrollToLastComment"
-       title="scroll to last comment...">&darr;</a>
-    <a tal:attributes="href api.request.url"
-       class="permalink" title="issue permalink">#</a>
-    #<span tal:replace="issue.ref"/> &mdash;
-    <span tal:replace="issue.title"/>
-  </h1>
+  <div class="issue-content">
+    <h1>
+      <a tal:attributes="href api.request.url"
+         class="permalink" title="permanent link to this issue">#</a>
+      <a tal:condition="len(issue.changes) > 1"
+         tal:attributes="href '#change-%d' % issue.changes[-1].id"
+         class="scroll-to-last-comment"
+         title="scroll to last comment...">&darr;</a>
+      #<span tal:replace="issue.ref"/> &mdash;
+      <span tal:replace="issue.title"/>
+    </h1>
 
-  <div class="change">
-    <div class="changeText changeIssueText"
-         tal:content="structure issue.changes[0].get_rendered_text()"/>
+    <div class="change">
+      <div class="change-text"
+           tal:content="structure issue.changes[0].get_rendered_text()"/>
+    </div>
+
+    <ol class="changes" tal:condition="len(issue.changes) > 1">
+      <li tal:repeat="change issue.changes[1:]"
+          class="change">
+        <div class="notification-success"
+             id="issue_updated"
+             tal:condition="repeat['change'].end and api.request.GET.get('issue_updated')"
+             style="margin-bottom: 1em;">
+          The issue has been updated, see below.
+          <!-- FIXME: add a link to scroll to the top of the page. -->
+        </div>
+        <tal:defines tal:define="details change.get_details(
+                                 include_private_time_info=can_see_private_time_info)">
+          <h2 class="change-header"
+              tal:attributes="id 'change-%d' % change.id">
+            <a tal:attributes="href '%s#change-%d' % (api.request.url, change.id)"
+               title="permanent link to this comment"
+               class="permalink">#</a>
+            Update by <span tal:replace="change.author"/>
+            on <span tal:replace="change.date.strftime('%d %B %Y at %H:%M')"/>
+          </h2>
+          <div class="change-text"
+               tal:define="change_text change.get_rendered_text()"
+               tal:condition="change_text"
+               tal:content="structure change_text">
+          </div>
+          <ul class="change-details"
+              tal:condition="details">
+            <li tal:repeat="detail details">
+              <span tal:replace="detail.label"/>:
+              <tal:if tal:condition="not detail.attr.startswith('time_spent_')">
+                <span tal:replace="detail.before"/> &rarr;
+              </tal:if>
+              <span tal:replace="detail.after"/>
+            </li>
+          </ul>
+        </tal:defines>
+      </li>
+    </ol>
+
+    <form method="post"
+          tal:condition="can_participate"
+          tal:attributes="action api.route_url('issue_update', project_name=project.name, issue_ref=issue.ref)"
+          tal:define="renderField api.form_macros['renderField'];
+                      field_options {}">
+      <fieldset>
+        <legend>Comment or update issue</legend>
+        <metal:issue-text-field metal:use-macro="api.form_macros['issue-text-field']"/>
+        <metal:link-extra-fieldset metal:use-macro="api.form_macros['link-extra-fieldset']"/>
+      </fieldset>
+
+      <metal:issue-extra-fieldset
+         metal:use-macro="api.form_macros['issue-extra-fieldset']"/>
+
+      <div class="buttons">
+        <button type="submit" class="positive">Update</button>
+        <!-- FIXME: remove?
+          <img tal:attributes="src api.static_url('static/img/tick.png')" alt=""/>
+          Update
+        </button>
+          -->
+        <a href="#FIXME" class="cancel">Cancel</a>
+      </div>
+    </form>
   </div>
 
-  <ol id="changes"
-      tal:condition="len(issue.changes) > 1">
-    <li tal:repeat="change issue.changes[1:]"
-        class="change">
-      <div class="successMessage"
-           id="issue_updated"
-           tal:condition="repeat['change'].end and api.request.GET.get('issue_updated')"
-           style="margin-bottom: 1em;">
-        The issue has been updated, see below.
-        <!-- FIXME: add a link to scroll to the top of the page. -->
-      </div>
-      <tal:defines tal:define="details change.get_details(
-                   include_private_time_info=can_see_private_time_info)">
-        <h2 class="changeHeader"
-            tal:attributes="id 'change-%d' % change.id">
-          <a tal:attributes="href '%s#change-%d' % (api.request.url, change.id)"
-             title="comment permalink"
-             class="permalink">#</a>
-          Update by <span tal:replace="change.author"/>
-          on <span tal:replace="change.date.strftime('%d %B %Y at %H:%M')"/>
-        </h2>
-        <div class="changeText"
-             tal:define="change_text change.get_rendered_text()"
-             tal:condition="change_text"
-             tal:content="structure change_text">
-        </div>
-        <ul class="changeDetails"
-            tal:condition="details">
-          <li tal:repeat="detail details">
-            <span tal:replace="detail.label"/>:
-            <tal:if tal:condition="not detail.attr.startswith('time_spent_')">
-              <span tal:replace="detail.before"/> &rarr;
-            </tal:if>
-            <span tal:replace="detail.after"/>
-          </li>
-        </ul>
-      </tal:defines>
-    </li>
-  </ol>
+  <div class="issue-meta">
+    <div class="status" tal:content="issue.status"></div>
 
-  <form method="post"
-        tal:condition="can_participate"
-        tal:attributes="action api.route_url('issue_update', project_name=project.name, issue_ref=issue.ref)"
-        tal:define="renderField api.form_macros['renderField'];
-                    field_options {}">
-    <fieldset>
-      <legend>Comment or update issue</legend>
-      <metal:issue-text-field metal:use-macro="api.form_macros['issue-text-field']"/>
-      <metal:link-extra-fieldset metal:use-macro="api.form_macros['link-extra-fieldset']"/>
-    </fieldset>
+    <h2>Details</h2>
+    <ul>
+      <li>Kind: <span tal:replace="issue.get_kind()"/></li>
+      <li>Priority: <span tal:replace="issue.get_priority()"/></li>
+    </ul>
 
-    <metal:issue-extra-fieldset
-       metal:use-macro="api.form_macros['issue-extra-fieldset']"/>
+    <h2>Participants</h2>
+    <ul>
+      <li>Reported by <span tal:replace="issue.reporter"/></li>
+      <li tal:condition="issue.assignee">
+        Assigned to <span tal:replace="issue.assignee"/>
+      </li>
+      <li tal:condition="not issue.assignee" class="issueUnassigned">
+        Unassigned
+      </li>
+      <!-- FIXME: link shows a dialog form with the list of issue subscribers + buttons to add/remove subscribers  -->
+      <li>Watchers: <a href="#">6</a></li>
+    </ul>
 
-    <div class="buttons">
-      <button type="submit" class="positive">
-        <img tal:attributes="src api.static_url('static/img/tick.png')" alt=""/>
-        Update
-      </button>
-    </div>
-  </form>
-</div>
+    <h2>Dates and time</h2>
+    <ul>
+      <li>
+        Reported on
+        <abbr tal:content="issue.date_created.strftime('%d %b %Y')"
+              tal:attributes="title issue.date_created.strftime('%H:%M')"/>
+      </li>
+      <li tal:condition="issue.date_edited != issue.date_created">
+        Updated on
+        <abbr tal:content="issue.date_edited.strftime('%d %b %Y')"
+              tal:attributes="title issue.date_edited.strftime('%H:%M')"/>
+      </li>
+      <li tal:condition="issue.deadline"
+          tal:attributes="class True and 'deadlineIsPast'">
+        Deadline: <span tal:replace="issue.deadline.strftime('%d %b %Y')"/>
+      </li>
+      <li tal:condition="not issue.deadline">
+        No deadline
+      </li>
+      <li tal:condition="can_see_private_time_info">
+        Time estimated: <span tal:replace="time_info['estimated'] or 'none'"/>
+      </li>
+      <li>Time billed: <span tal:replace="time_info['billed'] or 'none'"/></li>
+      <li tal:condition="can_see_private_time_info">
+        Time spent (real): <span tal:replace="time_info['spent_real'] or 'none'"/>
+      </li>
+      <li>
+        <tal:if tal:condition="not can_see_private_time_info">Time spent</tal:if>
+        <tal:if tal:condition="can_see_private_time_info">Time spent (public)</tal:if>
+        <span tal:replace="time_info['spent_public'] or 'none'"/>
+      </li>
+    </ul>
 
+    <h2>Related issues</h2>
+    <ul class="last">
+      <li>Parent issue: FIXME</li>
+      <li>Child issue(s): FIXME</li>
+    </ul>
+  </div>
 
-<div id="meta">
-<div id="properties"
-     tal:define="time_info issue.get_time_info(
-                 include_private_info=can_see_private_time_info)">
-  <div id="issueStatus" tal:content="issue.status"></div>
-
-  <h3>Details</h3>
-  <ul>
-    <li>Kind: <span tal:replace="issue.get_kind()"/></li>
-    <li>Priority: <span tal:replace="issue.get_priority()"/></li>
-  </ul>
-
-  <h3>Participants</h3>
-  <ul>
-    <li>Reported by <span tal:replace="issue.reporter"/></li>
-    <li tal:condition="issue.assignee">
-      Assigned to <span tal:replace="issue.assignee"/>
-    </li>
-    <li tal:condition="not issue.assignee" class="issueUnassigned">
-      Unassigned
-    </li>
-    <!-- FIXME: link shows a dialog form with the list of issue subscribers + buttons to add/remove subscribers  -->
-    <li>Watchers: <a href="#">6</a></li>
-  </ul>
-
-  <h3>Dates and time</h3>
-  <ul>
-    <li>
-      Reported on
-      <abbr tal:content="issue.date_created.strftime('%d %b %Y')"
-            tal:attributes="title issue.date_created.strftime('%H:%M')"/>
-    </li>
-    <li tal:condition="issue.date_edited != issue.date_created">
-      Updated on
-      <abbr tal:content="issue.date_edited.strftime('%d %b %Y')"
-            tal:attributes="title issue.date_edited.strftime('%H:%M')"/>
-    </li>
-    <li tal:condition="issue.deadline"
-        tal:attributes="class True and 'deadlineIsPast'">
-      Deadline: <span tal:replace="issue.deadline.strftime('%d %b %Y')"/>
-    </li>
-    <li tal:condition="not issue.deadline">
-      No deadline
-    </li>
-    <li tal:condition="can_see_private_time_info">
-      Time estimated: <span tal:replace="time_info['estimated'] or 'none'"/>
-    </li>
-    <li>Time billed: <span tal:replace="time_info['billed'] or 'none'"/></li>
-    <li tal:condition="can_see_private_time_info">
-      Time spent (real): <span tal:replace="time_info['spent_real'] or 'none'"/>
-    </li>
-    <li>
-      <tal:if tal:condition="not can_see_private_time_info">Time spent</tal:if>
-      <tal:if tal:condition="can_see_private_time_info">Time spent (public)</tal:if>
-      <span tal:replace="time_info['spent_public'] or 'none'"/>
-    </li>
-  </ul>
-
-  <h3>Related issues</h3>
-  <ul class="last">
-    <li>Parent issue: FIXME</li>
-    <li>Child issue(s): FIXME</li>
-  </ul>
-</div>
-
-<ul id="issueViewActions">
-  <li tal:condition="can_participate"
-      tal:define="action_url api.route_url('issue_add', project_name=project.name)">
-    <a tal:attributes="href action_url"
-       class="noUnderline"
-       ><img tal:attributes="src api.static_url('static/img/add.png')"
-             width="32" height="32" alt="add issue"/></a>
-    <a tal:attributes="href action_url">add issue</a>
-  </li>
-  <li tal:define="action_url api.route_url('project_search', project_name=project.name)">
-    <a tal:attributes="href action_url"
-       class="noUnderline"
-       ><img tal:attributes="src api.static_url('static/img/search.png')"
-             width="32" height="32" alt="search issues"/></a>
-    <a tal:attributes="href action_url">search issues</a>
-  </li>
-  <li tal:condition="can_admin_project"
-      tal:define="action_url api.route_url('project_configure', project_name=project.name)">
-    <a tal:attributes="href action_url"
-       class="noUnderline"
-       ><img tal:attributes="src api.static_url('static/img/configure.png')"
-             width="32" height="32" alt="configure project"/></a>
-    <a tal:attributes="href action_url">configure project</a>
-  </li>
-</ul>
-
-</div>
 
 </metal:content>
 </layout>

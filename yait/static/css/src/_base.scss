@@ -9,25 +9,17 @@ body {
     font-size: 87.5%; /* 14px */
 }
 
-img {
-    border: 0;
-}
-
-h1 {
-    font-size: 1.4em;
-    font-weight: bold;
-    margin-bottom: 0.714em; /* 1 / font-size */
-}
-
-h2 {
-    font-weight: bold;
-    padding-bottom: 0.2em;
-    border-bottom: 1px solid #CCCCCC;
-    margin-bottom: 0.5em;
+h1, h2 {
+    font-size: 100%;
+    font-weight: normal;
 }
 
 p, table {
     margin-bottom: 1em;
+}
+
+img {
+    border: 0;
 }
 
 a {

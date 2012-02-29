@@ -123,9 +123,11 @@ def view(request, form=None):
     can_participate = has_permission(
         request, PERM_PARTICIPATE_IN_PROJECT, project)
     can_admin_project = has_permission(request, PERM_ADMIN_PROJECT, project)
+    time_info = issue.get_time_info(include_private_info=can_see_priv)
     bindings = {'api': TemplateAPI(request, issue.title),
                 'project': project,
                 'issue': issue,
+                'time_info': time_info,
                 'form': form,
                 'can_participate': can_participate,
                 'can_admin_project': can_admin_project,
