@@ -94,7 +94,8 @@ class ExtraFieldset:
     time_billed = TimeInfoField(label=u'Time billed')
     time_spent_real = TimeInfoField(label=u'Time spent (real, internal)')
     time_spent_public = TimeInfoField(label=u'Time spent (public)')
-    deadline = DateTimeField(label='Deadline', validators=[optional()])
+    deadline = DateTimeField(label='Deadline', validators=[optional()],
+                             format='%Y-%m-%d %H:%M')
     priority = SelectField(
         label=u'Priority',
         coerce=int,

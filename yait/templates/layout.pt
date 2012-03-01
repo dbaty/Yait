@@ -84,7 +84,7 @@
   </div>
 
   <script tal:attributes="src api.static_url('static/js/jquery-1.7.1.min.js')"></script>
-  <script tal:attributes="src api.static_url('static/js/bootstrap-dropdown.js')"></script>
+  <script tal:attributes="src api.static_url('static/js/bootstrap-dropdown.min.js')"></script>
   <script tal:attributes="src api.static_url('static/js/utils.js')"></script>
   <script>
     $('.dropdown-toggle').dropdown();

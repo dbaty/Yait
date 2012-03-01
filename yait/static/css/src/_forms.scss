@@ -21,6 +21,8 @@ textarea {
 }
 
 .form-row {
+    /* needed because the date picker is floating */
+    clear: left;
     margin-bottom: 1em;
 
     label {
@@ -107,4 +109,22 @@ textarea {
         font-size: 0.8em;
         vertical-align: center;
     }
+}
+
+/* date picker field */
+.date-pick {
+    float: left;
+}
+
+/* date picker widget icon */
+.dp-choose-date {
+    float: left;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 5px 3px;
+    display: block;
+    text-indent: -2000px;
+    overflow: hidden;
+    background: url('../img/calendar.png') no-repeat; 
 }

@@ -93,7 +93,7 @@
 
       <metal:field tal:define="field_name 'status'" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'assignee'" metal:use-macro="renderField"/>
-      <metal:field tal:define="field_name 'deadline'" metal:use-macro="renderField"/>
+      <metal:field tal:define="field_name 'deadline'; field_options {'class': 'date-pick'}" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'priority'" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'kind'" metal:use-macro="renderField"/>
     </div>

@@ -29,7 +29,7 @@ Yait 0.2
     But this is too soon to spend time on this, as we have only one
     renderer for now. We should rather find a half-way solution
 
-  - buttons are ugly
+  - submit buttons are ugly (?)
 
 - relationships between issues : parent/child, blocker/blocked
 
@@ -90,7 +90,8 @@ Yait 0.2
 
   ProjectSubscription: project_id, user_id
 
-- i18n (and update Trove classifier in 'setup.py')
+- i18n (and update Trove classifier in 'setup.py'), including i18n of
+  jQuery date picker (cf. http://www.kelvinluck.com/assets/jquery/datePicker/v2/demo/) and date displayed in the 'meta' block
 
 - sanitize user input comments (remove iframe, Javascript, etc.) :
   https://github.com/jsocol/bleach ?
@@ -102,9 +103,12 @@ Yait 0.2
 
 - add auto-complete widget for "Parent issue"
 
-- remove "Child issue(s)" label from the extra fieldset
+- remove "Child issue(s)" label from the extra fieldset (?)
 
 - make status, priority and kind fields configurable.
+
+- show a list of unassigned issues on the project home page (or on a
+  separate report page)
 
 
 
@@ -212,6 +216,12 @@ Later
   - date component from the jQuery Methods (https://github.com/vitch/jquery-methods)
 
   - jQuery date picker (http://www.kelvinluck.com/assets/jquery/datePicker/v2/demo/)
+
+  - dropdown menu from Bootstrap
+
+  - calendar icon: Fam fam fam
+
+- remove unused assets from "static/img"
 
 - when the text renderer gives an error, refuse to save the issue/comment;
 
