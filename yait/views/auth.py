@@ -24,7 +24,8 @@ def login_form(request, login_failed=False):
     bindings = {'api': api,
                 'next': next,
                 'login_failed': login_failed,
-                'needs_login': 'needs_login' in request.GET}
+                'needs_login': 'needs_login' in request.GET,
+                'login': request.POST.get('login', '')}
     return render_to_response('../templates/login.pt', bindings)
 
 

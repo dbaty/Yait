@@ -65,11 +65,13 @@
       </li>
     </ol>
 
-    <form method="post"
+    <form id="update-form"
+          method="post"
           tal:condition="can_participate"
           tal:attributes="action api.route_url('issue_update', project_name=project.name, issue_ref=issue.ref)"
           tal:define="renderField api.form_macros['renderField'];
                       field_options {}">
+      <div class="notification-error" tal:condition="form.errors">The form has errors.</div>
       <fieldset>
         <legend>Comment or update issue</legend>
         <metal:issue-text-field metal:use-macro="api.form_macros['issue-text-field']"/>
@@ -80,13 +82,8 @@
          metal:use-macro="api.form_macros['issue-extra-fieldset']"/>
 
       <div class="buttons">
-        <button type="submit" class="positive">Update</button>
-        <!-- FIXME: remove?
-          <img tal:attributes="src api.static_url('static/img/tick.png')" alt=""/>
-          Update
-        </button>
-          -->
-        <a href="#FIXME" class="cancel">Cancel</a>
+        <button type="submit" class="positive" i18n:translate="">Update</button>
+        <a tal:attributes="href api.route_url('issue_view', project_name=project.name, issue_ref=issue.ref)" class="cancel" i18n:translate="">Cancel</a>
       </div>
     </form>
   </div>
@@ -152,7 +149,14 @@
       <li>Child issue(s): FIXME</li>
     </ul>
   </div>
-
-
 </metal:content>
+
+<metal:scripts tal:condition="form.errors" metal:fill-slot="scripts">
+  <script>
+    $(document).ready(function() {
+      var top = $('#update-form').offset()['top'];
+      $('html, body').scrollTop(top);
+    });
+  </script>
+</metal:scripts>
 </layout>

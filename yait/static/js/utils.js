@@ -1,10 +1,15 @@
 // Toggle extra fieldset in several forms (add/edit issue, add/edit comment)
 function toggleExtraFieldset() {
-    var elm = document.getElementById('extra-fieldset');
-    if (elm.className === 'hidden') {
-        elm.className = '';
+    $extra = $('#extra-fieldset');
+    if ($extra.hasClass('hidden')) {
+        // scroll to the bottom of the form so that the extra fieldset
+        // as well as the submit button are visible.
+        $extra.removeClass('hidden');
+        var $form = $('#extra-fieldset').parent();
+        var bottom = $form.offset()['top'] + $form.height();
+        $('html, body').animate({scrollTop: bottom}, 750);
     } else {
-        elm.className = 'hidden';
+        $extra.addClass('hidden');
     }
 }
 

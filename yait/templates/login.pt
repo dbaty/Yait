@@ -1,46 +1,38 @@
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="api.layout">
-<tal:block metal:fill-slot="html-head">
-  <script type="text/javascript">
-    $(document).ready(function() {
-      document.getElementById('login').focus();
-    });
-  </script>
-</tal:block>
-<tal:block metal:fill-slot="content">
-
-  <p tal:condition="login_failed" class="error-msg" i18n:translate="">
+<html metal:use-macro="api.layout">
+<metal:content metal:fill-slot="content">
+  <p tal:condition="login_failed" class="notification-error" i18n:translate="">
     Wrong login or password. Please try again.
   </p>
 
-  <p tal:condition="needs_login" class="error-msg" i18n:translate="">
+  <p tal:condition="needs_login" class="notification-error" i18n:translate="">
     You need to log in to access this resource.
   </p>
 
-  <form action="/login"
-        id="loginForm"
-        method="post">
+  <form tal:attributes="action api.request.url" method="post">
     <input type="hidden" name="next" tal:attributes="value next"/>
 
     <fieldset>
-      <div class="formRow">
+      <div class="form-row">
         <label for="login">User name</label>
-        <input type="text" id="login" name="login"/>
+        <input type="text" id="login" name="login" tal:attributes="value login"/>
       </div>
-      <div class="formRow">
+      <div class="form-row">
         <label for="password">Password</label>
-        <input type="password" name="password"/>
+        <input type="password" id="password" name="password"/>
       </div>
       <div class="buttons">
-        <button type="submit" class="positive">
-          <img tal:attributes="src api.static_url('static/img/tick.png')" alt=""/>
-          Log in
-        </button>
+        <button type="submit" class="positive" i18n:translate="">Log in</button>
       </div>
     </fieldset>
   </form>
-  
-</tal:block>
+</metal:content>
+
+<metal:scripts metal:fill-slot="scripts">
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#login').focus();
+    });
+  </script>
+</metal:scripts>
+
 </html>

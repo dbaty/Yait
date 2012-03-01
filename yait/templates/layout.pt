@@ -7,17 +7,24 @@
   <link rel="icon" tal:attributes="href api.static_url('static/img/favicon.ico')" type="image/x-icon"/>
   <link rel="stylesheet" type="text/css"
         tal:attributes="href api.static_url('static/css/style.css')"/>
+  <!-- FIXME: what do we use this macro for? -->
   <metal:html-head metal:define-slot="html-head"/>
 </head>
 <body>
   <div class="header">
-    <div class="login">
-      <a tal:condition="not api.logged_in and api.show_login_link"
-         tal:attributes="href api.route_url('login')">log in</a>
-      <tal:if tal:condition="api.logged_in">
+    <div tal:condition="not api.logged_in and api.show_login_link"
+         class="login">
+      <a tal:attributes="href api.route_url('login')">log in</a>
+    </div>
+    <div tal:condition="api.logged_in" class="login dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
         <span tal:replace="api.request.user.fullname"/>
-        (<a tal:attributes="href api.route_url('logout')">log out</a>)
-      </tal:if>
+        <b class="caret"></b>
+      </a>
+      <ul class="dropdown-menu">
+        <!-- FIXME: add link to 'preferences' -->
+        <li><a tal:attributes="href api.route_url('logout')">log out</a></li>
+      </ul>
     </div>
     <div class="search">
       <form>
@@ -82,6 +89,7 @@
   <script>
     $('.dropdown-toggle').dropdown();
   </script>
+  <metal:html-head metal:define-slot="scripts"/>
 
 </body>
 </html>

@@ -28,10 +28,7 @@
      metal:use-macro="api.form_macros['issue-extra-fieldset']"/>
 
   <div class="buttons">
-    <button type="submit" class="positive">
-      <img tal:attributes="src api.static_url('static/img/tick.png')" alt=""/>
-      Add issue
-    </button>
+    <button type="submit" class="positive">Add issue</button>
   </div>
 </form>
 

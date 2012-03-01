@@ -1,23 +1,6 @@
 Yait 0.2
 ========
 
-- review CSS:
-
-  - review layout, move info box to the left (?), move actions (add
-    issue, search, etc.) below the header, etc.
-
-  - show actions only on pages where it is sensible, i.e. on all pages
-    except the control panel and the home page. On the home page, we
-    should have a list of projects, though.
-
-  - "Update by xxx" header should probably be smaller, or with a
-     background-color different from the text of the comment itself)
-
-  - form errors: add formError in formRow. Cf. postaleo / Dolmen for
-    example
-
-- command-line tool to add a new user (really?)
-
 - complete the 'add issue' form:
 
   - add missing widgets
@@ -29,9 +12,13 @@ Yait 0.2
   - add a way to change the title: quick edit (cf. issue tracker
     Pilot), or when adding a comment
 
-- design:
+- review CSS:
 
-  - add "Cancel" button in forms
+  - show actions only on pages where it is sensible, i.e. on all pages
+    except the control panel and the home page. On the home page, we
+    should have a list of projects, though.
+
+- design:
 
   - review "Text renderer" field: we could move it to a hidden field
     and have a custom drop-down menu on the right of the "Text label",
@@ -42,7 +29,11 @@ Yait 0.2
     But this is too soon to spend time on this, as we have only one
     renderer for now. We should rather find a half-way solution
 
+  - buttons are ugly
+
 - relationships between issues : parent/child, blocker/blocked
+
+- command-line tool to add a new user (really?)
 
 - review permission system: turn it into a Pyramid authorization
   policy (?)
@@ -160,10 +151,6 @@ Later
 
   - store the renderer in the Change model, alongside the text.
 
-- when clicking on "show/hide extra", scroll to the end of the page so
-  that the "update" button is visible. Use $.scrollTo(object)
-  (cf. http://plugins.jquery.com/project/ScrollTo) or scrollTop() (?)
-
 - handle requests to "/robots.txt" (and possibly "/favicon.ico"
   if/when the layout template is not used)
 
@@ -236,3 +223,8 @@ Later
   http://stackoverflow.com/questions/264216/getjson-returning-cached-data-in-ie8
 
 - user guide
+
+- automatically grow textareas: http://www.technoreply.com/autogrow-textarea-plugin-version-2-0/
+
+- handle localization of timing information: "1j" in French should be
+  turned into "1d" in English.

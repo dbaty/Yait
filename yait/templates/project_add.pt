@@ -27,8 +27,7 @@
     </div>
 
     <div class="buttons">
-      <button type="submit" class="positive">
-        <img tal:attributes="src api.static_url('static/img/tick.png')" alt=""/>
+      <button type="submit" class="positive" i18n:translate="">
         Add project
       </button>
     </div>
