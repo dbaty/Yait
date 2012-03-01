@@ -205,7 +205,13 @@ Later
 
 - time reporting graphics
 
-- add credit for icons: Tango (http://tango.freedesktop.org/), etc.
+- give credit:
+
+  - icons: Tango (http://tango.freedesktop.org/), etc. (?)
+
+  - date component from the jQuery Methods (https://github.com/vitch/jquery-methods)
+
+  - jQuery date picker (http://www.kelvinluck.com/assets/jquery/datePicker/v2/demo/)
 
 - when the text renderer gives an error, refuse to save the issue/comment;
 

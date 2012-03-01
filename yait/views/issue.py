@@ -37,6 +37,8 @@ def add_form(request, form=None):
         raise HTTPForbidden()
     if form is None:
         form = AddIssueForm()
+        form.setup(project_id=project.id)
+    form.setup_choices()
     can_see_priv = has_permission(
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     bindings = {'api': TemplateAPI(request, _(u'Add issue')),
@@ -56,6 +58,7 @@ def add(request):
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         raise HTTPForbidden()
     form = AddIssueForm(request.POST)
+    form.setup(project_id=project.id)
     if not form.validate():
         return add_form(request, form)
 
@@ -118,6 +121,8 @@ def view(request, form=None):
                              time_estimated=issue.time_estimated,
                              time_billed=issue.time_billed,
                              title=issue.title)
+        form.setup(project_id=project.id)
+    form.setup_choices()
     can_see_priv = has_permission(
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     can_participate = has_permission(
@@ -152,6 +157,7 @@ def update(request):
         raise HTTPNotFound()
 
     form = AddChangeForm(request.POST)
+    form.setup(project_id=project.id)
     if not form.validate():
         return view(request, form)
 

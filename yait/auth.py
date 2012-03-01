@@ -21,6 +21,9 @@ PERM_SEE_PRIVATE_TIMING_INFO = u'See private time information'
 ALL_PERMS = (PERM_ADMIN_SITE, PERM_ADMIN_PROJECT, PERM_VIEW_PROJECT,
              PERM_PARTICIPATE_IN_PROJECT, PERM_SEE_PRIVATE_TIMING_INFO)
 ROLE_SITE_ADMIN = u'Site administrator'
+# FIXME: we should perhaps rename this role as 'Project manager':
+# having the word 'administrator' in 'project administrator' and 'site
+# administrator' is a bit confusing.
 ROLE_PROJECT_ADMIN = 1
 ROLE_PROJECT_VIEWER = 2
 ROLE_PROJECT_PARTICIPANT = 3
@@ -84,7 +87,6 @@ class AuthorizationPolicy(object):
     pass  # FIXME
 
 
-# FIXME: this should probably be moved to the 'auth' module
 def has_permission(request, permission, context=None):
     """Return whether the current user is granted the given
     ``permission`` in this ``context``.

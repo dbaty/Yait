@@ -92,9 +92,7 @@
     <div class="floatable-form-panel">
 
       <metal:field tal:define="field_name 'status'" metal:use-macro="renderField"/>
-      <!-- FIXME: use an auto-complete widget -->
       <metal:field tal:define="field_name 'assignee'" metal:use-macro="renderField"/>
-      <!-- FIXME: use a date widget: http://www.kelvinluck.com/assets/jquery/datePicker/v2/demo/ -->
       <metal:field tal:define="field_name 'deadline'" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'priority'" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'kind'" metal:use-macro="renderField"/>
@@ -120,7 +118,6 @@
         <metal:field tal:define="field_name 'time_spent_public'"
                      metal:use-macro="renderField"/>
       </tal:if>
-      <!-- FIXME: use an auto-complete widget -->
       <metal:field tal:define="field_name 'parent'" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'children'" metal:use-macro="renderField"/>
     </div>

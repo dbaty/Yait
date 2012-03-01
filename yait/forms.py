@@ -10,6 +10,10 @@ from wtforms.validators import required
 from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput
 
+from yait.auth import ROLE_PROJECT_ADMIN
+from yait.auth import ROLE_PROJECT_INTERNAL_PARTICIPANT
+from yait.auth import ROLE_PROJECT_PARTICIPANT
+from yait.i18n import _
 from yait.models import DBSession
 from yait.models import DEFAULT_ISSUE_KIND
 from yait.models import DEFAULT_ISSUE_PRIORITY
@@ -20,8 +24,23 @@ from yait.models import ISSUE_PRIORITY_LABELS
 from yait.models import ISSUE_PRIORITY_VALUES
 from yait.models import ISSUE_STATUS_VALUES
 from yait.models import Project
+from yait.models import Role
+from yait.models import User
 from yait.utils import str_to_time
 from yait.utils import time_to_str
+
+
+def int_or_none(value):
+    """Coerce the given ``value`` to ``None`` if it is the empty
+    string or to an integer if possible.
+
+    This is used for selection fields that are mapped to numeric
+    columns in the database, for which an empty value is accepted
+    (stored as NULL in the database).
+    """
+    if value == '':
+        return ''
+    return int(value)
 
 
 class TimeInfoField(TextField):
@@ -45,8 +64,8 @@ class BaseForm(Form):
 
 
 class AddProjectForm(BaseForm):
-    ## FIXME: check length of name (if we use a VARCHAR)
-    ## FIXME: check length of title (if we use a VARCHAR)
+    # FIXME: check length of name (if we use a VARCHAR)
+    # FIXME: check length of title (if we use a VARCHAR)
     name = TextField(label=u'Name',
                      description=u'Should be short, will be part of the URL.',
                      validators=[required()])
@@ -59,8 +78,8 @@ class AddProjectForm(BaseForm):
         session = DBSession()
         if session.query(Project).filter_by(name=field.data).all():
             raise ValidationError(u'This name is not available.')
-        ## FIXME: check that the name contains only alphanumerical
-        ## characters, underscores and dashes.
+        # FIXME: check that the name contains only alphanumerical
+        # characters, underscores and dashes.
 
 
 class ExtraFieldset:
@@ -69,8 +88,7 @@ class ExtraFieldset:
         choices=zip(ISSUE_STATUS_VALUES, ISSUE_STATUS_VALUES),
         default=DEFAULT_ISSUE_STATUS,
         validators=[required()])
-    ## FIXME: we need a specific widget and validator
-    assignee = TextField(label=u'Assign issue to')
+    assignee = SelectField(label=u'Assign issue to', coerce=int_or_none)
     ## FIXME: need a specific field or widget for time-related fields
     time_estimated = TimeInfoField(label=u'Estimated time (internal)')
     time_billed = TimeInfoField(label=u'Time billed')
@@ -93,6 +111,29 @@ class ExtraFieldset:
     parent = TextField(label=u'Parent issue')
     # FIXME: need work on UI
     children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput)
+
+    def setup(self, project_id):
+        self.project_id = project_id
+        self.setup_choices()
+
+    def setup_choices(self):
+        choices = [('', _(u'Nobody'))]
+        choices += self._get_possible_assignees()
+        self.assignee.choices = choices
+
+    def _get_possible_assignees(self):
+        """Return tuples of users that are allowed to participate in
+        the project.
+        """
+        session = DBSession()
+        res = session.query(User).join(Role).filter(
+            Role.project_id==self.project_id,
+            Role.role.in_((ROLE_PROJECT_ADMIN,
+                           ROLE_PROJECT_PARTICIPANT,
+                           ROLE_PROJECT_INTERNAL_PARTICIPANT)))
+        res = res.union(session.query(User).filter_by(is_admin=True))
+        res = res.order_by(User.fullname)
+        return [(user.id, user.fullname) for user in res]
 
 
 def text_renderer_field_factory():
