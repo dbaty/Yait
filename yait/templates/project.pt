@@ -30,7 +30,7 @@
         <!-- FIXME -->
       <td tal:content="issue.reporter"/>
       <td tal:content="issue.priority"/>
-      <td tal:content="issue.deadline"/>
+      <td tal:content="issue.deadline and issue.deadline.strftime('%d %b %Y')"/>
     </tr>
   </tbody>
 </table>

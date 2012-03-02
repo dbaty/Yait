@@ -44,7 +44,8 @@ def add_form(request, form=None):
     bindings = {'api': TemplateAPI(request, _(u'Add issue')),
                 'project': project,
                 'form': form,
-                'can_see_private_time_info': can_see_priv}
+                'can_see_private_time_info': can_see_priv,
+                'can_admin_project': False}
     return render_to_response('../templates/issue_add.pt', bindings)
 
 
@@ -135,6 +136,7 @@ def view(request, form=None):
                 'time_info': time_info,
                 'form': form,
                 'can_participate': can_participate,
+                # FIXME: rename as 'can_manage_project'
                 'can_admin_project': can_admin_project,
                 'can_see_private_time_info': can_see_priv}
     return render_to_response('../templates/issue.pt', bindings)

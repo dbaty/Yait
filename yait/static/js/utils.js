@@ -36,3 +36,16 @@ function togglePreviewPane(url) {
         preview_pane.className = 'hidden';
     }
 }
+
+
+// Used in the add issue/comment forms to assign the issue to the
+// logged-in user.
+function assignIssueTo(user_id) {
+    var sel = document.getElementById('assignee');
+    for (var i = 0; i < sel.length; i++) {
+        if (sel[i].value === user_id) {
+            sel.selectedIndex = i;
+            return;
+        }
+    }
+}

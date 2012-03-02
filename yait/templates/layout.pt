@@ -11,7 +11,7 @@
   <metal:html-head metal:define-slot="html-head"/>
 </head>
 <body>
-  <div class="header">
+  <div class="header" id="header">
     <div tal:condition="not api.logged_in and api.show_login_link"
          class="login">
       <a tal:attributes="href api.route_url('login')">log in</a>
@@ -46,9 +46,10 @@
       </a>
       <ul class="dropdown-menu">
         <!-- FIXME -->
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Search</a></li>
-        <li><a href="#">Configure</a></li>
+        <li><a tal:attributes="href api.route_url('project_home', project_name=project.name)">Home</a></li>
+        <li><a tal:attributes="href api.route_url('project_search', project_name=project.name)">Search</a></li>
+        <li><a tal:condition="can_admin_project"
+               tal:attributes="href api.route_url('project_configure', project_name=project.name)">Configure</a></li>
       </ul>
     </li>
     <li class="dropdown">

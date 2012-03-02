@@ -3,14 +3,8 @@ Yait 0.2
 
 - complete the 'add issue' form:
 
-  - add missing widgets
-
-  - add a checkbox to assign "to me" in the extra fields of the add
-    issue/comment form. Easier: add a "to me" link near the label,
-    which will fill the field.
-
-  - add a way to change the title: quick edit (cf. issue tracker
-    Pilot), or when adding a comment
+- add a way to change the title: add a "title" field above the "text"
+  field in the add comment form.
 
 - review CSS:
 
@@ -31,7 +25,7 @@ Yait 0.2
 
   - submit buttons are ugly (?)
 
-- relationships between issues : parent/child, blocker/blocked
+- relationships between issues : parent/child, requires/is required by
 
 - command-line tool to add a new user (really?)
 

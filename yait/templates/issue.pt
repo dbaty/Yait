@@ -34,9 +34,9 @@
              tal:condition="repeat['change'].end and api.request.GET.get('issue_updated')"
              style="margin-bottom: 1em;">
           The issue has been updated, see below.
-          <!-- FIXME: fix link to scroll to the top of the page. -->
-          <div style="float: right">
-            <a href="javascript: $.scrollTop(0)">&uarr;</a>
+          <div class="scroll-to-top-when-issue-updated">
+            <a href="#header" i18n:attributes="title"
+               title="scroll to the top of the page...">&uarr;</a>
           </div>
         </div>
         <tal:defines tal:define="details change.get_details(

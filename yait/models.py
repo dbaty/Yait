@@ -60,6 +60,7 @@ ISSUE_STATUS_VALUES = (ISSUE_STATUS_OPEN,
                        u'completed')
 DEFAULT_ISSUE_STATUS = ISSUE_STATUS_OPEN
 
+# FIXME: review this
 RELATIONSHIP_KINDS = (u'is child of',
                       u'is blocked by')
 

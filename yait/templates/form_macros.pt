@@ -25,6 +25,7 @@
       <img tal:condition="'required' in field.flags" 
            tal:attributes="src api.static_url('static/img/required.png')"
            width="4" height="4" alt="(required)"/>
+      <metal:after-label metal:define-slot="after-label"/>
     </label>
     <div tal:condition="field.description" tal:content="field.description"
          class="form-description"/>
@@ -92,7 +93,11 @@
     <div class="floatable-form-panel">
 
       <metal:field tal:define="field_name 'status'" metal:use-macro="renderField"/>
-      <metal:field tal:define="field_name 'assignee'" metal:use-macro="renderField"/>
+      <metal:field tal:define="field_name 'assignee'" metal:use-macro="renderField">
+        <metal:after-label metal:fill-slot="after-label">
+          (<a tal:attributes="href 'javascript: assignIssueTo(\'%s\')' % api.request.user.id">me</a>)
+        </metal:after-label>
+      </metal:field>
       <metal:field tal:define="field_name 'deadline'; field_options {'class': 'date-pick'}" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'priority'" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'kind'" metal:use-macro="renderField"/>
