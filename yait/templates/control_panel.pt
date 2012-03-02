@@ -1,6 +1,9 @@
 <layout metal:use-macro="api.layout">
 <metal:breadcrumbs metal:fill-slot="breadcrumbs">
-  <li>Site control panel</li>
+  <li>
+    <span class="separator">&rarr;</span>
+    Control panel
+  </li>
 </metal:breadcrumbs>
 
 <metal:content metal:fill-slot="content">

@@ -1,16 +1,20 @@
 Yait 0.2
 ========
 
-- complete the 'add issue' form:
+- control panel: change "manage admins" into a propert user management
+  page:
+
+  - "add user" form
+
+  - "change user" (disable user, change full name, login or e-mail
+    address)
+
+  - user roles + admin rights
+
+- complete the 'add issue' form: parent/children
 
 - add a way to change the title: add a "title" field above the "text"
   field in the add comment form.
-
-- review CSS:
-
-  - show actions only on pages where it is sensible, i.e. on all pages
-    except the control panel and the home page. On the home page, we
-    should have a list of projects, though.
 
 - design:
 
@@ -31,9 +35,6 @@ Yait 0.2
 
 - review permission system: turn it into a Pyramid authorization
   policy (?)
-
-- check "Add admin" interface. It should just provide a selection
-  widget to pick an existing user.
 
 - attachments
 

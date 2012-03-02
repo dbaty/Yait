@@ -14,23 +14,25 @@
 .breadcrumbs {
     font-size: 1.6em;
     list-style-type: none;
-    padding-left: 0.625em;
+    padding-left: 0.625em; /* align with .actions */
 
     li {
         float: left;
         line-height: 1em;
-        padding-right: 1em;
     }
 
     a {
-        display: block;
+        float: left;
+        margin: 0;
     }
 
-    a:after {
-        padding-left: 1em;
-        color: #dfdfdf;
-        content: '\25b8'
+    .separator {
+        opacity: 0.50;
+        float: left;
+        padding: 0 0.8em;
+        margin: 0;
     }
+    
 }
 
 .login {

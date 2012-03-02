@@ -1,10 +1,38 @@
+from pyramid.decorator import reify
 from pyramid.renderers import get_renderer
+
+from yait.models import DBSession
+from yait.models import Project
+from yait.models import Role
 
 
 HTML_TITLE = u'Yait'
 
 
-class TemplateAPI(object):
+class ActionBar:
+    """Define reified properties used in the action bar.
+
+    It is expected to be used as a mix-in class by ``TemplateAPI``.
+    """
+
+    @reify
+    def all_projects(self):
+        """Return all projects that the current user has access to."""
+        user = self.request.user
+        session = DBSession()
+        if user.is_admin:
+            projects = session.query(Project)
+        elif user.id:
+            public = session.query(Project).filter_by(public=True)
+            has_role = session.query(Project).join(Role).filter(
+                Project.id == Role.project_id)
+            projects = has_role.union(public)
+        else:
+            projects = session.query(Project).filter_by(public=True)
+        return projects.order_by(Project.title).all()
+
+
+class TemplateAPI(object, ActionBar):
     """Provide a master template and various information and utilities
     that can be used in any template.
     """

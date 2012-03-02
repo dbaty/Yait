@@ -7,8 +7,6 @@
   <link rel="icon" tal:attributes="href api.static_url('static/img/favicon.ico')" type="image/x-icon"/>
   <link rel="stylesheet" type="text/css"
         tal:attributes="href api.static_url('static/css/style.css')"/>
-  <!-- FIXME: what do we use this macro for? -->
-  <metal:html-head metal:define-slot="html-head"/>
 </head>
 <body>
   <div class="header" id="header">
@@ -22,7 +20,7 @@
         <b class="caret"></b>
       </a>
       <ul class="dropdown-menu">
-        <!-- FIXME: add link to 'preferences' -->
+        <li><a tal:attributes="href api.route_url('preferences')">preferences</a></li>
         <li><a tal:attributes="href api.route_url('logout')">log out</a></li>
       </ul>
     </div>
@@ -32,36 +30,38 @@
       </form>
     </div>
     <ol class="breadcrumbs">
-      <li class="first">
-        <a class="home" tal:attributes="href api.route_url('home')">Yait</a>
+      <li>
+        <a tal:attributes="href api.route_url('home')">&#8962; Yait</a>
       </li>
       <metal:breadcrumbs metal:define-slot="breadcrumbs"></metal:breadcrumbs>
     </ol>
   </div>
   <ol class="actions">
-    <li class="dropdown">
+    <li tal:condition="api.is_admin">
+      <a tal:attributes="href api.route_url('control_panel')">Control panel</a>
+    </li>
+    <li class="dropdown" tal:condition="api.all_projects">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+        All projects
+        <b class="caret"></b>
+      </a>
+      <ul class="dropdown-menu">
+        <li tal:repeat="one_project api.all_projects">
+          <a tal:attributes="href api.route_url('project_home', project_name=one_project.name)"
+             tal:content="one_project.title"/>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown" tal:condition="project | None">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#">
         This project
         <b class="caret"></b>
       </a>
       <ul class="dropdown-menu">
-        <!-- FIXME -->
         <li><a tal:attributes="href api.route_url('project_home', project_name=project.name)">Home</a></li>
         <li><a tal:attributes="href api.route_url('project_search', project_name=project.name)">Search</a></li>
         <li><a tal:condition="can_admin_project"
                tal:attributes="href api.route_url('project_configure', project_name=project.name)">Configure</a></li>
-      </ul>
-    </li>
-    <li class="dropdown">
-      <!-- FIXME -->
-      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-        Other projects
-        <b class="caret"></b>
-      </a>
-      <ul class="dropdown-menu">
-        <!-- FIXME -->
-        <li><a href="#">Project bar</a></li>
-        <li><a href="#">Project baz</a></li>
       </ul>
     </li>
     <li tal:condition="can_participate | None"

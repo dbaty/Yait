@@ -11,8 +11,5 @@ FIXME
   </li>
 </ul>
 
-<a tal:condition="api.is_admin"
-   tal:attributes="href api.route_url('project_add')">add a new project</a>
-
 </metal:content>
 </layout>

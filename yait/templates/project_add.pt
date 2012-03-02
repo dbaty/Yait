@@ -25,13 +25,12 @@
         Make this project public, i.e. accessible to anonymous users.
       </label>
     </div>
-
-    <div class="buttons">
-      <button type="submit" class="positive" i18n:translate="">
-        Add project
-      </button>
-    </div>
   </fieldset>
+  <div class="buttons">
+    <button type="submit" class="positive" i18n:translate="">
+      Add project
+      </button>
+  </div>
 </form>
 
 </metal:content>

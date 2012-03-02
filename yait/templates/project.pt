@@ -1,6 +1,9 @@
 <layout metal:use-macro="api.layout">
 <metal:breadcrumbs metal:fill-slot="breadcrumbs">
-  <li tal:content="project.title"/>
+  <li>
+    <span class="separator">&rarr;</span>
+    <span tal:replace="project.title">
+  </li>
 </metal:breadcrumbs>
 
 <metal:content metal:fill-slot="content">

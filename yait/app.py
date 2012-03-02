@@ -59,6 +59,8 @@ def make_app(global_settings, **settings):
                     request_method='POST')
     config.add_route('logout', '/logout')
     config.add_view('.views.auth.logout', route_name='logout')
+    config.add_route('preferences', '/preferences')
+    config.add_view('.views.preferences.prefs', route_name='preferences')
 
     # - control panel
     config.add_route('control_panel', '/control-panel')

@@ -1,21 +1,13 @@
-<layout metal:use-macro="api.layout">
-<metal:html-head metal:fill-slot="html-head">
-  <script type="text/javascript">
-    <tal:comment tal:replace="None">
-      FIXME: I am not too happy to require Javascript to submit a
-      form. We should be able to include the text field in the form
-      without breaking the layout.
-    </tal:comment>
-    function addAdmin(form) {
-      form.user_id.value = document.getElementById('admin_id_to_add').value;
-      return true;
-    }
-  </script>
-</metal:html-head>
+<html metal:use-macro="api.layout">
 <metal:breadcrumbs metal:fill-slot="breadcrumbs">
   <li>
-    <a tal:attributes="href api.route_url('control_panel')">Site control panel</a></li>
-  <li>Manage administrators</li>
+    <span class="separator">&rarr;</span>
+    <a tal:attributes="href api.route_url('control_panel')">Control panel</a>
+  </li>
+  <li>
+    <span class="separator">&rarr;</span>
+    Manage administrators
+  </li>
 </metal:breadcrumbs>
 
 <metal:content metal:fill-slot="content">
@@ -71,4 +63,17 @@
 </table>
 
 </metal:content>
-</layout>
+
+<metal:scripts metal:fill-slot="scripts">
+  <script>
+    /*
+      FIXME: I am not too happy to require Javascript to submit a
+      form. We should be able to include the text field in the form
+      without breaking the layout.
+    */
+    function addAdmin(form) {
+      form.user_id.value = document.getElementById('admin_id_to_add').value;
+      return true;
+    }
+  </script>
+</html>

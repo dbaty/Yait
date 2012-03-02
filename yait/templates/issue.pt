@@ -1,6 +1,7 @@
 <layout metal:use-macro="api.layout">
 <metal:breadcrumbs metal:fill-slot="breadcrumbs">
   <li>
+    <span class="separator">&rarr;</span>
     <a tal:attributes="href api.route_url('project_home',
                                           project_name=project.name)"
        tal:content="project.title"/>
