@@ -31,9 +31,10 @@
         <a tal:content="issue.title"
            tal:attributes="href api.route_url('issue_view', project_name=project.name, issue_ref=issue.ref)"/>
         <!-- FIXME -->
-      <td tal:content="issue.reporter"/>
-      <td tal:content="issue.priority"/>
-      <td tal:content="issue.deadline and issue.deadline.strftime('%d %b %Y')"/>
+      <td tal:content="issue.reporter" class="nowrap"/>
+      <td tal:content="issue.priority" class="nowrap"/>
+      <td tal:content="issue.deadline and issue.deadline.strftime('%d %b %Y')"
+          class="nowrap"/>
     </tr>
   </tbody>
 </table>

@@ -132,6 +132,8 @@ def add_project(request):
     form.populate_obj(project)
     session = DBSession()
     session.add(project)
+    # FIXME: we should rather redirect to the configuration page of
+    # the project (with a success message).
     url = request.route_url('project_home', project_name=project.name)
     return HTTPSeeOther(location=url)
 

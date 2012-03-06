@@ -16,6 +16,11 @@ input, textarea, select {
     padding: 0.2em;
 }
 
+input[type=checkbox] {
+    padding: 0;
+    padding: 0.1em;
+}
+
 textarea {
     width: 95%;
 }
@@ -38,6 +43,7 @@ textarea {
 
 .form-description {
     font-size: 0.8em;
+    margin-bottom: 0.5em;
 }
 
 .form-row-error {

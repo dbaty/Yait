@@ -8,15 +8,14 @@
 
 <metal:content metal:fill-slot="content">
 
-<ul id="actions">
+<ul>
   <li tal:define="action_url api.route_url('projects')">
     <a tal:attributes="href action_url"
        ><img tal:attributes="src api.static_url('static/img/project.png')"
              width="32" height="32" alt="manage projects"/></a>
     <a tal:attributes="href action_url">manage projects</a>
   </li>
-  <li class="last"
-      tal:define="action_url api.route_url('users')">
+  <li tal:define="action_url api.route_url('users')">
     <a tal:attributes="href action_url"
        ><img tal:attributes="src api.static_url('static/img/users.png')"
              width="32" height="32" alt="manage users"/></a>

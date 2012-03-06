@@ -3,9 +3,14 @@
 
     th {
         border-bottom: 1px solid #ccc;
-        padding: 0.2em;
-        text-align: left;
+        border-right: 1px solid #eee;
+        padding: 0.2em 1em;
+        text-align: center;
         font-weight: bold;
+    }
+
+    th:last-child {
+        border-right: 0;
     }
 
     tr.odd {
@@ -14,10 +19,15 @@
 
     td {
         border-bottom: 1px solid #eee;
+        border-right: 1px solid #eee;
         padding: 0.5em;
     }
 
     tfoot td {
         border:0;
+    }
+
+    td:last-child {
+        border-right: 0;
     }
 }

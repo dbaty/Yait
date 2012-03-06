@@ -6,14 +6,20 @@
   </li>
   <li>
     <span class="separator">&rarr;</span>
-    Manage projects
+    Projects
   </li>
 </metal:breadcrumbs>
 
 <metal:content metal:fill-slot="content">
 
-<table id="projectListing"
-       class="listing">
+<p tal:define="url api.route_url('project_add')">
+  <a tal:attributes="href url"
+     ><img tal:attributes="src api.static_url('static/img/add.png')"
+           width="32" height="32" alt=""></a>
+  <a tal:attributes="href url" i18n:translate="">Add a new project</a>
+</p>
+
+<table class="listing">
   <thead>
     <tr>
       <th>Name</th>
@@ -43,16 +49,6 @@
     </tr>
   </tbody>
 </table>
-
-
-<ul id="actions">
-  <li tal:define="action_url api.route_url('project_add')">
-    <a tal:attributes="href action_url"
-       ><img tal:attributes="src api.static_url('static/img/add.png')"
-             width="32" height="32" alt="add a new project"/></a>
-    <a tal:attributes="href action_url">add a new project</a>
-  </li>
-</ul>
 
 </metal:content>
 </layout>
