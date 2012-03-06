@@ -1,0 +1,61 @@
+<html metal:use-macro="api.layout">
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <span class="separator">&rarr;</span>
+    <a tal:attributes="href api.route_url('control_panel')"
+       i18n:translate="">Control panel</a>
+  </li>
+  <li>
+    <span class="separator">&rarr;</span>
+    <a tal:attributes="href api.route_url('users')" i18n:translate="">Users</a>
+  </li>
+  <li>
+    <span class="separator">&rarr;</span>
+    <span tal:omit-tag="" i18n:translate="">Add a new user</span>
+  </li>
+</metal:breadcrumbs>
+
+<metal:content metal:fill-slot="content">
+
+<form method="post"
+      tal:define="renderField api.form_macros['renderField'];
+                  field_options {}"
+      tal:attributes="action api.route_url('user_add')">
+
+  <fieldset>
+    <legend>Add a new user</legend>
+
+    <metal:field tal:define="field_name 'login';
+                             field_options {'size': 15}"
+                 metal:use-macro="renderField"/>
+
+    <metal:field tal:define="field_name 'password'"
+                 metal:use-macro="renderField"/>
+
+    <metal:field tal:define="field_name 'password_confirm'"
+                 metal:use-macro="renderField"/>
+
+    <metal:field tal:define="field_name 'fullname';
+                             field_options {'size': 30}"
+                 metal:use-macro="renderField"/>
+
+    <metal:field tal:define="field_name 'email';
+                             field_options {'size': 20}"
+                 metal:use-macro="renderField"/>
+
+    <div class="form-row">
+      <input id="is_admin" name="is_admin" type="checkbox" value="1"
+             tal:attributes="checked form.is_admin.data"/>
+      <label for="is_admin" style="display: inline" i18n:translate="">
+        Make this user an administrator.
+      </label>
+    </div>
+  </fieldset>
+  <div class="buttons">
+    <button type="submit" class="positive" i18n:translate="">Add user</button>
+    <a class="cancel" tal:attributes="href api.route_url('users')">Cancel</a>
+  </div>
+</form>
+
+</metal:content>
+</html>

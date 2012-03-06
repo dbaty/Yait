@@ -65,20 +65,24 @@ def make_app(global_settings, **settings):
     # - control panel
     config.add_route('control_panel', '/control-panel')
     config.add_view('.views.manage.control_panel', route_name='control_panel')
-    config.add_route('admins', '/control-panel/admins')
-    config.add_view('.views.manage.list_admins', route_name='admins')
-    config.add_route('admin_add', '/control-panel/add-admin')
-    config.add_view('.views.manage.add_admin', route_name='admin_add',
+    config.add_route('users', '/control-panel/users')
+    config.add_view('.views.manage.list_users', route_name='users')
+    config.add_route('user_add', '/control-panel/user/add')
+    config.add_view('.views.manage.add_user_form', route_name='user_add',
+                    request_method='GET')
+    config.add_view('.views.manage.add_user', route_name='user_add',
                     request_method='POST')
-    config.add_route('admin_delete', '/control-panel/delete-admin')
-    config.add_view('.views.manage.delete_admin', route_name='admin_delete',
+    config.add_route('user_edit', '/control-panel/user/{user_id}/edit')
+    config.add_view('.views.manage.edit_user_form', route_name='user_edit',
+                    request_method='GET')
+    config.add_view('.views.manage.edit_user', route_name='user_edit',
                     request_method='POST')
     config.add_route('projects', '/control-panel/projects')
     config.add_view('.views.manage.list_projects', route_name='projects')
     config.add_route('project_add', '/control-panel/add-project')
-    config.add_view('.views.project.add_form', route_name='project_add',
+    config.add_view('.views.manage.add_project_form', route_name='project_add',
                     request_method='GET')
-    config.add_view('.views.project.add', route_name='project_add',
+    config.add_view('.views.manage.add_project', route_name='project_add',
                     request_method='POST')
     config.add_route('project_delete', '/control-panel/delete-project')
     config.add_view('.views.manage.delete_project',

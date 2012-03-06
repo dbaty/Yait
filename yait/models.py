@@ -71,6 +71,9 @@ metadata = MetaData()
 
 class Model(object):
     def __init__(self, **kwargs):
+        self.update(**kwargs)
+
+    def update(self, **kwargs):
         for attr, value in kwargs.items():
             setattr(self, attr, value)
 

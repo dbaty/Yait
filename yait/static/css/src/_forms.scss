@@ -109,6 +109,10 @@ textarea {
         font-size: 0.8em;
         vertical-align: center;
     }
+
+    .cancel:hover {
+        text-decoration: underline;
+    }
 }
 
 /* date picker field */

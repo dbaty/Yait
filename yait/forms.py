@@ -9,6 +9,7 @@ from wtforms.validators import optional
 from wtforms.validators import required
 from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput
+from wtforms.widgets import PasswordInput
 
 from yait.auth import ROLE_PROJECT_ADMIN
 from yait.auth import ROLE_PROJECT_INTERNAL_PARTICIPANT
@@ -64,6 +65,7 @@ class BaseForm(Form):
 
 
 class AddProjectForm(BaseForm):
+    """Form used to add a new project."""
     # FIXME: check length of name (if we use a VARCHAR)
     # FIXME: check length of title (if we use a VARCHAR)
     name = TextField(label=u'Name',
@@ -83,6 +85,9 @@ class AddProjectForm(BaseForm):
 
 
 class ExtraFieldset:
+    """A field set used both in the "add issue" and the "add comment"
+    forms.
+    """
     status = SelectField(
         label=u'Status',
         choices=zip(ISSUE_STATUS_VALUES, ISSUE_STATUS_VALUES),
@@ -111,7 +116,7 @@ class ExtraFieldset:
     # FIXME: use an auto-complete widget
     parent = TextField(label=u'Parent issue')
     # FIXME: need work on UI
-    children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput)
+    children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput())
 
     def setup(self, project_id):
         self.project_id = project_id
@@ -145,12 +150,42 @@ def text_renderer_field_factory():
 
 
 class AddIssueForm(BaseForm, ExtraFieldset):
+    """Form used to add a new issue."""
     title = TextField(label=u'Title', validators=[required()])
     text = TextAreaField(label=u'Text', validators=[required()])
     text_renderer = text_renderer_field_factory()
 
 
 class AddChangeForm(BaseForm, ExtraFieldset):
-    """A form used to comment (change) an issue."""
+    """Form used to comment (change) an issue."""
     text = TextAreaField(label=u'Text')
     text_renderer = text_renderer_field_factory()
+
+
+class AddUserForm(BaseForm):
+    """Form used to add a new user."""
+    login = TextField(label=u'Login', validators=[required()])
+    password = TextField(label=u'Password', widget=PasswordInput(),
+                         validators=[required()])
+    password_confirm = TextField(label=u'Password (confirm)',
+                                 widget=PasswordInput(),
+                                 validators=[required()])
+    fullname = TextField(label=u'Full name', validators=[required()])
+    email = TextField(label=u'E-mail address', validators=[required()])
+    is_admin = BooleanField(label=u'Administrator')
+
+    # FIXME: validate login
+    # FIXME: validate password and password_confirm are equal
+    # FIXME: validate fullname
+    # FIXME: validate e-mail address
+
+
+class EditUserForm(AddUserForm):
+    """Form used to edit an existing user."""
+    password = None
+    password_confirm = None
+
+    # FIXME: check that login is the current login of the user, or a
+    # valid login
+    # FIXME: check that e-mail address is the current address of the
+    # user, of a valid e-mail.

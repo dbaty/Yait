@@ -48,7 +48,6 @@
 <ul id="actions">
   <li tal:define="action_url api.route_url('project_add')">
     <a tal:attributes="href action_url"
-       class="noUnderline"
        ><img tal:attributes="src api.static_url('static/img/add.png')"
              width="32" height="32" alt="add a new project"/></a>
     <a tal:attributes="href action_url">add a new project</a>

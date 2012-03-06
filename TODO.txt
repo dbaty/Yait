@@ -1,15 +1,12 @@
 Yait 0.2
 ========
 
-- control panel: change "manage admins" into a propert user management
-  page:
+- show user's roles in the "edit user" page.
 
-  - "add user" form
+- remove 'User.login' column. Users will log in with their email address.
 
-  - "change user" (disable user, change full name, login or e-mail
-    address)
-
-  - user roles + admin rights
+- check classes and IDs used in templates, and compare with those
+  defined in the CSS.
 
 - complete the 'add issue' form: parent/children
 

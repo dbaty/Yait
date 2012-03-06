@@ -23,119 +23,135 @@ class TestControlPanelHome(TestCaseForViews):
         self.assertEqual(response.status, '200 OK')
 
 
-class TestListAdmin(TestCaseForViews):
+class TestListUsers(TestCaseForViews):
 
-    template_under_test = '../templates/list_admins.pt'
+    template_under_test = '../templates/users.pt'
 
     def _call_fut(self, request):
-        from yait.views.manage import list_admins
-        return list_admins(request)
+        from yait.views.manage import list_users
+        return list_users(request)
 
-    def test_list_admins_reject_not_admin(self):
+    def test_list_users_reject_not_admin(self):
         from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
         self.assertRaises(HTTPForbidden, self._call_fut, request)
 
-    def test_list_admins_allow_admin(self):
+    def test_list_users_allow_admin(self):
         login = u'admin'
-        admin = self._make_user(login, u'Admin 1', is_admin=True)
-        a3 = self._make_user(u'admin3', u'Admin 3', is_admin=True)
-        a2 = self._make_user(u'admin2', u'Admin 2', is_admin=True)
+        admin = self._make_user(login, u'Admin One', is_admin=True)
+        a2 = self._make_user(u'admin2', u'Admin Two', is_admin=True)
+        u3 = self._make_user(u'user3', u'User Three')
         renderer = self._make_renderer()
         request = self._make_request(user=login)
         self._call_fut(request)
-        renderer.assert_(current_user_id=admin.id)
-        renderer.assert_(admins=[admin, a2, a3])
+        renderer.assert_(users=[admin, a2, u3])
 
 
-class TestAddAdmin(TestCaseForViews):
+class TestAddUser(TestCaseForViews):
+
+    template_under_test = '../templates/user_add.pt'
 
     def _call_fut(self, request):
-        from yait.views.manage import add_admin
-        return add_admin(request)
+        from yait.views.manage import add_user
+        return add_user(request)
 
-    def test_add_admin_reject_not_admin(self):
+    def test_add_user_reject_not_admin(self):
         from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
         self.assertRaises(HTTPForbidden, self._call_fut, request)
 
-    def test_add_admin_no_user_id(self):
-        login = u'admin'
-        self._make_user(login, is_admin=True)
-        post = {'user_id': u''}
-        request = self._make_request(user=login, post=post)
-        self._call_fut(request)
-        self.assertEqual(len(request.get_flash('error')), 1)
-        self.assertEqual(len(request.get_flash('success')), 0)
-
-    def test_add_admin_already_admin(self):
-        login = u'admin'
-        admin = self._make_user(login, is_admin=True)
-        post = {'user_id': admin.id}
-        request = self._make_request(user=login, post=post)
-        self._call_fut(request)
-        self.assertEqual(len(request.get_flash('error')), 1)
-        self.assertEqual(len(request.get_flash('success')), 0)
-
-    def test_add_admin_success(self):
+    def test_add_user_allow_admin(self):
         from yait.models import User
         login = u'admin'
         self._make_user(login, is_admin=True)
-        user = self._make_user(u'user')
-        post = {'user_id': user.id}
+        post = {'login': u'jsmith',
+                'password': u'secret',
+                'password_confirm': u'secret',
+                'fullname': u'John Smith',
+                'email': u'jsmith@exemple.com'}
         request = self._make_request(user=login, post=post)
         self._call_fut(request)
         self.assertEqual(len(request.get_flash('error')), 0)
         self.assertEqual(len(request.get_flash('success')), 1)
-        admins = self.session.query(User).filter_by(is_admin=True).all()
-        admins = sorted([a.login for a in admins])
-        self.assertEqual(admins, [u'admin', u'user'])
+        self.assertEqual(self.session.query(User).count(), 2)
+        user = self.session.query(User).filter_by(login=post['login']).one()
+        self.assertEqual(user.login, post['login'])
+        self.assertEqual(user.fullname, post['fullname'])
+        self.assertEqual(user.email, post['email'])
+        self.assert_(not user.is_admin)
+
+    def test_add_user_invalid_form(self):
+        from yait.models import User
+        login = u'admin'
+        self._make_user(login, is_admin=True)
+        post = {'login': u'',
+                'password': u'',
+                'password_confirm': u'',
+                'fullname': u'',
+                'email': u''}
+        self._make_renderer()
+        request = self._make_request(user=login, post=post)
+        self._call_fut(request)
+        self.assertEqual(self.session.query(User).count(), 1)
 
 
-class TestDeleteAdmin(TestCaseForViews):
+class TestEditUser(TestCaseForViews):
+
+    template_under_test = '../templates/user_edit.pt'
 
     def _call_fut(self, request):
-        from yait.views.manage import delete_admin
-        return delete_admin(request)
+        from yait.views.manage import edit_user
+        return edit_user(request)
 
-    def test_delete_admin_reject_not_admin(self):
+    def test_edit_user_reject_not_admin(self):
         from pyramid.httpexceptions import HTTPForbidden
         request = self._make_request()
         self.assertRaises(HTTPForbidden, self._call_fut, request)
 
-    def test_delete_admin_himself(self):
+    def test_edit_user_unknown_user(self):
+        from pyramid.httpexceptions import HTTPNotFound
+        login = u'admin'
+        admin = self._make_user(login, is_admin=True)
+        matchdict = {'user_id': 1 + admin.id}
+        request = self._make_request(user=login, matchdict=matchdict)
+        self.assertRaises(HTTPNotFound, self._call_fut, request)
+
+    def test_edit_user_allow_admin(self):
         from yait.models import User
         login = u'admin'
         admin = self._make_user(login, is_admin=True)
-        post = {'admin_id': admin.id}
-        request = self._make_request(user=login, post=post)
-        self._call_fut(request)
-        self.assertEqual(len(request.get_flash('error')), 1)
-        self.assertEqual(len(request.get_flash('success')), 0)
-        admins = self.session.query(User).filter_by(is_admin=True).all()
-        self.assertEqual(admins, [admin])
-
-    def test_delete_admin_no_user_id(self):
-        login = u'admin'
-        self._make_user(login, is_admin=True)
-        post = {'admin_id': u''}
-        request = self._make_request(user=login, post=post)
-        self._call_fut(request)
-        self.assertEqual(len(request.get_flash('error')), 1)
-        self.assertEqual(len(request.get_flash('success')), 0)
-
-    def test_delete_admin_success(self):
-        from yait.models import User
-        login = u'admin'
-        admin = self._make_user(login, is_admin=True)
-        admin2 = self._make_user(u'admin2', is_admin=True)
-        post = {'admin_id': admin2.id}
-        request = self._make_request(user=login, post=post)
+        post = {'login': login,
+                'fullname': u'John Smith',
+                'email': u'jsmith@exemple.com',
+                'is_admin': '1'}
+        matchdict = {'user_id': admin.id}
+        request = self._make_request(user=login, matchdict=matchdict, post=post)
         self._call_fut(request)
         self.assertEqual(len(request.get_flash('error')), 0)
         self.assertEqual(len(request.get_flash('success')), 1)
-        admins = self.session.query(User).filter_by(is_admin=True).all()
-        self.assertEqual(admins, [admin])
+        self.assertEqual(self.session.query(User).count(), 1)
+        admin = self.session.query(User).filter_by(login=post['login']).one()
+        self.assertEqual(admin.login, post['login'])
+        self.assertEqual(admin.fullname, post['fullname'])
+        self.assertEqual(admin.email, post['email'])
+        self.assert_(admin.is_admin)
+
+    def test_edit_user_cannot_revoke_own_s_admin_rights(self):
+        from yait.models import User
+        login = u'admin'
+        admin = self._make_user(login, is_admin=True)
+        post = {'login': admin.login,
+                'fullname': u'John Smith',
+                'email': u'jsmith@exemple.com'}
+        matchdict = {'user_id': admin.id}
+        request = self._make_request(user=login, matchdict=matchdict, post=post)
+        renderer = self._make_renderer()
+        self._call_fut(request)
+        api = renderer._received['api']
+        self.assertEqual(len(api.notifications['error']), 1)
+        self.assertEqual(len(api.notifications['success']), 0)
+        admin = self.session.query(User).filter_by(login=login).one()
+        self.assert_(admin.is_admin)
 
 
 class TestListProjects(TestCaseForViews):
@@ -161,6 +177,78 @@ class TestListProjects(TestCaseForViews):
         request = self._make_request(user=login)
         self._call_fut(request)
         renderer.assert_(projects=[p1, p2, p3])
+
+
+class TestProjectAddForm(TestCaseForViews):
+
+    template_under_test = '../templates/project_add.pt'
+
+    def _call_fut(self, request):
+        from yait.views.manage import add_project_form
+        return add_project_form(request)
+
+    def test_add_project_form_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
+        request = self._make_request()
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
+
+    def test_add_project_form_allow_admin(self):
+        from yait.forms import AddProjectForm
+        login = u'admin'
+        self._make_user(login, is_admin=True)
+        renderer = self._make_renderer()
+        request = self._make_request(user=login)
+        self._call_fut(request)
+        self.assertIsInstance(renderer.form, AddProjectForm)
+
+
+class TestAddProject(TestCaseForViews):
+
+    template_under_test = '../templates/project_add.pt'
+
+    def _call_fut(self, *args, **kwargs):
+        from yait.views.manage import add_project
+        return add_project(*args, **kwargs)
+
+    def test_add_project_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
+        request = self._make_request()
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
+
+    def test_add_project_incomplete_form(self):
+        from yait.forms import AddProjectForm
+        login = u'admin'
+        self._make_user(login, is_admin=True)
+        renderer = self._make_renderer()
+        post = {'name': u'p1', 'title': u''}
+        request = self._make_request(user=login, post=post)
+        self._call_fut(request)
+        self.assertIsInstance(renderer.form, AddProjectForm)
+        self.assert_(len(renderer.form.errors))
+
+    def test_add_project_name_already_taken(self):
+        from yait.forms import AddProjectForm
+        login = u'admin'
+        self._make_user(login, is_admin=True)
+        renderer = self._make_renderer()
+        self._make_project(name=u'p1')
+        post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
+        request = self._make_request(user=login, post=post)
+        self._call_fut(request)
+        self.assertIsInstance(renderer.form, AddProjectForm)
+        self.assert_(len(renderer.form.errors.get('name')))
+
+    def test_add_project_allow_admin(self):
+        from yait.models import Project
+        login = u'admin'
+        self._make_user(login, is_admin=True)
+        post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
+        request = self._make_request(user=login, post=post)
+        self._call_fut(request)
+        projects = self.session.query(Project).all()
+        self.assertEqual(len(projects), 1)
+        self.assertEqual(projects[0].name, u'p1')
+        self.assertEqual(projects[0].title, u'Project 1')
 
 
 class TestDeleteProject(TestCaseForViews):

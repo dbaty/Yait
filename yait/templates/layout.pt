@@ -31,7 +31,10 @@
     </div>
     <ol class="breadcrumbs">
       <li>
-        <a tal:attributes="href api.route_url('home')">&#8962; Yait</a>
+        <a tal:attributes="href api.route_url('home')"
+           ><img tal:attributes="src api.static_url('static/img/home.png')"
+                 width="16" height="16">
+          Yait</a>
       </li>
       <metal:breadcrumbs metal:define-slot="breadcrumbs"></metal:breadcrumbs>
     </ol>

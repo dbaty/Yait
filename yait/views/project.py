@@ -1,6 +1,5 @@
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPNotFound
-from pyramid.httpexceptions import HTTPSeeOther
 from pyramid.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -9,35 +8,9 @@ from yait.auth import has_permission
 from yait.auth import PERM_ADMIN_PROJECT
 from yait.auth import PERM_PARTICIPATE_IN_PROJECT
 from yait.auth import PERM_VIEW_PROJECT
-from yait.forms import AddProjectForm
-from yait.i18n import _
 from yait.models import DBSession
 from yait.models import Project
 from yait.views.utils import TemplateAPI
-
-
-def add_form(request, form=None):
-    if not request.user.is_admin:
-        raise HTTPForbidden()
-    if form is None:
-        form = AddProjectForm()
-    bindings = {'api': TemplateAPI(request, _(u'Add project')),
-                'form': form}
-    return render_to_response('../templates/project_add.pt', bindings)
-
-
-def add(request):
-    if not request.user.is_admin:
-        raise HTTPForbidden()
-    form = AddProjectForm(request.POST)
-    if not form.validate():
-        return add_form(request, form)
-    project = Project()
-    form.populate_obj(project)
-    session = DBSession()
-    session.add(project)
-    url = request.route_url('project_home', project_name=project.name)
-    return HTTPSeeOther(location=url)
 
 
 def home(request):

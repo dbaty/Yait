@@ -11,18 +11,16 @@
 <ul id="actions">
   <li tal:define="action_url api.route_url('projects')">
     <a tal:attributes="href action_url"
-       class="noUnderline"
        ><img tal:attributes="src api.static_url('static/img/project.png')"
              width="32" height="32" alt="manage projects"/></a>
     <a tal:attributes="href action_url">manage projects</a>
   </li>
   <li class="last"
-      tal:define="action_url api.route_url('admins')">
+      tal:define="action_url api.route_url('users')">
     <a tal:attributes="href action_url"
-       class="noUnderline"
        ><img tal:attributes="src api.static_url('static/img/users.png')"
-             width="32" height="32" alt="manage administrators"/></a>
-    <a tal:attributes="href action_url">manage administrators</a>
+             width="32" height="32" alt="manage users"/></a>
+    <a tal:attributes="href action_url">manage users</a>
   </li>
 </ul>
 

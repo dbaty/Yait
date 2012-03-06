@@ -2,7 +2,6 @@
 <metal:content metal:fill-slot="content">
 
 <form method="post"
-      id="addProjectForm"
       tal:define="renderField api.form_macros['renderField'];
                   field_options {}"
       tal:attributes="action api.route_url('project_add')">
@@ -18,7 +17,7 @@
                              field_options {'size': 50}"
                  metal:use-macro="renderField"/>
 
-    <div class="formRow">
+    <div class="form-row">
       <input id="public" name="public" type="checkbox" value="1"
              tal:attributes="checked form.public.data"/>
       <label for="public" style="display: inline">

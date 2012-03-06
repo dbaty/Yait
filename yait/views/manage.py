@@ -1,11 +1,15 @@
 """Global management interfaces."""
 
 from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPSeeOther
 from pyramid.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
 
+from yait.forms import AddProjectForm
+from yait.forms import AddUserForm
+from yait.forms import EditUserForm
 from yait.i18n import _
 from yait.models import DBSession
 from yait.models import Project
@@ -20,76 +24,82 @@ def control_panel(request):
     return render_to_response('../templates/control_panel.pt', bindings)
 
 
-def list_admins(request):
+def list_users(request):
+    """List users (in the control panel)."""
     if not request.user.is_admin:
         raise HTTPForbidden()
     session = DBSession()
-    admins = session.query(User).filter_by(
-        is_admin=True).order_by(User.fullname).all()
-    bindings = {'api': TemplateAPI(request, _(u'Administrators')),
-                'current_user_id': request.user.id,
-                'admins': admins}
-    return render_to_response('../templates/list_admins.pt', bindings)
+    # FIXME: paginate
+    users = session.query(User).order_by(User.fullname).all()
+    bindings = {'api': TemplateAPI(request, _(u'Users')),
+                'users': users}
+    return render_to_response('../templates/users.pt', bindings)
 
 
-def add_admin(request):
+def add_user_form(request, form=None):
     if not request.user.is_admin:
         raise HTTPForbidden()
-    user_id = request.POST['user_id']
-    if not user_id:
-        request.session.flash(_(u'Please select a user.'), 'error')
-        url = request.route_url('admins')
-        return HTTPSeeOther(location=url)
+    if form is None:
+        form = AddUserForm()
+    bindings = {'api': TemplateAPI(request, _(u'Add a new user')),
+                'form': form}
+    return render_to_response('../templates/user_add.pt', bindings)
+
+
+def add_user(request):
+    if not request.user.is_admin:
+        raise HTTPForbidden()
+    form = AddUserForm(request.POST)
+    if not form.validate():
+        return add_user_form(request, form)
+    data = form.data
+    data.pop('password_confirm')
+    user = User(**data)
+    session = DBSession()
+    session.add(user)
+    request.session.flash(_(u'User has been added.'), 'success')
+    location = request.route_url('users')
+    return HTTPSeeOther(location)
+
+
+def edit_user_form(request, form=None):
+    if not request.user.is_admin:
+        raise HTTPForbidden()
+    user_id = int(request.matchdict['user_id'])
     session = DBSession()
     try:
         user = session.query(User).filter_by(id=user_id).one()
     except NoResultFound:
-        # We should not get there unless the user has been removed or
-        # disabled after the form has been loaded.
-        request.session.flash(_(u'User could not be found.'), 'error')
-        url = request.route_url('admins')
-        return HTTPSeeOther(location=url)
-    if user.is_admin:
-        # We should not get there unless the user has been granted the
-        # administrator role after the form has been loaded.
-        msg = _(u'%s is already an administrator.' % user.fullname)
-        request.session.flash(msg, 'error')
-        url = request.route_url('admins')
-        return HTTPSeeOther(location=url)
-    user.is_admin = True
-    msg = _(u'%s is now an administrator.' % user.fullname)
-    request.session.flash(msg, 'success')
-    url = request.route_url('admins')
-    return HTTPSeeOther(location=url)
+        raise HTTPNotFound()
+    if form is None:
+        form = EditUserForm(obj=user)
+    bindings = {'api': TemplateAPI(request, user.fullname),
+                'form': form,
+                'user': user}
+    return render_to_response('../templates/user_edit.pt', bindings)
 
 
-def delete_admin(request):
+def edit_user(request):
     if not request.user.is_admin:
         raise HTTPForbidden()
-    admin_id = request.POST['admin_id']
-    if not admin_id:
-        request.session.flash(_(u'Please provide an user id.'), 'error')
-        url = request.route_url('admins')
-        return HTTPSeeOther(location=url)
-    if admin_id == request.user.id:
-        msg = _(u'You cannot revoke your own administrator rights.')
-        request.session.flash(msg, 'error')
-        url = request.route_url('admins')
-        return HTTPSeeOther(location=url)
+    user_id = int(request.matchdict['user_id'])
     session = DBSession()
     try:
-        admin = session.query(User).filter_by(id=admin_id).one()
+        user = session.query(User).filter_by(id=user_id).one()
     except NoResultFound:
-        # We should not get there unless the user has been removed or
-        # disabled after the form has been loaded.
-        request.session.flash(_(u'User could not be found.'), 'error')
-        url = request.route_url('admins')
-        return HTTPSeeOther(location=url)
-    admin.is_admin = False
-    msg = _(u'%s is no longer an administrator.' % admin.fullname)
-    request.session.flash(msg, 'success')
-    url = request.route_url('admins')
-    return HTTPSeeOther(location=url)
+        raise HTTPNotFound()
+    form = EditUserForm(request.POST)
+    if not form.validate():
+        return edit_user_form(request, form)
+    data = form.data
+    if user_id == request.user.id and not form.data['is_admin']:
+        msg = _(u"You cannot revoke your own administrator's rights.")
+        request.session.flash(msg, 'error')
+        return edit_user_form(request, form)
+    user.update(**data)
+    request.session.flash(_(u'User has been edited.'), 'success')
+    location = request.route_url('users')
+    return HTTPSeeOther(location)
 
 
 def list_projects(request):
@@ -100,6 +110,30 @@ def list_projects(request):
     bindings = {'api': TemplateAPI(request, _(u'Projects')),
                 'projects': projects}
     return render_to_response('../templates/list_projects.pt', bindings)
+
+
+def add_project_form(request, form=None):
+    if not request.user.is_admin:
+        raise HTTPForbidden()
+    if form is None:
+        form = AddProjectForm()
+    bindings = {'api': TemplateAPI(request, _(u'Add project')),
+                'form': form}
+    return render_to_response('../templates/project_add.pt', bindings)
+
+
+def add_project(request):
+    if not request.user.is_admin:
+        raise HTTPForbidden()
+    form = AddProjectForm(request.POST)
+    if not form.validate():
+        return add_project_form(request, form)
+    project = Project()
+    form.populate_obj(project)
+    session = DBSession()
+    session.add(project)
+    url = request.route_url('project_home', project_name=project.name)
+    return HTTPSeeOther(location=url)
 
 
 def delete_project(request):

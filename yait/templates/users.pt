@@ -1,0 +1,54 @@
+<html metal:use-macro="api.layout">
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <span class="separator">&rarr;</span>
+    <a tal:attributes="href api.route_url('control_panel')">Control panel</a>
+  </li>
+  <li>
+    <span class="separator">&rarr;</span>
+    Users
+  </li>
+</metal:breadcrumbs>
+
+<metal:content metal:fill-slot="content">
+
+<p>
+  <a tal:attributes="href api.route_url('user_add')"
+     ><img tal:attributes="src api.static_url('static/img/add.png')"
+           width="32" height="32" alt=""/>Add a new user</a>
+</p>
+
+<table class="listing">
+  <thead>
+    <tr>
+      <th>Full name</th>
+      <th>Login</th>
+      <th>E-mail address</th>
+      <th>Administrator</th>
+      <th>Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr tal:repeat="user users"
+        tal:attributes="class repeat['user'].odd and 'odd' or 'even'">
+      <td tal:content="user.fullname"/>
+      <td tal:content="user.login"/>
+      <td tal:content="user.email"/>
+      <td class="centered">
+        <img tal:condition="user.is_admin"
+             tal:attributes="src api.static_url('static/img/tick.png')"
+             width="16" height="16" alt="edit"
+             i18n:attributes="alt"/>
+      </td>
+      <td class="centered">
+        <a tal:attributes="href api.route_url('user_edit', user_id=user.id)"
+          ><img tal:attributes="src api.static_url('static/img/user_edit.png')"
+                width="16" height="16" alt="edit"
+                i18n:attributes="alt"/></a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+</metal:content>
+</html>
