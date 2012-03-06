@@ -1,12 +1,15 @@
 Yait 0.2
 ========
 
-- show user's roles in the "edit user" page.
+- project control panel : grant a permission to user U:
+
+  User/permission   Administer  View  Participate  See private info
+  ===============   ==========  ====  ===========  ================
+    john.smith          o         o       o               o
+       ...
+   <input field>        o         o       o               o
 
 - remove 'User.login' column. Users will log in with their email address.
-
-- check classes and IDs used in templates, and compare with those
-  defined in the CSS.
 
 - complete the 'add issue' form: parent/children
 
@@ -108,19 +111,6 @@ Yait 0.3
 ========
 
 - find a new name: obal, peri, prao, aster, noria, falgo, tern, tuit
-
-
-
-Yait 0.4
-========
-
-- project control panel : grant a permission to user U:
-
-  User/permission   Administer  View  Participate  See private info
-  ===============   ==========  ====  ===========  ================
-    john.smith          o         o       o               o
-       ...
-   <input field>        o         o       o               o
 
 
 Later

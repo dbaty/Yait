@@ -36,7 +36,10 @@ PERMISSIONS_FOR_ROLE = {
     ROLE_PROJECT_PARTICIPANT: (PERM_PARTICIPATE_IN_PROJECT,
                                PERM_VIEW_PROJECT),
     ROLE_PROJECT_VIEWER: (PERM_VIEW_PROJECT, )}
-
+ROLE_LABELS = {ROLE_PROJECT_MANAGER: u'Project manager',
+               ROLE_PROJECT_VIEWER: u'Viewer',
+               ROLE_PROJECT_PARTICIPANT: u'Participant',
+               ROLE_PROJECT_INTERNAL_PARTICIPANT: u'Internal participant'}
 
 class _AnonymousUser(object):
     def __init__(self):

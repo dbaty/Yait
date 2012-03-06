@@ -108,8 +108,10 @@ class TestCaseForViews(TestCase):
             self.session.add(r)
         return user
 
-    def _make_project(self, name=u'name', title=u'title', public=False):
+    def _make_project(self, name=u'name', title=None, public=False):
         from yait.models import Project
+        if title is None:
+            title = name
         p = Project(name=name, title=title, public=public)
         self.session.add(p)
         self.session.flush()  # sets id

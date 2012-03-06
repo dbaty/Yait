@@ -1,0 +1,50 @@
+<html metal:use-macro="api.layout">
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <span class="separator">&rarr;</span>
+    <a tal:attributes="href api.route_url('control_panel')">Control panel</a>
+  </li>
+  <li>
+    <span class="separator">&rarr;</span>
+    <a tal:attributes="href api.route_url('users')">Users</a>
+  </li>
+  <li>
+    <span class="separator">&rarr;</span>
+    <span tal:replace="user.fullname"/>
+  </li>
+</metal:breadcrumbs>
+
+<metal:content metal:fill-slot="content">
+
+<h1>Projects</h1>
+
+<p tal:condition="not roles and not user.is_admin" i18n:translate="">
+  This user does not have access to any private project.
+</p>
+
+<p tal:condition="not roles and user.is_admin" i18n:translate="">
+  This user does not have explicit access to any private project, but
+  can access all projects because (s)he is an administrator.
+</p>
+
+<table tal:condition="roles" class="listing">
+  <thead>
+    <tr>
+      <th i18n:translate="">Project</th>
+      <th i18n:translate="">Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr tal:repeat="role_info roles"
+        tal:attributes="class repeat['role_info'].odd and 'odd' or 'even'">
+      <td tal:define="project role_info[0]">
+        <a tal:content="project.title"
+           tal:attributes="href api.route_url('project_home', project_name=project.name)"/>
+      </td>
+      <td tal:content="role_info[1]"/>
+    </tr>
+  </tbody>
+</table>
+
+</metal:content>
+</html>

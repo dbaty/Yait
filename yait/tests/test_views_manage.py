@@ -47,6 +47,29 @@ class TestListUsers(TestCaseForViews):
         renderer.assert_(users=[admin, a2, u3])
 
 
+class TestAddUserForm(TestCaseForViews):
+
+    template_under_test = '../templates/user_add.pt'
+
+    def _call_fut(self, request):
+        from yait.views.manage import add_user_form
+        return add_user_form(request)
+
+    def test_add_user_form_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
+        request = self._make_request()
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
+
+    def test_add_user_form(self):
+        from yait.forms import AddUserForm
+        login = u'admin'
+        self._make_user(login, is_admin=True)
+        request = self._make_request(user=login)
+        renderer = self._make_renderer()
+        self._call_fut(request)
+        self.assertIsInstance(renderer.form, AddUserForm)
+
+
 class TestAddUser(TestCaseForViews):
 
     template_under_test = '../templates/user_add.pt'
@@ -95,6 +118,38 @@ class TestAddUser(TestCaseForViews):
         self.assertEqual(self.session.query(User).count(), 1)
 
 
+class TestEditUserForm(TestCaseForViews):
+
+    template_under_test = '../templates/user_edit.pt'
+
+    def _call_fut(self, request):
+        from yait.views.manage import edit_user_form
+        return edit_user_form(request)
+
+    def test_edit_user_form_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
+        request = self._make_request()
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
+
+    def test_edit_user_form_unknown_user(self):
+        from pyramid.httpexceptions import HTTPNotFound
+        login = u'admin'
+        admin = self._make_user(login, is_admin=True)
+        matchdict = {'user_id': str(1 + admin.id)}
+        request = self._make_request(user=login, matchdict=matchdict)
+        self.assertRaises(HTTPNotFound, self._call_fut, request)
+
+    def test_edit_user_form(self):
+        from yait.forms import EditUserForm
+        login = u'admin'
+        admin = self._make_user(login, is_admin=True)
+        matchdict = {'user_id': str(admin.id)}
+        request = self._make_request(user=login, matchdict=matchdict)
+        renderer = self._make_renderer()
+        self._call_fut(request)
+        self.assertIsInstance(renderer.form, EditUserForm)
+
+
 class TestEditUser(TestCaseForViews):
 
     template_under_test = '../templates/user_edit.pt'
@@ -112,9 +167,21 @@ class TestEditUser(TestCaseForViews):
         from pyramid.httpexceptions import HTTPNotFound
         login = u'admin'
         admin = self._make_user(login, is_admin=True)
-        matchdict = {'user_id': 1 + admin.id}
+        matchdict = {'user_id': str(1 + admin.id)}
         request = self._make_request(user=login, matchdict=matchdict)
         self.assertRaises(HTTPNotFound, self._call_fut, request)
+
+    def test_edit_user_incomplete_form(self):
+        from yait.forms import EditUserForm
+        login = u'admin'
+        admin = self._make_user(login, is_admin=True)
+        renderer = self._make_renderer()
+        post = {}
+        matchdict = {'user_id': str(admin.id)}
+        request = self._make_request(user=login, matchdict=matchdict, post=post)
+        self._call_fut(request)
+        self.assertIsInstance(renderer.form, EditUserForm)
+        self.assert_(len(renderer.form.errors))
 
     def test_edit_user_allow_admin(self):
         from yait.models import User
@@ -124,7 +191,7 @@ class TestEditUser(TestCaseForViews):
                 'fullname': u'John Smith',
                 'email': u'jsmith@exemple.com',
                 'is_admin': '1'}
-        matchdict = {'user_id': admin.id}
+        matchdict = {'user_id': str(admin.id)}
         request = self._make_request(user=login, matchdict=matchdict, post=post)
         self._call_fut(request)
         self.assertEqual(len(request.get_flash('error')), 0)
@@ -143,15 +210,64 @@ class TestEditUser(TestCaseForViews):
         post = {'login': admin.login,
                 'fullname': u'John Smith',
                 'email': u'jsmith@exemple.com'}
-        matchdict = {'user_id': admin.id}
+        matchdict = {'user_id': str(admin.id)}
         request = self._make_request(user=login, matchdict=matchdict, post=post)
         renderer = self._make_renderer()
         self._call_fut(request)
-        api = renderer._received['api']
-        self.assertEqual(len(api.notifications['error']), 1)
-        self.assertEqual(len(api.notifications['success']), 0)
+        self.assertEqual(len(renderer.api.notifications['error']), 1)
+        self.assertEqual(len(renderer.api.notifications['success']), 0)
         admin = self.session.query(User).filter_by(login=login).one()
         self.assert_(admin.is_admin)
+
+
+class TestListUserRoles(TestCaseForViews):
+
+    template_under_test = '../templates/user_roles.pt'
+
+    def _call_fut(self, request):
+        from yait.views.manage import list_user_roles
+        return list_user_roles(request)
+
+    def test_list_user_roles_reject_not_admin(self):
+        from pyramid.httpexceptions import HTTPForbidden
+        request = self._make_request()
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
+
+    def test_list_user_roles_reject_unknown_user(self):
+        from pyramid.httpexceptions import HTTPNotFound
+        login = u'admin'
+        user = self._make_user(login, u'admin', is_admin=True)
+        matchdict = {'user_id': str(1 + user.id)}
+        request = self._make_request(user=login, matchdict=matchdict)
+        self.assertRaises(HTTPNotFound, self._call_fut, request)
+
+    def test_list_user_roles_allow_admin(self):
+        from yait.auth import ROLE_LABELS
+        from yait.auth import ROLE_PROJECT_INTERNAL_PARTICIPANT 
+        from yait.auth import ROLE_PROJECT_MANAGER
+        from yait.auth import ROLE_PROJECT_PARTICIPANT
+        from yait.auth import ROLE_PROJECT_VIEWER
+        p1 = self._make_project(u'p1')
+        p2 = self._make_project(u'p2')
+        p3 = self._make_project(u'p3')
+        p4 = self._make_project(u'p4')
+        self._make_project(u'p5')
+        login = u'admin'
+        user = self._make_user(login, u'admin', is_admin=True,
+                               roles={p1: ROLE_PROJECT_INTERNAL_PARTICIPANT,
+                                      p2: ROLE_PROJECT_MANAGER,
+                                      p3: ROLE_PROJECT_PARTICIPANT,
+                                      p4: ROLE_PROJECT_VIEWER})
+        renderer = self._make_renderer()
+        matchdict = {'user_id': str(user.id)}
+        request = self._make_request(user=login, matchdict=matchdict)
+        self._call_fut(request)
+        renderer.assert_(user=user)
+        expected_roles = [(p1, ROLE_LABELS[ROLE_PROJECT_INTERNAL_PARTICIPANT]),
+                          (p2, ROLE_LABELS[ROLE_PROJECT_MANAGER]),
+                          (p3, ROLE_LABELS[ROLE_PROJECT_PARTICIPANT]),
+                          (p4, ROLE_LABELS[ROLE_PROJECT_VIEWER])]
+        renderer.assert_(roles=expected_roles)
 
 
 class TestListProjects(TestCaseForViews):

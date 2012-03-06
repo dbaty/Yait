@@ -22,11 +22,12 @@
 <table class="listing">
   <thead>
     <tr>
-      <th>Edit</th>
-      <th>Full name</th>
-      <th>Login</th>
-      <th>E-mail address</th>
-      <th>Administrator</th>
+      <th i18n:translate="">Edit</th>
+      <th i18n:translate="">Full name</th>
+      <th i18n:translate="">Login</th>
+      <th i18n:translate="">E-mail address</th>
+      <th i18n:translate="">Administrator</th>
+      <th i18n:translate="">Roles</th>
     </tr>
   </thead>
   <tbody>
@@ -46,6 +47,10 @@
              tal:attributes="src api.static_url('static/img/tick.png')"
              width="16" height="16" alt="edit"
              i18n:attributes="alt"/>
+      </td>
+      <td>
+        <a tal:attributes="href api.route_url('user_roles', user_id=user.id)"
+           i18n:translate="">show roles</a>
       </td>
     </tr>
   </tbody>

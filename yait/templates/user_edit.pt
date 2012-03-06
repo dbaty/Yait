@@ -16,11 +16,6 @@
 
 <metal:content metal:fill-slot="content">
 
-<p>
-  FIXME: list roles in projects (and a way to change them).
-</p>
-
-
 <form method="post"
       tal:define="renderField api.form_macros['renderField'];
                   field_options {}"

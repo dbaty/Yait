@@ -77,6 +77,8 @@ def make_app(global_settings, **settings):
                     request_method='GET')
     config.add_view('.views.manage.edit_user', route_name='user_edit',
                     request_method='POST')
+    config.add_route('user_roles', '/control-panel/user/{user_id}/roles')
+    config.add_view('.views.manage.list_user_roles', route_name='user_roles')
     config.add_route('projects', '/control-panel/projects')
     config.add_view('.views.manage.list_projects', route_name='projects')
     config.add_route('project_add', '/control-panel/add-project')

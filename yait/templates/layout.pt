@@ -33,7 +33,7 @@
       <li>
         <a tal:attributes="href api.route_url('home')"
            ><img tal:attributes="src api.static_url('static/img/home.png')"
-                 width="16" height="16">
+                 width="16" height="16" alt="">
           Yait</a>
       </li>
       <metal:breadcrumbs metal:define-slot="breadcrumbs"></metal:breadcrumbs>
