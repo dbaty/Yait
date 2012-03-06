@@ -109,7 +109,7 @@ def list_projects(request):
     projects = session.query(Project).order_by(Project.title).all()
     bindings = {'api': TemplateAPI(request, _(u'Projects')),
                 'projects': projects}
-    return render_to_response('../templates/list_projects.pt', bindings)
+    return render_to_response('../templates/projects.pt', bindings)
 
 
 def add_project_form(request, form=None):

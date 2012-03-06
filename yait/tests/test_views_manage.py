@@ -156,7 +156,7 @@ class TestEditUser(TestCaseForViews):
 
 class TestListProjects(TestCaseForViews):
 
-    template_under_test = '../templates/list_projects.pt'
+    template_under_test = '../templates/projects.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import list_projects
