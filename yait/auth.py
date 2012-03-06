@@ -1,4 +1,4 @@
-"""Authentication and authorization policies.
+"""Authentication and authorization policies, roles and permissions.
 
 Views are defined in the 'yait.views.auth' module, not here.
 """
@@ -12,28 +12,24 @@ from yait.models import Role
 from yait.models import User
 
 
-# Permissions and roles
 PERM_ADMIN_SITE = u'Administer site'
-PERM_ADMIN_PROJECT = u'Administer project'
+PERM_MANAGE_PROJECT = u'Manage project'
 PERM_VIEW_PROJECT = u'View project'
 PERM_PARTICIPATE_IN_PROJECT = u'Participate in project'
 PERM_SEE_PRIVATE_TIMING_INFO = u'See private time information'
-ALL_PERMS = (PERM_ADMIN_SITE, PERM_ADMIN_PROJECT, PERM_VIEW_PROJECT,
+ALL_PERMS = (PERM_ADMIN_SITE, PERM_MANAGE_PROJECT, PERM_VIEW_PROJECT,
              PERM_PARTICIPATE_IN_PROJECT, PERM_SEE_PRIVATE_TIMING_INFO)
 ROLE_SITE_ADMIN = u'Site administrator'
-# FIXME: we should perhaps rename this role as 'Project manager':
-# having the word 'administrator' in 'project administrator' and 'site
-# administrator' is a bit confusing.
-ROLE_PROJECT_ADMIN = 1
+ROLE_PROJECT_MANAGER = 1
 ROLE_PROJECT_VIEWER = 2
 ROLE_PROJECT_PARTICIPANT = 3
 ROLE_PROJECT_INTERNAL_PARTICIPANT = 4
 PERMISSIONS_FOR_ROLE = {
     ROLE_SITE_ADMIN: ALL_PERMS,
-    ROLE_PROJECT_ADMIN: (PERM_ADMIN_PROJECT,
-                         PERM_SEE_PRIVATE_TIMING_INFO,
-                         PERM_PARTICIPATE_IN_PROJECT,
-                         PERM_VIEW_PROJECT),
+    ROLE_PROJECT_MANAGER: (PERM_MANAGE_PROJECT,
+                           PERM_SEE_PRIVATE_TIMING_INFO,
+                           PERM_PARTICIPATE_IN_PROJECT,
+                           PERM_VIEW_PROJECT),
     ROLE_PROJECT_INTERNAL_PARTICIPANT: (PERM_SEE_PRIVATE_TIMING_INFO,
                                         PERM_PARTICIPATE_IN_PROJECT,
                                         PERM_VIEW_PROJECT),

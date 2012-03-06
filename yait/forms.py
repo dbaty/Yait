@@ -11,7 +11,7 @@ from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput
 from wtforms.widgets import PasswordInput
 
-from yait.auth import ROLE_PROJECT_ADMIN
+from yait.auth import ROLE_PROJECT_MANAGER
 from yait.auth import ROLE_PROJECT_INTERNAL_PARTICIPANT
 from yait.auth import ROLE_PROJECT_PARTICIPANT
 from yait.i18n import _
@@ -134,7 +134,7 @@ class ExtraFieldset:
         session = DBSession()
         res = session.query(User).join(Role).filter(
             Role.project_id==self.project_id,
-            Role.role.in_((ROLE_PROJECT_ADMIN,
+            Role.role.in_((ROLE_PROJECT_MANAGER,
                            ROLE_PROJECT_PARTICIPANT,
                            ROLE_PROJECT_INTERNAL_PARTICIPANT)))
         res = res.union(session.query(User).filter_by(is_admin=True))

@@ -42,14 +42,14 @@ class TestAddIssueForm(TestCase):
         return p
 
     def test_assignee_choices(self):
-        from yait.auth import ROLE_PROJECT_ADMIN
         from yait.auth import ROLE_PROJECT_INTERNAL_PARTICIPANT
+        from yait.auth import ROLE_PROJECT_MANAGER
         from yait.auth import ROLE_PROJECT_PARTICIPANT
         from yait.auth import ROLE_PROJECT_VIEWER
         p1 = self._make_project(u'project1')
         p2 = self._make_project(u'project2')
         self._make_user(u'allowed1', u'Allowed 1',
-                        roles={p1: ROLE_PROJECT_ADMIN})
+                        roles={p1: ROLE_PROJECT_MANAGER})
         self._make_user(u'allowed2', u'Allowed 2',
                         roles={p1: ROLE_PROJECT_PARTICIPANT})
         self._make_user(u'allowed3', u'Allowed 3',
@@ -57,7 +57,7 @@ class TestAddIssueForm(TestCase):
         self._make_user(u'forbidden1', u'Forbidden 1',
                         roles={p1: ROLE_PROJECT_VIEWER})
         self._make_user(u'forbidden2', u'Forbidden 2',
-                        roles={p2: ROLE_PROJECT_ADMIN})
+                        roles={p2: ROLE_PROJECT_MANAGER})
         self._make_user(u'admin', u'Admin', is_admin=True)
         form = self._make_one(project_id=p1.id)
         self.assertEqual(form.assignee.choices,

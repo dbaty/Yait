@@ -63,7 +63,7 @@
       <ul class="dropdown-menu">
         <li><a tal:attributes="href api.route_url('project_home', project_name=project.name)">Home</a></li>
         <li><a tal:attributes="href api.route_url('project_search', project_name=project.name)">Search</a></li>
-        <li><a tal:condition="can_admin_project"
+        <li><a tal:condition="can_manage_project"
                tal:attributes="href api.route_url('project_configure', project_name=project.name)">Configure</a></li>
       </ul>
     </li>

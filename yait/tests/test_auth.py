@@ -13,10 +13,10 @@ class TestHasPermission(TestCaseForViews):
             request=None, permission='Invalid permission')
 
     def test_invalid_permission_on_site(self):
-        from yait.auth import PERM_ADMIN_PROJECT
+        from yait.auth import PERM_MANAGE_PROJECT
         self.assertRaises(
             ValueError, self._call_fut,
-            request=None, permission=PERM_ADMIN_PROJECT, context=None)
+            request=None, permission=PERM_MANAGE_PROJECT, context=None)
 
     def test_invalid_permission_on_project(self):
         from yait.auth import PERM_ADMIN_SITE
@@ -32,10 +32,10 @@ class TestHasPermission(TestCaseForViews):
         self.assert_(self._call_fut(request, PERM_VIEW_PROJECT, project))
 
     def test_non_view_permission_on_public_project_for_anonymous(self):
-        from yait.auth import PERM_ADMIN_PROJECT
+        from yait.auth import PERM_MANAGE_PROJECT
         request = self._make_request()
         project = self._make_project(public=True)
-        self.assert_(not self._call_fut(request, PERM_ADMIN_PROJECT, project))
+        self.assert_(not self._call_fut(request, PERM_MANAGE_PROJECT, project))
 
     def test_view_permission_on_private_project_for_anonymous(self):
         from yait.auth import PERM_VIEW_PROJECT
@@ -52,12 +52,12 @@ class TestHasPermission(TestCaseForViews):
 
     def _test_role(self, login, project, expected):
         # An helper method for all 'test_role_*()' below
-        from yait.auth import PERM_VIEW_PROJECT
+        from yait.auth import PERM_MANAGE_PROJECT
         from yait.auth import PERM_PARTICIPATE_IN_PROJECT
         from yait.auth import PERM_SEE_PRIVATE_TIMING_INFO
-        from yait.auth import PERM_ADMIN_PROJECT
+        from yait.auth import PERM_VIEW_PROJECT
         missing_perms = set(
-            ['view', 'participate', 'see_timing', 'admin_project']
+            ['view', 'participate', 'see_timing', 'manage_project']
             ).difference(expected.keys())
         assert not missing_perms, \
             'The following permissions are not tested: %s' % missing_perms
@@ -66,7 +66,7 @@ class TestHasPermission(TestCaseForViews):
             'view': PERM_VIEW_PROJECT,
             'participate': PERM_PARTICIPATE_IN_PROJECT,
             'see_timing': PERM_SEE_PRIVATE_TIMING_INFO,
-            'admin_project': PERM_ADMIN_PROJECT}.items():
+            'manage_project': PERM_MANAGE_PROJECT}.items():
             allowed = expected[key]
             self.assertEqual(
                 self._call_fut(request, permission, project), allowed)
@@ -78,18 +78,18 @@ class TestHasPermission(TestCaseForViews):
         expected = {'view': True,
                     'participate': True,
                     'see_timing': True,
-                    'admin_project': True}
+                    'manage_project': True}
         self._test_role(login, project, expected)
 
     def test_role_project_admin(self):
-        from yait.auth import ROLE_PROJECT_ADMIN
+        from yait.auth import ROLE_PROJECT_MANAGER
         project = self._make_project()
         login = u'project_admin'
-        self._make_user(login, roles={project: ROLE_PROJECT_ADMIN})
+        self._make_user(login, roles={project: ROLE_PROJECT_MANAGER})
         expected = {'view': True,
                     'participate': True,
                     'see_timing': True,
-                    'admin_project': True}
+                    'manage_project': True}
         self._test_role(login, project, expected)
 
     def test_role_project_internal_participant(self):
@@ -101,7 +101,7 @@ class TestHasPermission(TestCaseForViews):
         expected = {'view': True,
                     'participate': True,
                     'see_timing': True,
-                    'admin_project': False}
+                    'manage_project': False}
         self._test_role(login, project, expected)
 
     def test_role_project_participant(self):
@@ -112,7 +112,7 @@ class TestHasPermission(TestCaseForViews):
         expected = {'view': True,
                     'participate': True,
                     'see_timing': False,
-                    'admin_project': False}
+                    'manage_project': False}
         self._test_role(login, project, expected)
 
     def test_role_project_viewer(self):
@@ -123,7 +123,7 @@ class TestHasPermission(TestCaseForViews):
         expected = {'view': True,
                     'participate': False,
                     'see_timing': False,
-                    'admin_project': False}
+                    'manage_project': False}
         self._test_role(login, project, expected)
 
     def test_no_role(self):
@@ -133,21 +133,21 @@ class TestHasPermission(TestCaseForViews):
         expected = {'view': False,
                     'participate': False,
                     'see_timing': False,
-                    'admin_project': False}
+                    'manage_project': False}
         self._test_role(login, project, expected)
 
     def test_role_in_another_project(self):
-        from yait.auth import PERM_ADMIN_PROJECT
+        from yait.auth import PERM_MANAGE_PROJECT
         project1 = self._make_project(name=u'p1')
         project2 = self._make_project(name=u'p2')
         login = u'user1'
         # give role in project 1
-        self._make_user(login, roles={project1: PERM_ADMIN_PROJECT})
+        self._make_user(login, roles={project1: PERM_MANAGE_PROJECT})
         # but check in project 2
         expected = {'view': False,
                     'participate': False,
                     'see_timing': False,
-                    'admin_project': False}
+                    'manage_project': False}
         self._test_role(login, project2, expected)
 
     def test_cache_site_permissions(self):
@@ -162,13 +162,13 @@ class TestHasPermission(TestCaseForViews):
 
     def test_cache_project_permissions(self):
         from yait.models import Role
-        from yait.auth import PERM_ADMIN_PROJECT
-        from yait.auth import ROLE_PROJECT_ADMIN
+        from yait.auth import PERM_MANAGE_PROJECT
+        from yait.auth import ROLE_PROJECT_MANAGER
         project = self._make_project()
         login = u'user1'
-        self._make_user(login, roles={project: ROLE_PROJECT_ADMIN})
+        self._make_user(login, roles={project: ROLE_PROJECT_MANAGER})
         request = self._make_request(user=login)
-        self.assert_(self._call_fut(request, PERM_ADMIN_PROJECT, project))
+        self.assert_(self._call_fut(request, PERM_MANAGE_PROJECT, project))
         role = self.session.query(Role).one()
         self.session.delete(role)
-        self.assert_(self._call_fut(request, PERM_ADMIN_PROJECT, project))
+        self.assert_(self._call_fut(request, PERM_MANAGE_PROJECT, project))

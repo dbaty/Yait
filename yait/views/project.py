@@ -5,7 +5,7 @@ from pyramid.renderers import render_to_response
 from sqlalchemy.orm.exc import NoResultFound
 
 from yait.auth import has_permission
-from yait.auth import PERM_ADMIN_PROJECT
+from yait.auth import PERM_MANAGE_PROJECT
 from yait.auth import PERM_PARTICIPATE_IN_PROJECT
 from yait.auth import PERM_VIEW_PROJECT
 from yait.models import DBSession
@@ -32,11 +32,11 @@ def home(request):
         raise HTTPForbidden()
     can_participate = has_permission(
         request, PERM_PARTICIPATE_IN_PROJECT, project)
-    can_admin_project = has_permission(request, PERM_ADMIN_PROJECT, project)
+    can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
     bindings = {'api': TemplateAPI(request, project.title),
                 'project': project,
                 'can_participate': can_participate,
-                'can_admin_project': can_admin_project}
+                'can_manage_project': can_manage_project}
     return render_to_response('../templates/project.pt', bindings)
 
 

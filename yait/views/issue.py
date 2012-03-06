@@ -11,7 +11,7 @@ from pyramid.renderers import render_to_response
 from sqlalchemy.orm.exc import NoResultFound
 
 from yait.auth import has_permission
-from yait.auth import PERM_ADMIN_PROJECT
+from yait.auth import PERM_MANAGE_PROJECT
 from yait.auth import PERM_PARTICIPATE_IN_PROJECT
 from yait.auth import PERM_SEE_PRIVATE_TIMING_INFO
 from yait.auth import PERM_VIEW_PROJECT
@@ -128,7 +128,7 @@ def view(request, form=None):
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     can_participate = has_permission(
         request, PERM_PARTICIPATE_IN_PROJECT, project)
-    can_admin_project = has_permission(request, PERM_ADMIN_PROJECT, project)
+    can_admin_project = has_permission(request, PERM_MANAGE_PROJECT, project)
     time_info = issue.get_time_info(include_private_info=can_see_priv)
     bindings = {'api': TemplateAPI(request, issue.title),
                 'project': project,
