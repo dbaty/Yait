@@ -116,7 +116,7 @@ class ExtraFieldset:
     # FIXME: use an auto-complete widget
     parent = TextField(label=u'Parent issue')
     # FIXME: need work on UI
-    children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput())
+    children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput)
 
     def setup(self, project_id):
         self.project_id = project_id

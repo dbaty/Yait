@@ -3,13 +3,16 @@ Yait 0.2
 
 - project control panel : grant a permission to user U:
 
-  User/permission   Administer  View  Participate  See private info
-  ===============   ==========  ====  ===========  ================
-    john.smith          o         o       o               o
+  User/permission   Manage  View  Participate  See private info
+  ===============   ======  ====  ===========  ================
+    john.smith        o       o       o               o
        ...
-   <input field>        o         o       o               o
+   <input field>      o       o       o               o
 
 - remove 'User.login' column. Users will log in with their email address.
+
+- in "control-panel/users/<user_id>/roles", allow admin to change
+  user's roles and add a role in other projects
 
 - complete the 'add issue' form: parent/children
 
@@ -26,8 +29,6 @@ Yait 0.2
 
     But this is too soon to spend time on this, as we have only one
     renderer for now. We should rather find a half-way solution
-
-  - submit buttons are ugly (?)
 
 - relationships between issues : parent/child, requires/is required by
 

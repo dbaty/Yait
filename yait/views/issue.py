@@ -41,11 +41,12 @@ def add_form(request, form=None):
     form.setup_choices()
     can_see_priv = has_permission(
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
+    can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
     bindings = {'api': TemplateAPI(request, _(u'Add issue')),
                 'project': project,
                 'form': form,
                 'can_see_private_time_info': can_see_priv,
-                'can_admin_project': False}
+                'can_manage_project': can_manage_project}
     return render_to_response('../templates/issue_add.pt', bindings)
 
 
@@ -128,7 +129,7 @@ def view(request, form=None):
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     can_participate = has_permission(
         request, PERM_PARTICIPATE_IN_PROJECT, project)
-    can_admin_project = has_permission(request, PERM_MANAGE_PROJECT, project)
+    can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
     time_info = issue.get_time_info(include_private_info=can_see_priv)
     bindings = {'api': TemplateAPI(request, issue.title),
                 'project': project,
@@ -136,8 +137,7 @@ def view(request, form=None):
                 'time_info': time_info,
                 'form': form,
                 'can_participate': can_participate,
-                # FIXME: rename as 'can_manage_project'
-                'can_admin_project': can_admin_project,
+                'can_manage_project': can_manage_project,
                 'can_see_private_time_info': can_see_priv}
     return render_to_response('../templates/issue.pt', bindings)
 

@@ -121,8 +121,7 @@ def list_user_roles(request):
         roles.append((project, _(ROLE_LABELS[role.role])))
     bindings = {'api': TemplateAPI(request, user.fullname),
                 'user': user,
-                'roles': roles,
-                'var': 2}
+                'roles': roles}
     return render_to_response('../templates/user_roles.pt', bindings)
 
 

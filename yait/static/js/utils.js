@@ -1,6 +1,6 @@
 // Toggle extra fieldset in several forms (add/edit issue, add/edit comment)
 function toggleExtraFieldset() {
-    $extra = $('#extra-fieldset');
+    var $extra = $('#extra-fieldset');
     if ($extra.hasClass('hidden')) {
         // scroll to the bottom of the form so that the extra fieldset
         // as well as the submit button are visible.
@@ -48,4 +48,35 @@ function assignIssueTo(user_id) {
             return;
         }
     }
+}
+
+
+// Used in the project configuration page to add a new row in the
+// 'roles' table.
+function addNewUserInProjectConfig() {
+    var $table_body = $('#roles');
+    $template = $($table_body.children()[0]);
+    var row = $template.clone();
+    $(row).removeClass('hidden');
+    $table_body.append(row);
+}
+
+
+// Callback on 'select' event in the project configuration form, when
+// a user is selected to be granted a role.
+function selectNewUserInProjectConfig(selector) {
+    var suffix = '_' + selector.options[selector.selectedIndex].value;
+    var inputs = $(selector).parent().parent().find('input');
+    for (var i = 0; i < inputs.length; i++) {
+        var input = inputs[i];
+        input.name = 'role' + suffix;
+        input.id = input.name;
+    }
+}
+
+
+// Used in the project configuration page to remove a previously added
+// row in the 'roles' table.
+function removeUserInProjectConfig(selector) {
+    $(selector).parents('tr').remove();
 }

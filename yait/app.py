@@ -95,7 +95,10 @@ def make_app(global_settings, **settings):
     config.add_view('.views.project.home', route_name='project_home')
     config.add_route('project_configure', '/p/{project_name}/configure')
     config.add_view('.views.project.configure_form',
-                    route_name='project_configure')
+                    route_name='project_configure', request_method='GET')
+    config.add_route('project_update_roles', '/p/{project_name}/update-roles')
+    config.add_view('.views.project.update_roles',
+                    route_name='project_update_roles', request_method='POST')
     config.add_route('project_search', '/p/{project_name}/search')
     config.add_view('.views.project.search_form', route_name='project_search')
 

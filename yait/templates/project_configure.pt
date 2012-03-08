@@ -1,0 +1,84 @@
+<layout metal:use-macro="api.layout">
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <span class="separator">&rarr;</span>
+    <span tal:replace="project.title">
+  </li>
+</metal:breadcrumbs>
+
+<metal:content metal:fill-slot="content">
+
+<form tal:attributes="action api.route_url('project_update_roles', project_name=project.name)"
+      method="post">
+  <fieldset>
+    <legend>Update roles</legend>
+
+    <table class="listing">
+      <thead>
+        <tr>
+          <th i18n:translate="">User</th>
+          <th tal:repeat="role roles"
+              tal:content="role['label']">
+          </th>
+          <th i18n:translate="">No access</th>
+        </tr>
+      </thead>
+      <tbody id="roles">
+        <tal:comment tal:replace="nothing">This row is a template.</tal:comment>
+        <tal:comment tal:replace="nothing">FIXME: would it be more readable if we used a (client- or server-side) template?</tal:comment>
+        <tr class="hidden">
+          <td>
+            <select name="_ignored_"
+                    onchange="selectNewUserInProjectConfig(this)">
+              <option tal:repeat="user users_with_no_role"
+                      tal:content="user.fullname"
+                      tal:attributes="value user.id"/>
+            </select>
+            <div>
+              (<a href="#" onclick="removeUserInProjectConfig(this)">remove</a>)
+            </div>
+          </td>
+          <td tal:repeat="role roles"
+              class="centered">
+            <input type="radio" name="role"
+                   tal:attributes="value role['id']"/>
+          </td>
+          <td class="centered">
+            <input type="radio"
+                   value="0"
+                   name="role"/>
+          </td>
+        </tr>
+        <tr tal:repeat="user_role user_roles">
+          <td tal:content="user_role['fullname']"/>
+          <td tal:repeat="role roles"
+              class="centered">
+            <input type="radio"
+                   tal:attributes="name 'role_%d' % user_role['user_id'];
+                                   value role['id'];
+                                   checked user_role['role'] == role['id'] and 'checked'"/>
+          </td>
+          <td class="centered">
+            <input type="radio"
+                   value="0"
+                   tal:attributes="name 'role_%d' % user_role['user_id']"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p tal:condition="api.is_admin">
+      <a href="#" onclick="javascript: addNewUserInProjectConfig()"
+         ><img tal:attributes="src api.static_url('static/img/add.png')"
+               width="32" height="32" alt=""></a>
+      <a href="#" onclick="javascript: addNewUserInProjectConfig()"
+         i18n:translate="">
+        Grant role to another user&hellip;</a>
+    </p>
+  </fieldset>
+  <div class="buttons">
+    <button type="submit" class="positive" i18n:translate="">Update roles</button>
+    <a class="cancel" tal:attributes="href api.route_url('project_home', project_name=project.name)">Cancel</a>
+  </div>
+</form>
+</metal:content>
+</layout>
