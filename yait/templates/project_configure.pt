@@ -56,7 +56,8 @@
             <input type="radio"
                    tal:attributes="name 'role_%d' % user_role['user_id'];
                                    value role['id'];
-                                   checked user_role['role'] == role['id'] and 'checked'"/>
+                                   checked user_role['role'] == role['id'] and 'checked';
+                                   disabled user_role['user_id'] == api.request.user.id and 'disabled'"/>
           </td>
           <td class="centered">
             <input type="radio"

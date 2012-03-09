@@ -94,11 +94,13 @@ class TestCaseForViews(TestCase):
             request.matchdict = matchdict
         return request
 
-    def _make_user(self, login, fullname=u'', is_admin=False, roles=None):
+    def _make_user(self, login, fullname=None, is_admin=False, roles=None):
         from yait.models import Role
         from yait.models import User
         if roles is None:
             roles = {}
+        if fullname is None:
+            fullname = login
         user = User(login=login, password=u'secret', fullname=fullname,
                     email=u'', is_admin=is_admin)
         self.session.add(user)

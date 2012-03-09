@@ -214,6 +214,9 @@ class TestEditUser(TestCaseForViews):
         request = self._make_request(user=login, matchdict=matchdict, post=post)
         renderer = self._make_renderer()
         self._call_fut(request)
+        # The 'edit_form' view is called, which creates a TemplateAPI,
+        # which in turns pulls the notification from the session. This
+        # is why we cannot use 'request.get_flash()'.
         self.assertEqual(len(renderer.api.notifications['error']), 1)
         self.assertEqual(len(renderer.api.notifications['success']), 0)
         admin = self.session.query(User).filter_by(login=login).one()

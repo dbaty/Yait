@@ -1,13 +1,7 @@
 Yait 0.2
 ========
 
-- project control panel : grant a permission to user U:
-
-  User/permission   Manage  View  Participate  See private info
-  ===============   ======  ====  ===========  ================
-    john.smith        o       o       o               o
-       ...
-   <input field>      o       o       o               o
+- experiment with CodeMirror (http://codemirror.net/)
 
 - remove 'User.login' column. Users will log in with their email address.
 

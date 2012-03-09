@@ -65,12 +65,19 @@ def configure_form(request):
         user_roles.append({'user_id': user.id,
                            'fullname': user.fullname,
                            'role': role.role})
-    # FIXME: do not include users who already have a role in this project.
-    # FIXME: do not include administrators
-    # FIXME: do not include the logged-in user
-    users_with_no_role = [{'id': 0, 'fullname': _(u'Select a user...')}]
-    for user in session.query(User).order_by(User.fullname):
-        users_with_no_role.append({'id': user.id, 'fullname': user.fullname})
+    if request.user.is_admin:
+        ids_with_role = [u['user_id'] for u in user_roles]
+        users_with_no_role = [{'id': 0, 'fullname': _(u'Select a user...')}]
+        for user in session.query(User).\
+                filter(~User.id.in_(ids_with_role)).\
+                filter_by(is_admin=False).\
+                order_by(User.fullname):
+            users_with_no_role.append({'id': user.id,
+                                       'fullname': user.fullname})
+    else:
+        # Project managers are not allowed to grant a role to users
+        # who do not have a prior role in the project.
+        users_with_no_role = ()
     bindings = {'api': TemplateAPI(request, project.title),
                 'can_manage_project': True,
                 'project': project,
@@ -94,24 +101,25 @@ def update_roles(request):
         current_roles[role.user_id] = role.role
     updated_roles = []
     for field, role_id in request.POST.items():
-        if not field.startswith('role_'):
+        if not field.startswith('role_'):  # pragma: no cover
             continue
         user_id = int(field[1 + field.rfind('_'):])
         if not request.user.is_admin:
             if user_id == request.user.id:
                 # Manager cannot revoke his/her own manager role. This
-                # is not allowed by the UI, hence the bare exception.
+                # is not allowed by the UI but we handle the case
+                # anyway.
                 msg = _(u'You cannot revoke your own manager role.')
-                # FIXME: does forbidden messages appear anywhere in the UI?
-                raise HTTPForbidden(msg)
+                request.session.flash(msg, 'error')
+                return configure_form(request)
             if user_id not in current_roles:
                 # A non-administrator cannot grant a role to a user
                 # who has no prior role in this project. This is not
-                # allowed by the UI, hence the bare exception.
+                # allowed by the UI but we handle the case anyway.
                 msg = _(u'Granting a role to a new user is not allowed '
-                        'because you are not an administrator.')
-                # FIXME: does forbidden messages appear anywhere in the UI?
-                raise HTTPForbidden(msg)
+                        u'because you are not an administrator.')
+                request.session.flash(msg, 'error')
+                return configure_form(request)
         role_id = int(role_id)
         if role_id:
             updated_roles.append(Role(project_id=project.id,
