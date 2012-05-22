@@ -64,4 +64,4 @@ sass:
 
 .PHONY: test
 test:
-	PYTHONWARNINGS=all nosetests
+	PYTHONWARNINGS=all nosetests --with-progressive
