@@ -47,8 +47,8 @@
             <a tal:attributes="href '%s#change-%d' % (api.request.url, change.id)"
                title="permanent link to this comment"
                class="permalink">#</a>
-            Update by <span tal:replace="change.author"/>
-            on <span tal:replace="change.date.strftime('%d %B %Y at %H:%M')"/>
+            Updated by <span tal:replace="change.author_info['fullname']"/>
+            on <span class="date" tal:content="change.date.isoformat()"/>
           </h2>
           <div class="change-text"
                tal:define="change_text change.get_rendered_text()"
@@ -163,7 +163,7 @@
     $(document).ready(function() {
       // prepare date widgets
       Date.format = 'yyyy-mm-dd 18:00';
-      $('.date-pick').datePicker();
+      $('.date-picker').datePicker();
     });
   </script>
   <script tal:condition="form.errors">

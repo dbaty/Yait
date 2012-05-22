@@ -26,8 +26,6 @@ textarea {
 }
 
 .form-row {
-    /* needed because the date picker is floating */
-    clear: left;
     margin-bottom: 1em;
 
     label {
@@ -69,6 +67,17 @@ textarea {
 
 .show-hide-extra-fieldset {
     font-size: 0.8em;
+}
+
+#extra-fieldset {
+    font-size: 0.8em;
+
+    label {
+        display: inline-block;
+        width: 14em;
+        text-align: right;
+        margin-right: 1em;
+    }
 }
 
 #preview-pane {
@@ -121,20 +130,15 @@ textarea {
     }
 }
 
-/* date picker field */
-.date-pick {
-    float: left;
-}
-
 /* date picker widget icon */
 .dp-choose-date {
-    float: left;
     width: 16px;
     height: 16px;
     padding: 0;
-    margin: 5px 3px;
-    display: block;
+    margin-left: 5px;
+    vertical-align: middle;
     text-indent: -2000px;
+    display: inline-block;
     overflow: hidden;
     background: url('../img/calendar.png') no-repeat; 
 }

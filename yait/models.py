@@ -1,5 +1,7 @@
 from cryptacular.bcrypt import BCRYPTPasswordManager
 
+from pyramid.decorator import reify
+
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import create_engine
@@ -60,9 +62,10 @@ ISSUE_STATUS_VALUES = (ISSUE_STATUS_OPEN,
                        u'completed')
 DEFAULT_ISSUE_STATUS = ISSUE_STATUS_OPEN
 
-# FIXME: review this
-RELATIONSHIP_KINDS = (u'is child of',
-                      u'is blocked by')
+RELATIONSHIP_CHILD_OF = 1
+RELATIONSHIP_PARENT_OF = -RELATIONSHIP_CHILD_OF
+RELATIONSHIP_REQUIRES = 2
+RELATIONSHIP_BLOCKS = -RELATIONSHIP_REQUIRES
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
@@ -236,6 +239,17 @@ class Change(Model):
                             'before': before, 'after': after})
         return details
 
+    @reify
+    def author_info(self):
+        # FIXME: we should use a global cache
+        # FIXME: check whether we could not use some kind of
+        # "automatic lazy join" feature from SQLAlchemy
+        # (file:///Users/damien/data/docs/sqlalchemy/0.7.2/orm/loading.html)
+        session = DBSession()
+        fullname = session.query(User).filter_by(id=self.author).one().fullname
+        return {'id': self.author,
+                'fullname': fullname}
+
 
 changes_table = Table(
     'changes',
@@ -248,7 +262,11 @@ changes_table = Table(
     Column('time_spent_public', Integer),
     Column('text', Text),
     Column('text_renderer', String(20)),
-    # FIXME: I think that we do need it to be mutable. To be checked.
+    # FIXME: could be a better idea to store a JSON string instead of
+    # a pickle. (See
+    # file:///Users/damien/data/docs/sqlalchemy/0.7.2/core/types.html#marshal-json-strings
+    # and
+    # file:///Users/damien/data/docs/sqlalchemy/0.7.2/orm/extensions/mutable.html#establishing-mutability-on-scalar-column-values)
     Column('changes', PickleType(mutable=False)))
 
 

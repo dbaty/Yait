@@ -163,8 +163,8 @@ def update(request):
     if not form.validate():
         return view(request, form)
 
-    now = datetime.now()
-    userid = u'damien.baty'  # FIXME
+    now = datetime.utcnow()
+    userid = request.user.id
     changes = {}
     for attr in (
         'status', 'assignee', 'deadline', 'priority', 'kind',
@@ -193,7 +193,8 @@ def update(request):
     change = Change(issue_id=issue.id,
                     author=userid,
                     date=now,
-                    text=form.text.data)
+                    text=form.text.data,
+                    text_renderer=form.text_renderer.data)
     if form.time_spent_real.data and \
             has_permission(request, PERM_SEE_PRIVATE_TIMING_INFO, project):
         change.time_spent_real = form.time_spent_real.data
@@ -203,8 +204,6 @@ def update(request):
         changes['time_spent_public'] = (None, change.time_spent_public)
 
     if not changes and not form.text.data:
-        # FIXME: move this test above before we add 'Change' so we do
-        # not have to rollback anything.
         # FIXME: redisplay update form with an appropriate general
         # error message.
         # FIXME: and rollback changes made on 'issue' and 'change'!
@@ -222,7 +221,7 @@ def update(request):
 
 
 def ajax_render_text(request):
-    """Render reStructuredText (called via AJAX)."""
+    """Render text (called via AJAX)."""
     text = request.GET['text']
     renderer_name = request.GET['text_renderer']
     return {'rendered': render(text, renderer_name)}

@@ -80,3 +80,25 @@ function selectNewUserInProjectConfig(selector) {
 function removeUserInProjectConfig(selector) {
     $(selector).parents('tr').remove();
 }
+
+
+// FIXME: timezone detection does not work well.
+// Replace UTC dates with the user's local timezone.
+// Should be called after the DOM is ready on any page that may show a date.
+function updateDatesWithUserTimezone() {
+    var user_timezone = jstz.determine_timezone();
+    var offset_str = user_timezone.offset();
+    var sign = 1;
+    if (offset_str.substring(0, 1) === '-') {
+        sign = -1;
+    }
+    var hours = parseInt(offset_str.substring(1, offset_str.search(':')), 10);
+    var minutes = parseInt(offset_str.substring(1 + offset_str.search(':')), 10);
+    var offset = 1000 * 60 * sign * (minutes + 60 * hours);  // in ms
+    $('.date').each(function () {
+        var $elm = $(this);
+        var utc = Date.parse($elm.html());
+        var local = utc + offset;
+        $elm.html(new Date(local).toLocaleString());
+    })
+}

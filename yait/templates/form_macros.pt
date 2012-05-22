@@ -98,14 +98,16 @@
           (<a tal:attributes="href 'javascript: assignIssueTo(\'%s\')' % api.request.user.id">me</a>)
         </metal:after-label>
       </metal:field>
-      <metal:field tal:define="field_name 'deadline'; field_options {'class': 'date-pick'}" metal:use-macro="renderField"/>
+      <metal:field tal:define="field_name 'deadline'; field_options {'class': 'date-picker', 'size': 14}" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'priority'" metal:use-macro="renderField"/>
       <metal:field tal:define="field_name 'kind'" metal:use-macro="renderField"/>
     </div>
 
     <div class="floatable-form-panel last-floatable-form-panel"
          tal:define="show_private_timing_info can_see_private_time_info;
-                     show_public_timing_info True or 'FIXME: should be configurable per project'"
+                     show_public_timing_info True or 'FIXME: should be configurable per project';
+
+                     field_options {'size': 6}"
          tal:condition="show_public_timing_info or show_private_timing_info">
       <tal:if tal:condition="show_private_timing_info">
         <metal:field tal:define="field_name 'time_estimated'"
@@ -123,8 +125,6 @@
         <metal:field tal:define="field_name 'time_spent_public'"
                      metal:use-macro="renderField"/>
       </tal:if>
-      <metal:field tal:define="field_name 'parent'" metal:use-macro="renderField"/>
-      <metal:field tal:define="field_name 'children'" metal:use-macro="renderField"/>
     </div>
   </fieldset>
 </metal:issue-extra-fieldset>
