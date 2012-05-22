@@ -45,11 +45,29 @@
   Parameters: none
 </tal:comment>
 <metal:issue-text-field metal:define-macro="issue-text-field">
-  <metal:field tal:define="field_name 'text_renderer'"
-               metal:use-macro="renderField"/>
   <metal:field tal:define="field_name 'text';
                            field_options {'rows': 10, 'cols': 80}"
                metal:use-macro="renderField">
+    <metal:after-label metal:fill-slot="after-label">
+      <input type="hidden" id="text_renderer" name="text_renderer"
+             tal:attributes="value form.text_renderer.data"/>
+      <span class="dropdown text-renderer-dropdown"
+            tal:define="choices list(form.text_renderer.iter_choices())">
+        using
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+          <span tal:content="[r for r in choices if r[2]][0][1]"
+                id="selected_text_renderer"/>
+          <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu">
+          <li tal:repeat="renderer choices"
+              tal:attributes="id python: 'renderer-%s' % renderer[0]">
+            <a tal:attributes="href 'javascript:selectTextRenderer(\'%s\', \'%s\')' % (renderer[0], renderer[1])"
+               tal:content="renderer[1]"/>
+          </li>
+        </ul>
+      </span>
+    </metal:after-label>
     <metal:before-input metal:fill-slot="before-input">
       <a class="preview-button"
          title="preview comment"
@@ -125,7 +143,7 @@
         </tal:if>
       </div>
     </fieldset>
-    <fieldset tal:condition="python: False and 'FIXME: relationships-related fields below'">
+    <fieldset tal:condition="False and 'FIXME: relationships-related fields below'">
     </fieldset>
   </div>
 </metal:issue-extra-fieldsets>

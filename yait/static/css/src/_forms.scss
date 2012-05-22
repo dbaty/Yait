@@ -130,6 +130,24 @@ textarea {
     }
 }
 
+#text_renderer {
+    font-size: 0.8em;
+}
+
+.text-renderer-dropdown {
+    margin-left: 2em;
+    font-size: 0.8em;
+
+    .dropdown-menu {
+        background-color: white;
+
+        a:hover {
+            font-weight: normal;
+            text-decoration: underline;
+        }
+    }
+}
+
 /* date picker widget icon */
 .dp-choose-date {
     width: 16px;

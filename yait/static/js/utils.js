@@ -38,6 +38,22 @@ function togglePreviewPane(url) {
 }
 
 
+// Callback for the renderer selection widget.
+// Used in the add issue/comment forms.
+function selectTextRenderer(value, label) {
+    var field = document.getElementById('text_renderer');
+    field.value = value;
+    var dropdown = document.getElementById('selected_text_renderer');
+    dropdown.innerHTML = label;
+    // FIXME (future): if the preview pane is displayed, resend the
+    // request with the newly selected renderer. It should just be a
+    // matter of faking a click on the preview button, but the
+    // following code does not seem to work.
+    var preview_button = document.getElementsByClassName('preview-button')[0];
+    $(preview_button).click();
+}
+
+
 // Used in the add issue/comment forms to assign the issue to the
 // logged-in user.
 function assignIssueTo(user_id) {

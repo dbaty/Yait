@@ -140,7 +140,7 @@ class ExtraFieldset:
 def text_renderer_field_factory():
     return SelectField(label=u'Text format',
                        choices=(('rest', 'reStructuredText'), 
-                                ('plain', 'Plain text')),
+                                ('plain', 'plain text')),
                        default='rest',
                        validators=[required()])
 
