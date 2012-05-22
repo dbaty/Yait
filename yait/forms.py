@@ -94,7 +94,6 @@ class ExtraFieldset:
         default=DEFAULT_ISSUE_STATUS,
         validators=[required()])
     assignee = SelectField(label=u'Assign issue to', coerce=int_or_none)
-    ## FIXME: need a specific field or widget for time-related fields
     time_estimated = TimeInfoField(label=u'Estimated time (internal)')
     time_billed = TimeInfoField(label=u'Time billed')
     time_spent_real = TimeInfoField(label=u'Time spent (real, internal)')
@@ -113,10 +112,6 @@ class ExtraFieldset:
         choices=zip(ISSUE_KIND_VALUES, ISSUE_KIND_LABELS),
         default=DEFAULT_ISSUE_KIND,
         validators=[required()])
-    # FIXME: use an auto-complete widget
-    parent = TextField(label=u'Parent issue')
-    # FIXME: need work on UI
-    children = SelectMultipleField(u'Child issue(s)', widget=CheckboxInput)
 
     def setup(self, project_id):
         self.project_id = project_id
@@ -144,7 +139,8 @@ class ExtraFieldset:
 
 def text_renderer_field_factory():
     return SelectField(label=u'Text format',
-                       choices=(('rest', 'reStructuredText'), ),
+                       choices=(('rest', 'reStructuredText'), 
+                                ('plain', 'Plain text')),
                        default='rest',
                        validators=[required()])
 
@@ -188,4 +184,4 @@ class EditUserForm(AddUserForm):
     # FIXME: check that login is the current login of the user, or a
     # valid login
     # FIXME: check that e-mail address is the current address of the
-    # user, of a valid e-mail.
+    # user, or a valid e-mail.

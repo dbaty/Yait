@@ -1,5 +1,8 @@
 """Text-related utilities."""
 
+import re
+
+
 RENDERERS = {}
 try:
     import docutils  # pyflakes: ignore
@@ -16,6 +19,23 @@ def render(src, renderer_name='rest'):
         # FIXME: log error
         return src
     return renderer(src)
+
+
+PARAGRAPHS_SEPARATOR = re.compile('\n\n')
+
+def render_plain(text):
+    """Render the given ``text`` as plain text.
+
+    Single lines are separated by ``<br/>`` tags. When an empty line
+    is found, a paragraph (``<p>``) is generated.
+    """
+    text = text.replace('\r', '')
+    paragraphs = PARAGRAPHS_SEPARATOR.split(text)
+    text = ''.join(['<p>%s</p>' % p for p in paragraphs if p])
+    text = text.replace('\n', '<br/>')
+    return text
+
+RENDERERS['plain'] = render_plain
 
 
 if RENDERERS['rest']:
