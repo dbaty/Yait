@@ -32,6 +32,7 @@
     <tr>
       <th i18n:translate="">Project</th>
       <th i18n:translate="">Role</th>
+      <th i18n:translate="">Configure</th>
     </tr>
   </thead>
   <tbody>
@@ -42,6 +43,9 @@
            tal:attributes="href api.route_url('project_home', project_name=project.name)"/>
       </td>
       <td tal:content="role_info[1]"/>
+      <td class="centered">
+        <a tal:attributes="href api.route_url('project_configure', project_name=role_info[0].name)">configure</a>
+      </td>
     </tr>
   </tbody>
 </table>

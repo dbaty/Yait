@@ -79,11 +79,11 @@
       <fieldset>
         <legend>Comment or update issue</legend>
         <metal:issue-text-field metal:use-macro="api.form_macros['issue-text-field']"/>
-        <metal:link-extra-fieldset metal:use-macro="api.form_macros['link-extra-fieldset']"/>
+        <metal:link-extra-fieldset metal:use-macro="api.form_macros['link-extra-fieldsets']"/>
       </fieldset>
 
       <metal:issue-extra-fieldset
-         metal:use-macro="api.form_macros['issue-extra-fieldset']"/>
+         metal:use-macro="api.form_macros['issue-extra-fieldsets']"/>
 
       <div class="buttons">
         <button type="submit" class="positive" i18n:translate="">Update</button>

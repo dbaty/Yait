@@ -24,6 +24,7 @@
     <tr>
       <th>Name</th>
       <th>Title</th>
+      <th>Configure</th>
       <th>Delete</th>
     </tr>
   </thead>
@@ -35,6 +36,9 @@
              tal:attributes="href api.route_url('project_home', project_name=project.name)"/>
       </td>
       <td tal:content="project.title"/>
+      <td class="centered">
+        <a tal:attributes="href api.route_url('project_configure', project_name=project.name)">configure</a>
+      </td>
       <td class="centered">
         <form class="ninja"
               tal:attributes="action api.route_url('project_delete')"

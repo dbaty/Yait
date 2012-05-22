@@ -21,11 +21,11 @@
                              field_options {'size': 60}"
                  metal:use-macro="renderField"/>
     <metal:issue-text-field metal:use-macro="api.form_macros['issue-text-field']"/>
-    <metal:link-extra-fieldset metal:use-macro="api.form_macros['link-extra-fieldset']"/>
+    <metal:link-extra-fieldsets metal:use-macro="api.form_macros['link-extra-fieldsets']"/>
   </fieldset>
 
-  <metal:issue-extra-fieldset
-     metal:use-macro="api.form_macros['issue-extra-fieldset']"/>
+  <metal:issue-extra-fieldsets
+     metal:use-macro="api.form_macros['issue-extra-fieldsets']"/>
 
   <div class="buttons">
     <button type="submit" class="positive">Add issue</button>

@@ -2,7 +2,7 @@
   This template defines several macros used in various forms:
   - renderField
   - issue-text-field
-  - issue-extra-fieldset
+  - issue-extra-fieldsets
 </tal:comment>
 
 
@@ -73,58 +73,59 @@
   Name: link-extra-fieldset
   Description: display 'show/hide extra...' link
 </tal:comment>
-<metal:link-extra-fieldset metal:define-macro="link-extra-fieldset">
-  <div class="show-hide-extra-fieldset">
-    <a href="javascript: toggleExtraFieldset()">show/hide extra&hellip;</a>
+<metal:link-extra-fieldsets metal:define-macro="link-extra-fieldsets">
+  <div class="show-hide-extra-fieldsets">
+    <a href="javascript: toggleExtraFieldsets()">show/hide extra&hellip;</a>
   </div>
-</metal:link-extra-fieldset>
+</metal:link-extra-fieldsets>
 
 
 
 <tal:comment tal:replace="None">
-  Name: issue-extra-fieldset
-  Description: display the "extra" fieldset in the issue add/update forms.
+  Name: issue-extra-fieldsets
+  Description: display the "extra" fieldsets in the issue add/update forms.
   Parameters: none
 </tal:comment>
-<metal:issue-extra-fieldset metal:define-macro="issue-extra-fieldset">
-  <fieldset id="extra-fieldset"
-            tal:attributes="class not form.errors and 'hidden' or ''">
+<metal:issue-extra-fieldsets metal:define-macro="issue-extra-fieldsets">
+  <div id="extra-fieldsets"
+       tal:attributes="class not form.errors and 'hidden' or ''">
+    <fieldset>
+      <div class="floatable-form-panel">
+        <metal:field tal:define="field_name 'status'" metal:use-macro="renderField"/>
+        <metal:field tal:define="field_name 'assignee'" metal:use-macro="renderField">
+          <metal:after-label metal:fill-slot="after-label">
+            (<a tal:attributes="href 'javascript: assignIssueTo(\'%s\')' % api.request.user.id">me</a>)
+          </metal:after-label>
+        </metal:field>
+        <metal:field tal:define="field_name 'deadline'; field_options {'class': 'date-picker', 'size': 14}" metal:use-macro="renderField"/>
+        <metal:field tal:define="field_name 'priority'" metal:use-macro="renderField"/>
+        <metal:field tal:define="field_name 'kind'" metal:use-macro="renderField"/>
+      </div>
 
-    <div class="floatable-form-panel">
-
-      <metal:field tal:define="field_name 'status'" metal:use-macro="renderField"/>
-      <metal:field tal:define="field_name 'assignee'" metal:use-macro="renderField">
-        <metal:after-label metal:fill-slot="after-label">
-          (<a tal:attributes="href 'javascript: assignIssueTo(\'%s\')' % api.request.user.id">me</a>)
-        </metal:after-label>
-      </metal:field>
-      <metal:field tal:define="field_name 'deadline'; field_options {'class': 'date-picker', 'size': 14}" metal:use-macro="renderField"/>
-      <metal:field tal:define="field_name 'priority'" metal:use-macro="renderField"/>
-      <metal:field tal:define="field_name 'kind'" metal:use-macro="renderField"/>
-    </div>
-
-    <div class="floatable-form-panel last-floatable-form-panel"
-         tal:define="show_private_timing_info can_see_private_time_info;
-                     show_public_timing_info True or 'FIXME: should be configurable per project';
-
-                     field_options {'size': 6}"
-         tal:condition="show_public_timing_info or show_private_timing_info">
-      <tal:if tal:condition="show_private_timing_info">
-        <metal:field tal:define="field_name 'time_estimated'"
-                     metal:use-macro="renderField"/>
-      </tal:if>
-      <tal:if tal:condition="show_public_timing_info">
-        <metal:field tal:define="field_name 'time_billed'"
-                     metal:use-macro="renderField"/>
-      </tal:if>
-      <tal:if tal:condition="show_private_timing_info">
-        <metal:field tal:define="field_name 'time_spent_real'"
-                     metal:use-macro="renderField"/>
-      </tal:if>
-      <tal:if tal:condition="show_public_timing_info">
-        <metal:field tal:define="field_name 'time_spent_public'"
-                     metal:use-macro="renderField"/>
-      </tal:if>
-    </div>
-  </fieldset>
-</metal:issue-extra-fieldset>
+      <div class="floatable-form-panel last-floatable-form-panel"
+           tal:define="show_private_timing_info can_see_private_time_info;
+                       show_public_timing_info True or 'FIXME: should be configurable per project';
+                       field_options {'size': 6}"
+           tal:condition="show_public_timing_info or show_private_timing_info">
+        <tal:if tal:condition="show_private_timing_info">
+          <metal:field tal:define="field_name 'time_estimated'"
+                       metal:use-macro="renderField"/>
+        </tal:if>
+        <tal:if tal:condition="show_public_timing_info">
+          <metal:field tal:define="field_name 'time_billed'"
+                       metal:use-macro="renderField"/>
+        </tal:if>
+        <tal:if tal:condition="show_private_timing_info">
+          <metal:field tal:define="field_name 'time_spent_real'"
+                       metal:use-macro="renderField"/>
+        </tal:if>
+        <tal:if tal:condition="show_public_timing_info">
+          <metal:field tal:define="field_name 'time_spent_public'"
+                       metal:use-macro="renderField"/>
+        </tal:if>
+      </div>
+    </fieldset>
+    <fieldset tal:condition="python: False and 'FIXME: relationships-related fields below'">
+    </fieldset>
+  </div>
+</metal:issue-extra-fieldsets>
