@@ -100,6 +100,7 @@ class TestAddIssue(TestCaseForViews):
         self.assertEqual(change.changes, {})
 
     def test_add_issue_check_references(self):
+        # Check the references of issues (#1, #2, and so on).
         from yait.auth import ROLE_PROJECT_PARTICIPANT
         from yait.models import Project
         p1 = self._make_project(name=u'p1')
@@ -132,6 +133,45 @@ class TestAddIssue(TestCaseForViews):
                                      matchdict=matchdict)
         self._call_fut(request)
         self.assertEqual(p1.issues[1].ref, 2)
+
+    def test_assign_to_participant(self):
+        # Check that one can assign an issue to a participant of the
+        # project.
+        from yait.auth import ROLE_PROJECT_PARTICIPANT
+        p = self._make_project(name=u'p')
+        login = u'user1'
+        self._make_user(login, roles={p: ROLE_PROJECT_PARTICIPANT})
+        another_user = self._make_user(u'user2',
+                                       roles={p: ROLE_PROJECT_PARTICIPANT})
+        post = {'title': u't',
+                'text': u't',
+                'assignee': unicode(another_user.id)}
+        matchdict = {'project_name': u'p'}
+        request = self._make_request(user=login, post=post,
+                                     matchdict=matchdict)
+        self._call_fut(request)
+        self.assertEqual(len(p.issues), 1)
+
+    def test_cannot_assign_to_not_participant(self):
+        # Check that one cannot assign an issue to a user who is not a
+        # participant in the project. This is not possible through the
+        # web UI but may be tried nonetheless. If this succeeded, then
+        # anyone could see the full name of any user of the whole site.
+        from yait.auth import ROLE_PROJECT_PARTICIPANT
+        p = self._make_project(name=u'p')
+        login = u'user1'
+        self._make_user(login, roles={p: ROLE_PROJECT_PARTICIPANT})
+        another_user = self._make_user(u'user2')
+        post = {'title': u't',
+                'text': u't',
+                'assignee': unicode(another_user.id)}
+        matchdict = {'project_name': u'p'}
+        request = self._make_request(user=login, post=post,
+                                     matchdict=matchdict)
+        renderer = self._make_renderer()
+        self._call_fut(request)
+        self.assertEqual(renderer.form.errors.keys(), ['assignee'])
+        self.assertEqual(len(p.issues), 0)
 
 
 class TestViewIssue(TestCaseForViews):
