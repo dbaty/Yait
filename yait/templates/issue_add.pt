@@ -33,4 +33,17 @@
 </form>
 
 </metal:content>
+
+<metal:scripts metal:fill-slot="scripts">
+  <script tal:attributes="src api.static_url('static/js/date.min.js')"></script>
+  <script tal:attributes="src api.static_url('static/js/jquery.datePicker.min.js')"></script>
+  <script>
+    $(document).ready(function() {
+      // prepare date widgets
+      Date.format = 'yyyy-mm-dd 18:00';
+      $('.date-picker').datePicker();
+    });
+  </script>
+</metal:scripts>
+
 </layout>

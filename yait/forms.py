@@ -1,14 +1,14 @@
+from webob.multidict import MultiDict
+
 from wtforms.fields import BooleanField
 from wtforms.fields import DateTimeField
 from wtforms.fields import SelectField
-from wtforms.fields import SelectMultipleField
 from wtforms.fields import TextAreaField
 from wtforms.fields import TextField
 from wtforms.form import Form
 from wtforms.validators import optional
 from wtforms.validators import required
 from wtforms.validators import ValidationError
-from wtforms.widgets import CheckboxInput
 from wtforms.widgets import PasswordInput
 
 from yait.auth import ROLE_PROJECT_MANAGER
@@ -23,12 +23,17 @@ from yait.models import ISSUE_KIND_LABELS
 from yait.models import ISSUE_KIND_VALUES
 from yait.models import ISSUE_PRIORITY_LABELS
 from yait.models import ISSUE_PRIORITY_VALUES
-from yait.models import ISSUE_STATUS_VALUES
+from yait.models import ISSUE_STATUS_CLOSED
+from yait.models import ISSUE_STATUS_OPEN
 from yait.models import Project
 from yait.models import Role
 from yait.models import User
 from yait.utils import str_to_time
 from yait.utils import time_to_str
+
+
+ISSUE_STATUSES = ((ISSUE_STATUS_OPEN, _('open')),
+                  (ISSUE_STATUS_CLOSED, _('closed')))
 
 
 def int_or_none(value):
@@ -94,9 +99,10 @@ class ExtraFieldset:
     """
     status = SelectField(
         label=u'Status',
-        choices=zip(ISSUE_STATUS_VALUES, ISSUE_STATUS_VALUES),
+        choices=ISSUE_STATUSES,
         default=DEFAULT_ISSUE_STATUS,
-        validators=[required()])
+        validators=[required()],
+        coerce=int)
     assignee = SelectField(label=u'Assign issue to', coerce=int_or_none)
     time_estimated = TimeInfoField(label=u'Estimated time (internal)')
     time_billed = TimeInfoField(label=u'Time billed')
@@ -117,26 +123,25 @@ class ExtraFieldset:
         default=DEFAULT_ISSUE_KIND,
         validators=[required()])
 
-    def setup(self, project_id):
+    def setup(self, project_id, db_session):
         self.project_id = project_id
-        self.setup_choices()
+        self.setup_choices(db_session)
 
-    def setup_choices(self):
+    def setup_choices(self, db_session):
         choices = [('', _(u'Nobody'))]
-        choices += self._get_possible_assignees()
+        choices += self._get_possible_assignees(db_session)
         self.assignee.choices = choices
 
-    def _get_possible_assignees(self):
+    def _get_possible_assignees(self, db_session):
         """Return tuples of users that are allowed to participate in
         the project.
         """
-        session = DBSession()
-        res = session.query(User).join(Role).filter(
+        res = db_session.query(User).join(Role).filter(
             Role.project_id==self.project_id,
             Role.role.in_((ROLE_PROJECT_MANAGER,
                            ROLE_PROJECT_PARTICIPANT,
                            ROLE_PROJECT_INTERNAL_PARTICIPANT)))
-        res = res.union(session.query(User).filter_by(is_admin=True))
+        res = res.union(db_session.query(User).filter_by(is_admin=True))
         res = res.order_by(User.fullname)
         return [(user.id, user.fullname) for user in res]
 
@@ -189,3 +194,15 @@ class EditUserForm(AddUserForm):
     # valid login
     # FIXME: check that e-mail address is the current address of the
     # user, or a valid e-mail.
+
+
+def make_add_issue_form(project_id, db_session, post=None):
+    form = AddIssueForm(post)
+    form.setup(project_id, db_session)
+    return form
+
+
+def make_add_change_form(project_id, db_session, post=None, **kwargs):
+    form = AddChangeForm(post, **kwargs)
+    form.setup(project_id, db_session)
+    return form

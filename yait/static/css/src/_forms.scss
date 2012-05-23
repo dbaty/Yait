@@ -54,7 +54,7 @@ textarea {
 }
 
 .floatable-form-panel { /* FIXME: review */
-    width: 45%;
+    width: 46%;
     float: left;
     border-right: 1px solid #ccc;
     padding-right: 1em;
@@ -135,8 +135,11 @@ textarea {
 }
 
 .text-renderer-dropdown {
-    margin-left: 2em;
     font-size: 0.8em;
+    margin-left: 1em;
+    padding-left: 1em;
+    border-left: 1px solid #ccc;
+    font-weight: normal;
 
     .dropdown-menu {
         background-color: white;

@@ -15,8 +15,8 @@ from yait.auth import PERM_MANAGE_PROJECT
 from yait.auth import PERM_PARTICIPATE_IN_PROJECT
 from yait.auth import PERM_SEE_PRIVATE_TIMING_INFO
 from yait.auth import PERM_VIEW_PROJECT
-from yait.forms import AddChangeForm
-from yait.forms import AddIssueForm
+from yait.forms import make_add_change_form
+from yait.forms import make_add_issue_form
 from yait.i18n import _
 from yait.models import Change
 from yait.models import DBSession
@@ -36,9 +36,7 @@ def add_form(request, form=None):
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         raise HTTPForbidden()
     if form is None:
-        form = AddIssueForm()
-        form.setup(project_id=project.id)
-    form.setup_choices()
+        form = make_add_issue_form(project.id, session)
     can_see_priv = has_permission(
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
@@ -59,8 +57,7 @@ def add(request):
         raise HTTPNotFound()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         raise HTTPForbidden()
-    form = AddIssueForm(request.POST)
-    form.setup(project_id=project.id)
+    form = make_add_issue_form(project.id, session, request.POST)
     if not form.validate():
         return add_form(request, form)
 
@@ -77,6 +74,11 @@ def add(request):
                   date_edited=now,
                   reporter=reporter,
                   ref=ref)
+    # FIXME: work around WTForms behaviour (bug?) that stores an empty
+    # string if the HTML DateTimeField is left empty. We would rather
+    # store None.
+    if form.deadline.data == '':
+        form.deadline.data = None
     form.populate_obj(issue)
     session.add(issue)
     session.flush()
@@ -113,18 +115,17 @@ def view(request, form=None):
     except NoResultFound:
         raise HTTPNotFound()
     if form is None:
-        form = AddChangeForm(assignee=issue.assignee,
-                             children=issue.get_children(),
-                             deadline=issue.deadline,
-                             kind=issue.kind,
-                             parent=issue.get_parent(),
-                             priority=issue.priority,
-                             status=issue.status,
-                             time_estimated=issue.time_estimated,
-                             time_billed=issue.time_billed,
-                             title=issue.title)
-        form.setup(project_id=project.id)
-    form.setup_choices()
+        data = {'assignee': issue.assignee,
+                'children': issue.get_children(),
+                'deadline': issue.deadline,
+                'kind': issue.kind,
+                'parent': issue.get_parent(),
+                'priority': issue.priority,
+                'status': issue.status,
+                'time_estimated': issue.time_estimated,
+                'time_billed': issue.time_billed,
+                'title': issue.title}
+        form = make_add_change_form(project.id, session, **data)
     can_see_priv = has_permission(
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     can_participate = has_permission(
@@ -158,8 +159,7 @@ def update(request):
     except NoResultFound:
         raise HTTPNotFound()
 
-    form = AddChangeForm(request.POST)
-    form.setup(project_id=project.id)
+    form = make_add_change_form(project.id, session, request.POST)
     if not form.validate():
         return view(request, form)
 

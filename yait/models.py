@@ -53,13 +53,8 @@ ISSUE_PRIORITY_VALUES = (ISSUE_PRIORITY_LOW,
 ISSUE_PRIORITY_LABELS = (u'low', u'medium', u'high', u'critical')
 DEFAULT_ISSUE_PRIORITY = ISSUE_PRIORITY_MEDIUM
 
-ISSUE_STATUS_OPEN = u'open'
-ISSUE_STATUS_PARENT = u'parent'
-ISSUE_STATUS_VALUES = (ISSUE_STATUS_OPEN,
-                       ISSUE_STATUS_PARENT,
-                       u'in progress',
-                       u'on hold',
-                       u'completed')
+ISSUE_STATUS_OPEN = 1
+ISSUE_STATUS_CLOSED = 2
 DEFAULT_ISSUE_STATUS = ISSUE_STATUS_OPEN
 
 RELATIONSHIP_CHILD_OF = 1
@@ -181,7 +176,7 @@ issues_table = Table(
     Column('assignee', Integer, ForeignKey('users.id')),
     Column('kind', Integer),  # FIXME: should be an Enum
     Column('priority', Integer),  # FIXME: should be an Enum
-    Column('status', Unicode),
+    Column('status', Integer),
     # FIXME: is 'resolution' useful?
     # Update 1: Yes, it's useful.
     # Update2: ok, perhaps it's useful, but there is no UI
