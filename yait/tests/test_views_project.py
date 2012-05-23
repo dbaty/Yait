@@ -42,13 +42,13 @@ class TestProjectHome(TestCaseForViews):
         renderer.assert_(project=p)
 
 
-class TestProjectConfigure(TestCaseForViews):
+class TestProjectConfigureRolesForm(TestCaseForViews):
 
-    template_under_test = '../templates/project_configure.pt'
+    template_under_test = '../templates/project_roles.pt'
 
     def _call_fut(self, request):
-        from yait.views.project import configure_form
-        return configure_form(request)
+        from yait.views.project import configure_roles_form
+        return configure_roles_form(request)
 
     def test_project_config_form_unknown_project(self):
         from pyramid.httpexceptions import HTTPNotFound
@@ -117,13 +117,13 @@ class TestProjectConfigure(TestCaseForViews):
         self.assertEqual(renderer.users_with_no_role, users_with_no_role)
 
 
-class TestUpdateRoles(TestCaseForViews):
+class TestProjectConfigureRoles(TestCaseForViews):
 
-    template_under_test = '../templates/project_configure.pt'
+    template_under_test = '../templates/project_roles.pt'
 
     def _call_fut(self, request):
-        from yait.views.project import update_roles
-        return update_roles(request)
+        from yait.views.project import configure_roles
+        return configure_roles(request)
 
     def test_project_update_roles_unknown_project(self):
         from pyramid.httpexceptions import HTTPNotFound

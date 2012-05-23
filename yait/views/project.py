@@ -46,6 +46,15 @@ def home(request):
 
 
 def configure_form(request):
+    pass  # FIXME: main configuration page, with general features
+          # (title, private or public project, etc.)
+
+
+def configure(request):
+    pass  # FIXME
+
+
+def configure_roles_form(request):
     project_name = request.matchdict['project_name']
     session = DBSession()
     try:
@@ -68,8 +77,15 @@ def configure_form(request):
     if request.user.is_admin:
         ids_with_role = [u['user_id'] for u in user_roles]
         users_with_no_role = [{'id': 0, 'fullname': _(u'Select a user...')}]
+        # 'ids_with_role' may be empty. SQLAlchemy informs us in this
+        # case that
+        #     the IN-predicate on "users.id" was invoked with an empty
+        #     sequence. This results in a contradiction, which
+        #     nonetheless can be expensive to evaluate.
+        # Hence the construction of a tuple that contains at least -1 (an
+        # impossible user id).
         for user in session.query(User).\
-                filter(~User.id.in_(ids_with_role)).\
+                filter(~User.id.in_((-1, ) + tuple(ids_with_role))).\
                 filter_by(is_admin=False).\
                 order_by(User.fullname):
             users_with_no_role.append({'id': user.id,
@@ -84,10 +100,10 @@ def configure_form(request):
                 'roles': roles,
                 'user_roles': user_roles,
                 'users_with_no_role': users_with_no_role}
-    return render_to_response('../templates/project_configure.pt', bindings)
+    return render_to_response('../templates/project_roles.pt', bindings)
 
 
-def update_roles(request):
+def configure_roles(request):
     project_name = request.matchdict['project_name']
     session = DBSession()
     try:
@@ -111,7 +127,7 @@ def update_roles(request):
                 # anyway.
                 msg = _(u'You cannot revoke your own manager role.')
                 request.session.flash(msg, 'error')
-                return configure_form(request)
+                return configure_roles_form(request)
             if user_id not in current_roles:
                 # A non-administrator cannot grant a role to a user
                 # who has no prior role in this project. This is not
@@ -119,7 +135,7 @@ def update_roles(request):
                 msg = _(u'Granting a role to a new user is not allowed '
                         u'because you are not an administrator.')
                 request.session.flash(msg, 'error')
-                return configure_form(request)
+                return configure_roles_form(request)
         role_id = int(role_id)
         if role_id:
             updated_roles.append(Role(project_id=project.id,
@@ -128,7 +144,8 @@ def update_roles(request):
     session.query(Role).filter_by(project_id=project.id).delete()
     session.add_all(updated_roles)
     request.session.flash(_(u'Roles have been updated'), 'success')
-    location = request.route_url('project_configure', project_name=project.name)
+    location = request.route_url('project_configure_roles',
+                                 project_name=project.name)
     return HTTPSeeOther(location=location)
 
 

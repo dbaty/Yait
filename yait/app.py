@@ -96,9 +96,12 @@ def make_app(global_settings, **settings):
     config.add_route('project_configure', '/p/{project_name}/configure')
     config.add_view('.views.project.configure_form',
                     route_name='project_configure', request_method='GET')
-    config.add_route('project_update_roles', '/p/{project_name}/update-roles')
-    config.add_view('.views.project.update_roles',
-                    route_name='project_update_roles', request_method='POST')
+    config.add_route('project_configure_roles',
+                     '/p/{project_name}/configure-roles')
+    config.add_view('.views.project.configure_roles_form',
+                    route_name='project_configure_roles', request_method='GET')
+    config.add_view('.views.project.configure_roles',
+                    route_name='project_configure_roles', request_method='POST')
     config.add_route('project_search', '/p/{project_name}/search')
     config.add_view('.views.project.search_form', route_name='project_search')
 

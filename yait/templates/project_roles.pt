@@ -8,7 +8,7 @@
 
 <metal:content metal:fill-slot="content">
 
-<form tal:attributes="action api.route_url('project_update_roles', project_name=project.name)"
+<form tal:attributes="action api.route_url('project_configure_roles', project_name=project.name)"
       method="post">
   <fieldset>
     <legend>Update roles</legend>
