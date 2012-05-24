@@ -155,6 +155,10 @@
         border-top: 0;
         border-bottom: 0;
         background-color: #f7f7f7;
+
+        .literal-block {
+            overflow: auto;
+        }
     }
 
     .change-text:last-child {
