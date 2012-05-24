@@ -36,7 +36,7 @@ def add_form(request, form=None):
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         raise HTTPForbidden()
     if form is None:
-        form = make_add_issue_form(project.id, session)
+        form = make_add_issue_form(project, session)
     can_see_priv = has_permission(
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
@@ -57,7 +57,7 @@ def add(request):
         raise HTTPNotFound()
     if not has_permission(request, PERM_PARTICIPATE_IN_PROJECT, project):
         raise HTTPForbidden()
-    form = make_add_issue_form(project.id, session, request.POST)
+    form = make_add_issue_form(project, session, request.POST)
     if not form.validate():
         return add_form(request, form)
 
@@ -77,6 +77,7 @@ def add(request):
     # FIXME: work around WTForms behaviour (bug?) that stores an empty
     # string if the HTML DateTimeField is left empty. We would rather
     # store None.
+    # FIXME: is this still needed?
     if form.deadline.data == '':
         form.deadline.data = None
     form.populate_obj(issue)
@@ -125,7 +126,7 @@ def view(request, form=None):
                 'time_estimated': issue.time_estimated,
                 'time_billed': issue.time_billed,
                 'title': issue.title}
-        form = make_add_change_form(project.id, session, **data)
+        form = make_add_change_form(project, session, **data)
     can_see_priv = has_permission(
         request, PERM_SEE_PRIVATE_TIMING_INFO, project)
     can_participate = has_permission(
@@ -159,7 +160,7 @@ def update(request):
     except NoResultFound:
         raise HTTPNotFound()
 
-    form = make_add_change_form(project.id, session, request.POST)
+    form = make_add_change_form(project, session, request.POST)
     if not form.validate():
         return view(request, form)
 
@@ -211,7 +212,7 @@ def update(request):
 
     change.changes = changes
     session.add(change)
-    session.flush()
+    session.flush()  # FIXME: why do we need to flush?
     route_args = {'project_name': project_name,
                   'issue_ref': issue.ref,
                   '_query': {'issue_updated': 1},

@@ -1,18 +1,14 @@
-<layout metal:use-macro="api.layout">
-<metal:content metal:fill-slot="content">
+<layout tal:define="master load: project_configure_macros.pt;
+                    current_config_page python: 'general'"
+        metal:use-macro="master">
+<metal:content metal:fill-slot="configuration-content">
 
-<form method="post"
+<form tal:attributes="action api.route_url('project_configure', project_name=project.name)"
       tal:define="renderField api.form_macros['renderField'];
                   field_options {}"
-      tal:attributes="action api.route_url('project_add')">
+      method="post">
 
   <fieldset>
-    <legend>Add a new project</legend>
-
-    <metal:field tal:define="field_name 'name';
-                             field_options {'size': 15}"
-                 metal:use-macro="renderField"/>
-
     <metal:field tal:define="field_name 'title';
                              field_options {'size': 50}"
                  metal:use-macro="renderField"/>
@@ -24,12 +20,13 @@
         Make this project public, i.e. accessible to anonymous users.
       </label>
     </div>
+
     <div class="buttons">
-      <button type="submit" class="positive" i18n:translate="">
-        Add project
-      </button>
+      <button type="submit" class="positive" i18n:translate="">Update</button>
+      <a class="cancel" tal:attributes="href api.route_url('project_home', project_name=project.name)">Cancel</a>
     </div>
   </fieldset>
+
 </form>
 
 </metal:content>

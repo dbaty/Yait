@@ -85,7 +85,7 @@
       <metal:issue-extra-fieldset
          metal:use-macro="api.form_macros['issue-extra-fieldsets']"/>
 
-      <div class="buttons">
+      <div class="buttons buttons-outside-of-fieldset">
         <button type="submit" class="positive" i18n:translate="">Update</button>
         <a tal:attributes="href api.route_url('issue_view', project_name=project.name, issue_ref=issue.ref)" class="cancel" i18n:translate="">Cancel</a>
       </div>

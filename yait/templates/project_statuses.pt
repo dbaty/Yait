@@ -1,0 +1,55 @@
+<layout tal:define="master load: project_configure_macros.pt;
+                    current_config_page python: 'statuses'"
+        metal:use-macro="master">
+<metal:content metal:fill-slot="configuration-content">
+
+<form tal:attributes="action api.route_url('project_configure_statuses', project_name=project.name)"
+      method="post">
+  <fieldset>
+
+    <p>
+      You may reorder statuses by drag-and-dropping them in the list
+      below.
+    </p>
+
+    <ol class="sortable">
+      <li tal:repeat="status project.statuses">
+        <input type="text" name="labels" tal:attributes="value status.label"
+               class="hidden"/>
+        <input type="hidden" name="statuses" tal:attributes="value status.id"/>
+        <span tal:content="status.label"/>
+        <a href="#" onclick="renameProjectPropertyItem(this)"
+           ><img tal:attributes="src api.static_url('static/img/edit-label.png')"
+                 width="16" height="16" alt="edit label"/></a>
+        <a tal:condition="status.id not in used"
+           href="#" onclick="deleteProjectPropertyItem(this)"
+           ><img tal:attributes="src api.static_url('static/img/delete.png')"
+                 width="16" height="16" alt="delete status"/></a>
+      </li>
+    </ol>
+
+    <p>
+      Add a new status:
+      <input type="text" name="new_status" id="new_status"/>
+      <button type="button" class="positive"
+              onclick="addProjectPropertyItem(this)">
+        Add&hellip;
+      </button>
+    </p>
+
+    <div class="buttons">
+      <button type="submit" class="positive" i18n:translate="">
+        Update statuses
+      </button>
+      <a class="cancel" tal:attributes="href api.route_url('project_home', project_name=project.name)">Cancel</a>
+    </div>
+  </fieldset>
+</form>
+</metal:content>
+<metal:scripts metal:fill-slot="scripts">
+  <script tal:attributes="src api.static_url('static/js/jquery.dragsort.min.js')"></script>
+  <script>
+    $('.sortable').dragsort();
+  </script>
+</metal:scripts>
+</layout>

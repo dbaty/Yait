@@ -210,6 +210,34 @@
     }
 }
 
+.project-configuration-menu {
+    list-style-type: none;
+    float: left;
+    margin: 0 1em 1em 0;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+
+    li {
+        padding: 1em;
+        border-bottom: 1px solid #ddd;
+    }
+     
+    li:last-child {
+        border-bottom: 0;
+    }
+
+    a {
+        display: block;
+        text-decoration: none;
+        color: black;
+    }
+
+    a.current {
+        font-weight: bold;
+    }
+}
+
+
 .footer {
     clear: both;
     color: #aaa;

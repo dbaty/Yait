@@ -44,7 +44,7 @@
       </td>
       <td tal:content="role_info[1]"/>
       <td class="centered">
-        <a tal:attributes="href api.route_url('project_configure', project_name=role_info[0].name)">configure</a>
+        <a tal:attributes="href api.route_url('project_configure_roles', project_name=role_info[0].name)">configure</a>
       </td>
     </tr>
   </tbody>

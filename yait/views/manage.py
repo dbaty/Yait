@@ -13,8 +13,10 @@ from yait.forms import AddUserForm
 from yait.forms import EditUserForm
 from yait.i18n import _
 from yait.models import DBSession
+from yait.models import DEFAULT_STATUSES
 from yait.models import Project
 from yait.models import Role
+from yait.models import Status
 from yait.models import User
 from yait.views.utils import TemplateAPI
 
@@ -145,6 +147,20 @@ def add_project_form(request, form=None):
     return render_to_response('../templates/project_add.pt', bindings)
 
 
+def _add_project(db_session, project):
+    """Helper method that takes care of adding the project and default
+    statuses.
+
+    This is also used in tests.
+    """
+    db_session.add(project)
+    db_session.flush()  # set project.id
+    for position, status in enumerate(DEFAULT_STATUSES, 1):
+        status = Status(id=status['id'], project_id=project.id,
+                        label=status['label'], position=position)
+        db_session.add(status)
+
+
 def add_project(request):
     if not request.user.is_admin:
         raise HTTPForbidden()
@@ -154,7 +170,7 @@ def add_project(request):
     project = Project()
     form.populate_obj(project)
     session = DBSession()
-    session.add(project)
+    _add_project(session, project)
     # FIXME: we should rather redirect to the configuration page of
     # the project (with a success message).
     url = request.route_url('project_home', project_name=project.name)

@@ -54,8 +54,14 @@ ISSUE_PRIORITY_LABELS = (u'low', u'medium', u'high', u'critical')
 DEFAULT_ISSUE_PRIORITY = ISSUE_PRIORITY_MEDIUM
 
 ISSUE_STATUS_OPEN = 1
+ISSUE_STATUS_OPEN_LABEL = u'open'
 ISSUE_STATUS_CLOSED = 2
+ISSUE_STATUS_CLOSED_LABEL = u'closed'
+# FIXME: do we need a default status? The default status is the first one.
 DEFAULT_ISSUE_STATUS = ISSUE_STATUS_OPEN
+DEFAULT_STATUSES = (
+    {'id': ISSUE_STATUS_OPEN, 'label': ISSUE_STATUS_OPEN_LABEL},
+    {'id': ISSUE_STATUS_CLOSED, 'label': ISSUE_STATUS_CLOSED_LABEL})
 
 RELATIONSHIP_CHILD_OF = 1
 RELATIONSHIP_PARENT_OF = -RELATIONSHIP_CHILD_OF
@@ -78,7 +84,7 @@ class Model(object):
 
 class Project(Model):
 
-    def __repr__(self):
+    def __repr__(self):  # FIXME: do we really need this?
         return '<Project %s (id=%d)>' % (self.name, self.id)
 
 ## FIXME: shall we use String (VARCHAR) or Text?
@@ -92,6 +98,21 @@ projects_table = Table(
     Column('name', String, nullable=False, unique=True),
     Column('title', Unicode, nullable=False),
     Column('public', Boolean, nullable=False))
+
+
+class Status(Model):
+    pass
+
+
+statuses_table = Table(
+    'statuses',
+    metadata,
+    # A composite primary key (id, project_id) is defined by the
+    # mapper below.
+    Column('id', Integer, nullable=False),
+    Column('project_id', Integer, ForeignKey('projects.id'), nullable=False),
+    Column('label', Unicode, nullable=False),
+    Column('position', Integer, nullable=False))
 
 
 class Issue(Model):
@@ -321,7 +342,13 @@ users_table = Table(
 ##########
 projects_mapper = mapper(
     Project, projects_table,
-    properties={'issues': relationship(Issue, lazy='select')})
+    properties={'issues': relationship(Issue, lazy='select'),
+                'statuses': relationship(Status, lazy='select',
+                                         order_by=statuses_table.c.position,
+                                         cascade='delete')})
+statuses_mapper = mapper(
+    Status, statuses_table,
+    primary_key=(statuses_table.c.id, statuses_table.c.project_id))
 issues_mapper = mapper(
     Issue, issues_table,
     properties={'changes': relationship(Change, lazy='select')})

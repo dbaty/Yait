@@ -1,5 +1,3 @@
-from webob.multidict import MultiDict
-
 from wtforms.fields import BooleanField
 from wtforms.fields import DateTimeField
 from wtforms.fields import SelectField
@@ -24,16 +22,14 @@ from yait.models import ISSUE_KIND_VALUES
 from yait.models import ISSUE_PRIORITY_LABELS
 from yait.models import ISSUE_PRIORITY_VALUES
 from yait.models import ISSUE_STATUS_CLOSED
+from yait.models import ISSUE_STATUS_CLOSED_LABEL
 from yait.models import ISSUE_STATUS_OPEN
+from yait.models import ISSUE_STATUS_OPEN_LABEL
 from yait.models import Project
 from yait.models import Role
 from yait.models import User
 from yait.utils import str_to_time
 from yait.utils import time_to_str
-
-
-ISSUE_STATUSES = ((ISSUE_STATUS_OPEN, _('open')),
-                  (ISSUE_STATUS_CLOSED, _('closed')))
 
 
 def int_or_none(value):
@@ -87,10 +83,19 @@ class AddProjectForm(BaseForm):
 
     def validate_name(self, field):
         session = DBSession()
-        if session.query(Project).filter_by(name=field.data).all():
+        if session.query(Project).filter_by(name=field.data).first():
             raise ValidationError(u'This name is not available.')
         # FIXME: check that the name contains only alphanumerical
         # characters, underscores and dashes.
+
+
+class EditProjectForm(AddProjectForm):
+    name = None  # it is not possible to change the name of a project
+
+
+def make_edit_project_form(post=None, **kwargs):
+    form = EditProjectForm(post, **kwargs)
+    return form
 
 
 class ExtraFieldset:
@@ -99,8 +104,7 @@ class ExtraFieldset:
     """
     status = SelectField(
         label=u'Status',
-        choices=ISSUE_STATUSES,
-        default=DEFAULT_ISSUE_STATUS,
+        choices=(),  # is filled when instanced
         validators=[required()],
         coerce=int)
     assignee = SelectField(label=u'Assign issue to', coerce=int_or_none)
@@ -123,25 +127,26 @@ class ExtraFieldset:
         default=DEFAULT_ISSUE_KIND,
         validators=[required()])
 
-    def setup(self, project_id, db_session):
-        self.project_id = project_id
-        self.setup_choices(db_session)
+    def setup(self, project, db_session):
+        self.project = project
+        self.db_session = db_session
+        # 'assignee'
+        assignee_choices = [('', _(u'Nobody'))]
+        assignee_choices += self._get_possible_assignees()
+        self.assignee.choices = assignee_choices
+        # 'status'
+        self.status.choices = [(s.id, s.label) for s in self.project.statuses]
 
-    def setup_choices(self, db_session):
-        choices = [('', _(u'Nobody'))]
-        choices += self._get_possible_assignees(db_session)
-        self.assignee.choices = choices
-
-    def _get_possible_assignees(self, db_session):
+    def _get_possible_assignees(self):
         """Return tuples of users that are allowed to participate in
         the project.
         """
-        res = db_session.query(User).join(Role).filter(
-            Role.project_id==self.project_id,
+        res = self.db_session.query(User).join(Role).filter(
+            Role.project_id==self.project.id,
             Role.role.in_((ROLE_PROJECT_MANAGER,
                            ROLE_PROJECT_PARTICIPANT,
                            ROLE_PROJECT_INTERNAL_PARTICIPANT)))
-        res = res.union(db_session.query(User).filter_by(is_admin=True))
+        res = res.union(self.db_session.query(User).filter_by(is_admin=True))
         res = res.order_by(User.fullname)
         return [(user.id, user.fullname) for user in res]
 
@@ -196,13 +201,13 @@ class EditUserForm(AddUserForm):
     # user, or a valid e-mail.
 
 
-def make_add_issue_form(project_id, db_session, post=None):
+def make_add_issue_form(project, db_session, post=None):
     form = AddIssueForm(post)
-    form.setup(project_id, db_session)
+    form.setup(project, db_session)
     return form
 
 
-def make_add_change_form(project_id, db_session, post=None, **kwargs):
+def make_add_change_form(project, db_session, post=None, **kwargs):
     form = AddChangeForm(post, **kwargs)
-    form.setup(project_id, db_session)
+    form.setup(project, db_session)
     return form

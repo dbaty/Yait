@@ -78,16 +78,17 @@ class TestCaseForViews(TestCase):
         return self.config.testing_add_renderer(self.template_under_test)
 
     def _make_request(self, user=None, post=None, get=None, matchdict=None):
+        from webob.multidict import MultiDict
         from yait.auth import _get_user
         from yait.models import User
-        if post is not None:
-            from webob.multidict import MultiDict
-            post = MultiDict(post)
+        if post is None:
+            post = {}
+        post = MultiDict(post)
         request = DummyRequest(params=get, post=post)
         _set_property(request, 'user', _get_user, do_reify=True)
         if user:
             # 'user' may be the user id or the login.
-            if isinstance(user, unicode):
+            if isinstance(user, basestring):
                 user = self.session.query(User).filter_by(login=user).one().id
             DummyAuthenticationPolicy.fake_login(request, user)
         if matchdict is not None:
@@ -112,11 +113,11 @@ class TestCaseForViews(TestCase):
 
     def _make_project(self, name=u'name', title=None, public=False):
         from yait.models import Project
+        from yait.views.manage import _add_project
         if title is None:
             title = name
         p = Project(name=name, title=title, public=public)
-        self.session.add(p)
-        self.session.flush()  # sets id
+        _add_project(self.session, p)
         return p
 
     def _make_issue(self, project, ref=1,
@@ -127,13 +128,12 @@ class TestCaseForViews(TestCase):
         from yait.models import Issue
         from yait.models import DEFAULT_ISSUE_KIND
         from yait.models import DEFAULT_ISSUE_PRIORITY
-        from yait.models import DEFAULT_ISSUE_STATUS
         if kind is None:
             kind = DEFAULT_ISSUE_KIND
         if priority is None:
             priority = DEFAULT_ISSUE_PRIORITY
         if status is None:
-            status = DEFAULT_ISSUE_STATUS
+            status = project.statuses[0].id
         i = Issue(project_id=project.id,
                   ref=ref,
                   title=title,

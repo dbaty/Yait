@@ -69,7 +69,10 @@ class TestAddIssue(TestCaseForViews):
         p = self._make_project(name=u'p1')
         login = u'user1'
         self._make_user(login, roles={p: ROLE_PROJECT_PARTICIPANT})
-        post = {'title': u'Issue title', 'text': u'', 'assignee': u''}
+        post = {'title': u'Issue title',
+                'status': unicode(p.statuses[0].id),
+                'text': u'',
+                'assignee': u''}
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, post=post,
                                     matchdict=matchdict)
@@ -83,7 +86,10 @@ class TestAddIssue(TestCaseForViews):
         p = self._make_project(name=u'p1')
         login = u'user1'
         user = self._make_user(login, roles={p: ROLE_PROJECT_PARTICIPANT})
-        post = {'title': u'Issue title', 'text': u'Issue body', 'assignee': u''}
+        post = {'title': u'Issue title',
+                'text': u'Issue body',
+                'status': unicode(p.statuses[0].id),
+                'assignee': u''}
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, post=post,
                                      matchdict=matchdict)
@@ -108,14 +114,20 @@ class TestAddIssue(TestCaseForViews):
         login = u'user1'
         self._make_user(login, roles={p1: ROLE_PROJECT_PARTICIPANT,
                                       p2: ROLE_PROJECT_PARTICIPANT})
-        post = {'title': u't', 'text': u't', 'assignee': u''}
+        post = {'title': u't',
+                'text': u't',
+                'status': unicode(p1.statuses[0].id),
+                'assignee': u''}
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, post=post,
                                      matchdict=matchdict)
         self._call_fut(request)
         self.assertEqual(p1.issues[0].ref, 1)
 
-        post = {'title': u't', 'text': u't', 'assignee': u''}
+        post = {'title': u't',
+                'text': u't',
+                'status': unicode(p2.statuses[0].id),                
+                'assignee': u''}
         matchdict = {'project_name': u'p2'}
         request = self._make_request(user=login, post=post,
                                      matchdict=matchdict)
@@ -127,7 +139,10 @@ class TestAddIssue(TestCaseForViews):
         # 'p1.issues'.
         self.session.expunge(p1)
         p1 = self.session.query(Project).filter_by(name=u'p1').one()
-        post = {'title': u't', 'text': u't', 'assignee': u''}
+        post = {'title': u't',
+                'text': u't',
+                'status': unicode(p1.statuses[0].id),
+                'assignee': u''}
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, post=post,
                                      matchdict=matchdict)
@@ -145,6 +160,7 @@ class TestAddIssue(TestCaseForViews):
                                        roles={p: ROLE_PROJECT_PARTICIPANT})
         post = {'title': u't',
                 'text': u't',
+                'status': unicode(p.statuses[0].id),
                 'assignee': unicode(another_user.id)}
         matchdict = {'project_name': u'p'}
         request = self._make_request(user=login, post=post,
@@ -164,6 +180,7 @@ class TestAddIssue(TestCaseForViews):
         another_user = self._make_user(u'user2')
         post = {'title': u't',
                 'text': u't',
+                'status': unicode(p.statuses[0].id),
                 'assignee': unicode(another_user.id)}
         matchdict = {'project_name': u'p'}
         request = self._make_request(user=login, post=post,
@@ -280,7 +297,9 @@ class TestUpdateIssue(TestCaseForViews):
         login = u'user1'
         user = self._make_user(login, roles={p: ROLE_PROJECT_PARTICIPANT})
         matchdict = {'project_name': u'p1', 'issue_ref': str(issue.ref)}
-        post = {'text': u'comment', 'assignee': unicode(user.id)}
+        post = {'text': u'comment',
+                'status': unicode(p.statuses[0].id),
+                'assignee': unicode(user.id)}
         request = self._make_request(user=login, matchdict=matchdict,
                                      post=post)
         self._call_fut(request)

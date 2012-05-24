@@ -27,7 +27,7 @@
   <metal:issue-extra-fieldsets
      metal:use-macro="api.form_macros['issue-extra-fieldsets']"/>
 
-  <div class="buttons">
+  <div class="buttons buttons-outside-of-fieldset">
     <button type="submit" class="positive">Add issue</button>
   </div>
 </form>

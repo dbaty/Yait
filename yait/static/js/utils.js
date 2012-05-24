@@ -98,6 +98,41 @@ function removeUserInProjectConfig(selector) {
 }
 
 
+// Used in project configuration pages to add a new item to a project
+// property (status, priority, etc.).
+function addProjectPropertyItem(button) {
+    var $input = $(button).prev();
+    var label = $input.attr('value');
+    var $items = $('.sortable').first();
+    var $new_item = $items.children().first().clone();
+    $infos = $new_item.children();
+    $infos[0].value = label;
+    $infos[1].value = '0';  // id
+    $infos[2].innerHTML = label;
+    $input.attr('value', '');
+    $items.append($new_item);
+}
+
+
+// Used in project configuration pages to change the label of an
+// existing item of a project property (status, priority, etc.).
+function renameProjectPropertyItem(button) {
+    var $button = $(button);
+    $button.css({'display': 'none'});
+    var $label_span = $(button).prev();
+    $label_span.css({'display': 'none'});
+    var $label_field = $label_span.prev().prev();
+    $label_field.css({'display': 'inline'});
+}
+
+
+// Used in project configuration pages to remove an item of a project
+// property (status, priority, etc.).
+function deleteProjectPropertyItem(button) {
+    $(button).parent().remove();
+}
+
+
 // FIXME: timezone detection does not work well.
 // Replace UTC dates with the user's local timezone.
 // Should be called after the DOM is ready on any page that may show a date.

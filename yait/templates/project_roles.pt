@@ -1,17 +1,11 @@
-<layout metal:use-macro="api.layout">
-<metal:breadcrumbs metal:fill-slot="breadcrumbs">
-  <li>
-    <span class="separator">&rarr;</span>
-    <span tal:replace="project.title">
-  </li>
-</metal:breadcrumbs>
-
-<metal:content metal:fill-slot="content">
+<layout tal:define="master load: project_configure_macros.pt;
+                    current_config_page python: 'roles'"
+        metal:use-macro="master">
+<metal:content metal:fill-slot="configuration-content">
 
 <form tal:attributes="action api.route_url('project_configure_roles', project_name=project.name)"
       method="post">
   <fieldset>
-    <legend>Update roles</legend>
 
     <table class="listing">
       <thead>
@@ -75,11 +69,11 @@
          i18n:translate="">
         Grant role to another user&hellip;</a>
     </p>
+    <div class="buttons">
+      <button type="submit" class="positive" i18n:translate="">Update roles</button>
+      <a class="cancel" tal:attributes="href api.route_url('project_home', project_name=project.name)">Cancel</a>
+    </div>
   </fieldset>
-  <div class="buttons">
-    <button type="submit" class="positive" i18n:translate="">Update roles</button>
-    <a class="cancel" tal:attributes="href api.route_url('project_home', project_name=project.name)">Cancel</a>
-  </div>
 </form>
 </metal:content>
 </layout>

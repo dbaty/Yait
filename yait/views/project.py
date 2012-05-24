@@ -3,6 +3,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPSeeOther
 from pyramid.renderers import render_to_response
 
+from sqlalchemy import distinct
 from sqlalchemy.orm.exc import NoResultFound
 
 from yait.auth import has_permission
@@ -10,10 +11,14 @@ from yait.auth import PERM_MANAGE_PROJECT
 from yait.auth import PERM_PARTICIPATE_IN_PROJECT
 from yait.auth import PERM_VIEW_PROJECT
 from yait.auth import ROLE_LABELS
+from yait.forms import make_edit_project_form
 from yait.i18n import _
 from yait.models import DBSession
+from yait.models import DEFAULT_STATUSES
+from yait.models import Issue
 from yait.models import Project
 from yait.models import Role
+from yait.models import Status
 from yait.models import User
 from yait.views.utils import TemplateAPI
 
@@ -46,8 +51,22 @@ def home(request):
 
 
 def configure_form(request):
-    pass  # FIXME: main configuration page, with general features
-          # (title, private or public project, etc.)
+    project_name = request.matchdict['project_name']
+    session = DBSession()
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        raise HTTPNotFound()
+    if not has_permission(request, PERM_MANAGE_PROJECT, project):
+        raise HTTPForbidden()
+    data = {'title': project.title,
+            'public': project.public}
+    form = make_edit_project_form(**data)
+    bindings = {'api': TemplateAPI(request, project.title),
+                'project': project,
+                'can_manage_project': True,
+                'form': form}
+    return render_to_response('../templates/project_configure.pt', bindings)
 
 
 def configure(request):
@@ -147,6 +166,76 @@ def configure_roles(request):
     location = request.route_url('project_configure_roles',
                                  project_name=project.name)
     return HTTPSeeOther(location=location)
+
+
+def configure_statuses_form(request):
+    project_name = request.matchdict['project_name']
+    session = DBSession()
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        raise HTTPNotFound()
+    if not has_permission(request, PERM_MANAGE_PROJECT, project):
+        raise HTTPForbidden()
+    used = [s[0] for s in session.query(distinct(Issue.status)).\
+        filter_by(project_id=project.id).all()]
+    # FIXME: We may want to include default statuses in 'used' as well.
+    bindings = {'api': TemplateAPI(request, project.title),
+                'project': project,
+                'can_manage_project': True,
+                'used': used}
+    return render_to_response('../templates/project_statuses.pt', bindings)
+
+
+def configure_statuses(request):
+    project_name = request.matchdict['project_name']
+    session = DBSession()
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        raise HTTPNotFound()
+    if not has_permission(request, PERM_MANAGE_PROJECT, project):
+        raise HTTPForbidden()
+    posted_statuses = map(int, request.POST.getall('statuses'))
+    # The UI should not allow to remove default statuses, but let's
+    # enforce it here.
+    for default_status in DEFAULT_STATUSES:
+        if default_status['id'] not in posted_statuses:
+            msg = _('You cannot remove this status.')
+            request.session.flash(msg, 'error')
+            return configure_statuses_form(request)
+    # The UI should not allow to remove statuses that are being used,
+    # but let's enforce it here.
+    # FIXME: to do
+    current_statuses = {}
+    for status in project.statuses:
+        current_statuses[status.id] = status
+    statuses = zip(posted_statuses, request.POST.getall('labels'))
+    # Change existing statuses and add new ones
+    new_id = session.execute(
+        'SELECT MAX(id) FROM statuses '
+        'WHERE project_id=%d' % project.id).fetchone()[0]
+    for position, (status_id, label) in enumerate(statuses, 1):
+        if not status_id:
+            new_id += 1
+            status = Status(id=new_id, project_id=project.id,
+                            label=label, position=position)
+            session.add(status)
+        else:
+            status = current_statuses[status_id]
+            if label != status.label:
+                status.label = label
+            if position != status.position:
+                status.position = position
+    # Remove statuses
+    for status in project.statuses:
+        if status.id not in posted_statuses:
+            session.delete(status)
+    msg = _('Your changes have been saved.')
+    request.session.flash(msg, 'success')
+    url = request.route_url('project_configure_statuses',
+                            project_name=project.name)
+    return HTTPSeeOther(location=url)
 
 
 def search_form(request):

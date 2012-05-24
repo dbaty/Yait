@@ -67,7 +67,7 @@
                tal:attributes="href api.route_url('project_configure', project_name=project.name)">Configure</a></li>
       </ul>
     </li>
-    <li tal:condition="can_participate | None"
+    <li tal:condition="can_participate | can_manage_project | None"
         class="add-new-issue">
       <a tal:attributes="href api.route_url('issue_add', project_name=project.name)">Add new issue</a>
     </li>

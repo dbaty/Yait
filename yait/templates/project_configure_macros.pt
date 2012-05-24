@@ -1,0 +1,28 @@
+<metal:configure-page metal:define-macro="master">
+<metal:layout metal:use-macro="api.layout">
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <span class="separator">&rarr;</span>
+    <span tal:replace="project.title">
+  </li>
+</metal:breadcrumbs>
+
+<metal:content metal:fill-slot="content">
+
+  <ul class="project-configuration-menu">
+    <li tal:repeat="line (
+                    ('general', 'General configuration', 'project_configure'),
+                    ('roles', 'User roles', 'project_configure_roles'),
+                    ('statuses', 'Statuses', 'project_configure_statuses'),
+                    )">
+      <a tal:attributes="href api.route_url(line[2], project_name=project.name);
+                         class line[0] == current_config_page and 'current'"
+         tal:content="line[1]"/>
+    </li>
+  </ul>
+
+  <metal:configuration-content metal:define-slot="configuration-content"/>
+
+</metal:content>
+</metal:layout>
+</metal:configure-page>

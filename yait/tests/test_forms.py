@@ -10,13 +10,13 @@ class TestAddIssueForm(TestCase):
     def tearDown(self):
         self.session.remove()
 
-    def _make_one(self, project_id, post=None, **kwargs):
+    def _make_one(self, project, post=None, **kwargs):
         from yait.forms import make_add_issue_form
         if isinstance(post, dict):
             # test helper
             from webob.multidict import MultiDict
             post = MultiDict(post)
-        form = make_add_issue_form(project_id, self.session, post, **kwargs)
+        form = make_add_issue_form(project, self.session, post, **kwargs)
         return form
 
     def _make_user(self, login, fullname=u'', is_admin=False, roles=None):
@@ -58,7 +58,7 @@ class TestAddIssueForm(TestCase):
         self._make_user(u'forbidden2', u'Forbidden 2',
                         roles={p2: ROLE_PROJECT_MANAGER})
         self._make_user(u'admin', u'Admin', is_admin=True)
-        form = self._make_one(project_id=p1.id)
+        form = self._make_one(project=p1)
         self.assertEqual(form.assignee.choices,
                          [('', u'Nobody'),
                           (6, u'Admin'),
@@ -67,7 +67,8 @@ class TestAddIssueForm(TestCase):
                           (3, u'Allowed 3')])
 
     def test_assignee_not_required(self):
-        form = self._make_one('project_id', post={'assignee': u''})
+        project = self._make_project(u'project')
+        form = self._make_one(project, post={'assignee': u''})
         # assert that no assignee has been selected
         assert form.data['assignee'] == u''
         form.validate()

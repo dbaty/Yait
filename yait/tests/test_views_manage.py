@@ -368,6 +368,7 @@ class TestAddProject(TestCaseForViews):
         self.assertEqual(len(projects), 1)
         self.assertEqual(projects[0].name, u'p1')
         self.assertEqual(projects[0].title, u'Project 1')
+        self.assertEqual(len(projects[0].statuses), 2)
 
 
 class TestDeleteProject(TestCaseForViews):

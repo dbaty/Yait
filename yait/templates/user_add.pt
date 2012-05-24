@@ -50,11 +50,11 @@
         Make this user an administrator.
       </label>
     </div>
+    <div class="buttons">
+      <button type="submit" class="positive" i18n:translate="">Add user</button>
+      <a class="cancel" tal:attributes="href api.route_url('users')">Cancel</a>
+    </div>
   </fieldset>
-  <div class="buttons">
-    <button type="submit" class="positive" i18n:translate="">Add user</button>
-    <a class="cancel" tal:attributes="href api.route_url('users')">Cancel</a>
-  </div>
 </form>
 
 </metal:content>
