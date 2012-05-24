@@ -74,12 +74,6 @@ def add(request):
                   date_edited=now,
                   reporter=reporter,
                   ref=ref)
-    # FIXME: work around WTForms behaviour (bug?) that stores an empty
-    # string if the HTML DateTimeField is left empty. We would rather
-    # store None.
-    # FIXME: is this still needed?
-    if form.deadline.data == '':
-        form.deadline.data = None
     form.populate_obj(issue)
     session.add(issue)
     session.flush()
