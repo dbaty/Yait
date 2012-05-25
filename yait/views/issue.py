@@ -19,8 +19,14 @@ from yait.forms import make_add_change_form
 from yait.forms import make_add_issue_form
 from yait.i18n import _
 from yait.models import Change
+from yait.models import CHANGE_TYPE_CLOSING
+from yait.models import CHANGE_TYPE_OPENING
+from yait.models import CHANGE_TYPE_REOPENING
+from yait.models import CHANGE_TYPE_UPDATE
 from yait.models import DBSession
 from yait.models import Issue
+from yait.models import ISSUE_STATUS_CLOSED
+from yait.models import ISSUE_STATUS_OPEN
 from yait.models import Project
 from yait.text import render
 from yait.views.utils import TemplateAPI
@@ -68,7 +74,7 @@ def add(request):
         last_ref = 0
     ref = last_ref + 1
     reporter = request.user.id
-    now = datetime.now()
+    now = datetime.utcnow()
     issue = Issue(project_id=project.id,
                   date_created=now,
                   date_edited=now,
@@ -77,7 +83,9 @@ def add(request):
     form.populate_obj(issue)
     session.add(issue)
     session.flush()
-    change = Change(issue_id=issue.id,
+    change = Change(project_id=project.id,
+                    issue_id=issue.id,
+                    type=CHANGE_TYPE_OPENING,
                     author=reporter,
                     date=now,
                     changes={})
@@ -185,7 +193,16 @@ def update(request):
 #         changes['children'] = (current_children, new_children)
 #         issue.setChildren(new_children)
 
-    change = Change(issue_id=issue.id,
+    if form.status.data == ISSUE_STATUS_OPEN and \
+            issue.status != ISSUE_STATUS_OPEN:
+        change_type = CHANGE_TYPE_REOPENING
+    elif form.status.data == ISSUE_STATUS_CLOSED:
+        change_type = CHANGE_TYPE_CLOSING
+    else:
+        change_type = CHANGE_TYPE_UPDATE
+    change = Change(project_id=project.id,
+                    issue_id=issue.id,
+                    type=change_type,
                     author=userid,
                     date=now,
                     text=form.text.data,

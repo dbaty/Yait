@@ -12,7 +12,10 @@ from yait.auth import PERM_PARTICIPATE_IN_PROJECT
 from yait.auth import PERM_VIEW_PROJECT
 from yait.auth import ROLE_LABELS
 from yait.forms import make_edit_project_form
+from yait.forms import make_simplified_search_form
 from yait.i18n import _
+from yait.models import Change
+from yait.models import CHANGE_ACTIONS
 from yait.models import DBSession
 from yait.models import DEFAULT_STATUSES
 from yait.models import Issue
@@ -23,6 +26,8 @@ from yait.models import User
 from yait.views.utils import TemplateAPI
 
 
+RECENT_ACTIVITY_LENGTH = 10
+
 def home(request):
     project_name = request.matchdict['project_name']
     session = DBSession()
@@ -30,24 +35,53 @@ def home(request):
         project = session.query(Project).filter_by(name=project_name).one()
     except NoResultFound:
         raise HTTPNotFound()
-
-    ## FIXME:
-    ## - list of issues assigned to the current user
-    ## - list of top master issues (issues without any parent)
-    ## - list of recently edited/commented issues
-    ## - link to the tree view;
-    ## anything else?
-
     if not has_permission(request, PERM_VIEW_PROJECT, project):
         raise HTTPForbidden()
     can_participate = has_permission(
         request, PERM_PARTICIPATE_IN_PROJECT, project)
     can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
+    # FIXME
+    n_assigned = 5
+    n_watching = 3
+    n_not_assigned = 2
+    search_form = make_simplified_search_form(project, session)
+    recent_activity = get_recent_activity(session, project, request)
     bindings = {'api': TemplateAPI(request, project.title),
                 'project': project,
                 'can_participate': can_participate,
-                'can_manage_project': can_manage_project}
+                'can_manage_project': can_manage_project,
+                'n_assigned': n_assigned,
+                'n_watching': n_watching,
+                'n_not_assigned': n_not_assigned,
+                'search_form': search_form,
+                'recent_activity': recent_activity}
     return render_to_response('../templates/project.pt', bindings)
+
+
+def get_recent_activity(db_session, project, request):
+    """Return a list of strings that describe the recent activity in
+    the given ``project``.
+    """
+    activity = []
+    for issue, change in db_session.query(Issue, Change).\
+            filter(Change.project_id==project.id).\
+            filter(Issue.id==Change.issue_id).\
+            order_by(Change.date.desc()).\
+            limit(RECENT_ACTIVITY_LENGTH).all():
+        action = _(CHANGE_ACTIONS[change.type])
+        issue_url = request.route_url(
+            'issue_view', project_name=project.name, issue_ref=issue.ref)
+        change_url = '%s#change-%d' % (issue_url, change.id)
+        info = {'author': change.author_info['fullname'],
+                'action': action,
+                'issue_ref': issue.ref,
+                'issue_url': issue_url,
+                'change_url': change_url,
+                'title': issue.title}
+        msg = _('${author} <a href="${change_url}">${action}</a> issue '
+                '<a href="${issue_url}">#${issue_ref}: ${title}</a>.') % info
+        activity.append({'desc': msg, 'text': change.get_rendered_text()})
+    return activity
 
 
 def configure_form(request, form=None):

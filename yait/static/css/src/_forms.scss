@@ -53,6 +53,7 @@ textarea {
     margin-bottom: 0.5em;
 }
 
+/* FIXME: also, could be renamed as .floatable-panel because it is used outside of forms */
 .floatable-form-panel { /* FIXME: review */
     width: 46%;
     float: left;
@@ -69,7 +70,7 @@ textarea {
     font-size: 0.8em;
 }
 
-#extra-fieldsets {
+#extra-fieldsets, .compact-fieldset {
     font-size: 0.8em;
 
     label {
@@ -78,6 +79,10 @@ textarea {
         text-align: right;
         margin-right: 1em;
     }
+}
+
+.compact-fieldset label {
+    width: 7em;
 }
 
 #preview-pane {

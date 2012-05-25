@@ -210,3 +210,26 @@ def make_add_change_form(project, db_session, post=None, **kwargs):
     form = AddChangeForm(post, **kwargs)
     form.setup(project, db_session)
     return form
+
+
+class SimplifiedSearchForm(BaseForm):
+    """The search form that is displayed in the project dashboard."""
+
+    status = SelectField(
+        label=u'Status',
+        choices=(),  # is filled when instanced
+        coerce=int)
+    assignee = SelectField(
+        label=u'Assignee',
+        choices=(),  # is filled when instanced
+        coerce=int)
+    text = TextField(label=u'Text')
+
+    def setup(self, project, db_session):
+        pass  # FIXME
+
+
+def make_simplified_search_form(project, db_session):
+    form = SimplifiedSearchForm()
+    form.setup(project, db_session)
+    return form

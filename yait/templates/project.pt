@@ -8,50 +8,57 @@
 
 <metal:content metal:fill-slot="content">
 
-<h1>Assigned to me</h1>
+<div class="project-dashboard">
 
-<table class="listing expanded">
-  <thead>
-    <tr>
-      <th i18n:translate="">Ref.</th>
-      <th i18n:translate="">Title</th>
-      <th i18n:translate="">Reporter</th>
-      <th i18n:translate="">Priority</th>
-      <th i18n:translate="">Deadline</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr tal:repeat="issue project.issues"
-        tal:attributes="class repeat['issue'].odd() and 'odd'">
-      <td>
-        <a tal:content="issue.ref"
-           tal:attributes="href api.route_url('issue_view', project_name=project.name, issue_ref=issue.ref)"/>
-      </td>
-      <td>
-        <a tal:content="issue.title"
-           tal:attributes="href api.route_url('issue_view', project_name=project.name, issue_ref=issue.ref)"/>
-        <!-- FIXME -->
-      <td tal:content="issue.reporter" class="nowrap"/>
-      <td tal:content="issue.priority" class="nowrap"/>
-      <td tal:content="issue.deadline and issue.deadline.strftime('%d %b %Y')"
-          class="nowrap"/>
-    </tr>
-  </tbody>
-</table>
+  <div class="floatable-form-panel last-floatable-form-panel">
+    <ul class="reports">
+      <li tal:condition="n_assigned">
+        <a href="FIXME">Assigned to me (<span tal:replace="n_assigned"/>)</a>
+      </li>
+      <li tal:condition="n_watching">
+        <a href="FIXME">Watching (<span tal:replace="n_watching"/>)</a>
+      </li>
+      <li tal:condition="n_assigned">
+        <a href="FIXME">Not assigned (<span tal:replace="n_not_assigned"/>)</a>
+      </li>
+    </ul>
+  </div>
 
-<h1>Watching (but not assigned to me)</h1>
+  <div class="floatable-form-panel last-floatable-form-panel">
+    <form method="post"
+          tal:attributes="action api.route_url('project_search', project_name=project.name)"
+          tal:define="form search_form;
+                      field_options {};
+                      renderField api.form_macros['renderField']">
+      <fieldset class="compact-fieldset">
+        <metal:field tal:define="field_name 'text'; field_options {'size': 30}"
+                     metal:use-macro="renderField"/>
+        <metal:field tal:define="field_name 'assignee'"
+                     metal:use-macro="renderField"/>
+        <metal:field tal:define="field_name 'status'"
+                     metal:use-macro="renderField"/>
+        <div class="buttons">
+          <button type="submit" class="positive" i18n:translate="">
+            Search
+          </button>
+          <a class="cancel" tal:attributes="href api.route_url('users')">Cancel</a>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
 
-FIXME
+<h1 class="clear">Recent activity</h1>
 
-<h1>Recent activity</h1>
-
-FIXME
-
-<ul>
-  <li>
-    
-  </li>
-</ul>
+<dl class="recent-activity">
+  <tal:loop tal:repeat="activity recent_activity">
+    <dt tal:content="structure activity['desc']"/>
+    <dd>
+      <a tal:content="structure activity['text']"
+         href="#" onclick="expandChangeTextInRecentActivity(this)"></a>
+    </dd>
+  </tal:loop>
+</dl>
 
 </metal:content>
 </layout>

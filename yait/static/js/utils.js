@@ -133,6 +133,16 @@ function deleteProjectPropertyItem(button) {
 }
 
 
+function expandChangeTextInRecentActivity(link) {
+    var $dd = $(link).parent();
+    if ($dd.css('overflow') === 'hidden') {
+        $dd.css({'overflow': 'visible', 'height': '100%'});
+    } else {
+        $dd.css({'overflow': 'hidden', 'height': '1.2em'});
+    }
+}
+
+
 // FIXME: timezone detection does not work well.
 // Replace UTC dates with the user's local timezone.
 // Should be called after the DOM is ready on any page that may show a date.

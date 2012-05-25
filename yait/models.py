@@ -68,6 +68,14 @@ RELATIONSHIP_PARENT_OF = -RELATIONSHIP_CHILD_OF
 RELATIONSHIP_REQUIRES = 2
 RELATIONSHIP_BLOCKS = -RELATIONSHIP_REQUIRES
 
+CHANGE_TYPE_CLOSING = 1
+CHANGE_TYPE_OPENING = 2
+CHANGE_TYPE_REOPENING = 3
+CHANGE_TYPE_UPDATE = 4
+CHANGE_ACTIONS = {CHANGE_TYPE_OPENING: 'opened',
+                  CHANGE_TYPE_REOPENING: 'reopened',
+                  CHANGE_TYPE_UPDATE: 'updated',
+                  CHANGE_TYPE_CLOSING: 'closed'}
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 metadata = MetaData()
@@ -195,8 +203,9 @@ issues_table = Table(
     Column('title', Unicode),
     Column('reporter', Integer, ForeignKey('users.id')),
     Column('assignee', Integer, ForeignKey('users.id')),
-    Column('kind', Integer),  # FIXME: should be an Enum
-    Column('priority', Integer),  # FIXME: should be an Enum
+    # FIXME: rename 'kind' as 'type'
+    Column('kind', Integer),
+    Column('priority', Integer),
     Column('status', Integer),
     # FIXME: is 'resolution' useful?
     # Update 1: Yes, it's useful.
@@ -271,7 +280,9 @@ changes_table = Table(
     'changes',
     metadata,
     Column('id', Integer, primary_key=True),
+    Column('project_id', Integer, ForeignKey('projects.id')),
     Column('issue_id', Integer, ForeignKey('issues.id')),
+    Column('type', Integer),  # FIXME: use an ENUM
     Column('author', Integer, ForeignKey('users.id')),
     Column('date', DateTime),
     Column('time_spent_real', Integer),

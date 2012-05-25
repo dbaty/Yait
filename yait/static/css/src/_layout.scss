@@ -245,6 +245,53 @@
     }
 }
 
+.project-dashboard {
+
+    .reports {
+        list-style-type: none;
+
+        li {
+            padding: 1em;
+            margin-bottom: 1em;
+            background-color: #f7f7f7;
+        }
+    }
+}
+
+.recent-activity {
+    width: 45em;
+    font-size: 0.8em;
+
+    dt {
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+        border-top: 1px solid #eee;
+    }
+
+    dt:first-child {
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    dd {
+        height: 1.2em;
+        overflow: hidden;
+        margin-left: 2em;
+        padding: 0.5em;
+        margin-bottom: 0.5em;
+        background-color: #f7f7f7;
+
+        a {
+            text-decoration: none;
+            color: black;
+
+            // cancel the space below the last paragraph of the comment.
+            p:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
 
 .footer {
     clear: both;
