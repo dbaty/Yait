@@ -50,7 +50,7 @@ def home(request):
     return render_to_response('../templates/project.pt', bindings)
 
 
-def configure_form(request):
+def configure_form(request, form=None):
     project_name = request.matchdict['project_name']
     session = DBSession()
     try:
@@ -59,9 +59,10 @@ def configure_form(request):
         raise HTTPNotFound()
     if not has_permission(request, PERM_MANAGE_PROJECT, project):
         raise HTTPForbidden()
-    data = {'title': project.title,
-            'public': project.public}
-    form = make_edit_project_form(**data)
+    if form is None:
+        data = {'title': project.title,
+                'public': project.public}
+        form = make_edit_project_form(**data)
     bindings = {'api': TemplateAPI(request, project.title),
                 'project': project,
                 'can_manage_project': True,
@@ -70,7 +71,22 @@ def configure_form(request):
 
 
 def configure(request):
-    pass  # FIXME
+    project_name = request.matchdict['project_name']
+    session = DBSession()
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        raise HTTPNotFound()
+    if not has_permission(request, PERM_MANAGE_PROJECT, project):
+        raise HTTPForbidden()
+    form = make_edit_project_form(request.POST)
+    if not form.validate():
+        return configure_form(request, form)
+    project.update(**form.data)
+    msg = _(u'Changes have been saved.')
+    request.session.flash(msg, 'success')
+    url = request.route_url('project_configure', project_name=project.name)
+    return HTTPSeeOther(url)
 
 
 def configure_roles_form(request):

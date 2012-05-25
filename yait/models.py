@@ -342,7 +342,9 @@ users_table = Table(
 ##########
 projects_mapper = mapper(
     Project, projects_table,
-    properties={'issues': relationship(Issue, lazy='select'),
+    # FIXME: do we really need the 'issues' relationship?
+    properties={'issues': relationship(Issue, lazy='select',
+                                       cascade='delete'),
                 'statuses': relationship(Status, lazy='select',
                                          order_by=statuses_table.c.position,
                                          cascade='delete')})

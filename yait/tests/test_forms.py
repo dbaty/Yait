@@ -73,7 +73,7 @@ class TestAddIssueForm(TestCase):
         assert form.data['assignee'] == u''
         form.validate()
         self.assert_('assignee' not in form.errors)
-    
+
 
 # FIXME: run the same tests (and perhaps additional tests if needed)
 # against AddChangeForm, with something like this:

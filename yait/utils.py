@@ -1,4 +1,3 @@
-from datetime import datetime
 import re
 
 TIME_REGEXP = re.compile('(?:(\d+)w)?'
@@ -36,28 +35,3 @@ def time_to_str(t):
             s += ' %d%s' % (q, u)
     s = s.lstrip()
     return s
-
-
-def str_to_date(s, format='dd/mm/yyyy'):  # FIXME: is it used anywhere?
-    """Convert a string to the date it respresents.
-
-    Only one format is available: ``dd/mm/yyyy``.
-
-    >>> str_to_date('', 'yyyy/dd/mm')
-    Traceback (most recent call last):
-    ...
-    ValueError: Unrecognized date format: yyyy/dd/mm
-    >>> str_to_date('', 'dd/mm/yyyy') is None
-    True
-    >>> from datetime import datetime
-    >>> str_to_date('28/07/2011') == datetime(2011, 07, 28)
-    True
-    """
-    if format != 'dd/mm/yyyy':
-        raise ValueError('Unrecognized date format: %s' % format)
-    ## FIXME: add error handling
-    if not s:
-        return None
-    components = map(int, s.split('/'))
-    components.reverse()
-    return datetime(*components)

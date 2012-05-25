@@ -88,7 +88,7 @@
 
 
 <tal:comment tal:replace="None">
-  Name: link-extra-fieldset
+  Name: link-extra-fieldsets
   Description: display 'show/hide extra...' link
 </tal:comment>
 <metal:link-extra-fieldsets metal:define-macro="link-extra-fieldsets">
@@ -107,6 +107,10 @@
 <metal:issue-extra-fieldsets metal:define-macro="issue-extra-fieldsets">
   <div id="extra-fieldsets"
        tal:attributes="class not form.errors and 'hidden' or ''">
+    <fieldset tal:condition="issue | False">
+      <metal:field tal:define="field_name 'title'; field_options {'size': 40}"
+                   metal:use-macro="renderField"/>
+    </fieldset>
     <fieldset>
       <div class="floatable-form-panel">
         <metal:field tal:define="field_name 'status'" metal:use-macro="renderField"/>

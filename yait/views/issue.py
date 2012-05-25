@@ -162,7 +162,7 @@ def update(request):
     userid = request.user.id
     changes = {}
     for attr in (
-        'status', 'assignee', 'deadline', 'priority', 'kind',
+        'title', 'status', 'assignee', 'deadline', 'priority', 'kind',
         'time_estimated', 'time_billed'):
         old_v = getattr(issue, attr)
         new_v = getattr(form, attr).data

@@ -66,6 +66,10 @@
         border: 1px solid #ccc;
         padding: 0.2em;
     }
+
+    input:focus {
+        color: black;
+    }
 }
 
 .actions {
@@ -87,7 +91,7 @@
         text-decoration: none;
     }
 
-    .add-new-issue {
+    .add-new-issue a {
         font-weight: bold;
     }
 }

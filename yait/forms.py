@@ -16,15 +16,10 @@ from yait.i18n import _
 from yait.models import DBSession
 from yait.models import DEFAULT_ISSUE_KIND
 from yait.models import DEFAULT_ISSUE_PRIORITY
-from yait.models import DEFAULT_ISSUE_STATUS
 from yait.models import ISSUE_KIND_LABELS
 from yait.models import ISSUE_KIND_VALUES
 from yait.models import ISSUE_PRIORITY_LABELS
 from yait.models import ISSUE_PRIORITY_VALUES
-from yait.models import ISSUE_STATUS_CLOSED
-from yait.models import ISSUE_STATUS_CLOSED_LABEL
-from yait.models import ISSUE_STATUS_OPEN
-from yait.models import ISSUE_STATUS_OPEN_LABEL
 from yait.models import Project
 from yait.models import Role
 from yait.models import User
@@ -153,12 +148,15 @@ class ExtraFieldset:
 
 def text_renderer_field_factory():
     return SelectField(label=u'Text format',
-                       choices=(('rest', 'reStructuredText'), 
+                       choices=(('rest', 'reStructuredText'),
                                 ('plain', 'plain text')),
                        default='rest',
                        validators=[required()])
 
 
+# FIXME: use the same class for this, and just change the validator
+# for 'text' in 'make_add_change_form()'. Also, get rid of the
+# 'test_renderer_field_factory'.
 class AddIssueForm(BaseForm, ExtraFieldset):
     """Form used to add a new issue."""
     title = TextField(label=u'Title', validators=[required()])
@@ -168,6 +166,7 @@ class AddIssueForm(BaseForm, ExtraFieldset):
 
 class AddChangeForm(BaseForm, ExtraFieldset):
     """Form used to comment (change) an issue."""
+    title = TextField(label=u'Title', validators=[required()])
     text = TextAreaField(label=u'Text')
     text_renderer = text_renderer_field_factory()
 

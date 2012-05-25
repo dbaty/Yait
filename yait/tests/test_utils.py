@@ -41,4 +41,3 @@ class TestTimeToStr(TestCase):
         self.assertEqual(self._call_fut(541), '1d 1h 1m')
         self.assertEqual(self._call_fut(2399), '4d 7h 59m')
         self.assertEqual(self._call_fut(2401), '1w 1m')
-

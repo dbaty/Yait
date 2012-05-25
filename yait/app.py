@@ -96,6 +96,8 @@ def make_app(global_settings, **settings):
     config.add_route('project_configure', '/p/{project_name}/configure')
     config.add_view('.views.project.configure_form',
                     route_name='project_configure', request_method='GET')
+    config.add_view('.views.project.configure',
+                    route_name='project_configure', request_method='POST')
     config.add_route('project_configure_roles',
                      '/p/{project_name}/configure-roles')
     config.add_view('.views.project.configure_roles_form',

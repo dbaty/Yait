@@ -5,6 +5,7 @@
 ** which is licensed under the Apache License v2.0.
 */
 
+
 .dropdown { position:relative; }
 
 .dropdown-toggle { *margin-bottom:-3px; }
@@ -33,6 +34,7 @@
   margin-top:8px;
   margin-left:2px;
 }
+
 .dropdown-menu {
   position:absolute;
   top:100%;
@@ -57,16 +59,20 @@
   *border-right-width:2px;
   *border-bottom-width:2px;
 }
+
+.actions .dropdown-menu li {
+    float: none;
+}
+
 .dropdown-menu .divider {
- /* FIXME: fix background-color and border-color */
   height:1px;
   margin:5px 1px;
   overflow:hidden;
-  background-color:#e5e5e5;
-  border-bottom:1px solid black;
   *width:100%;
   *margin:-5px 0 5px;
+  background-color: rgba(0,0,0,0.2);
 }
+
 .dropdown-menu a {
   display:block;
   padding:3px 15px;
@@ -75,12 +81,14 @@
   line-height: 1em;
   white-space:nowrap;
 }
+
 .dropdown-menu li > a:hover,
 .dropdown-menu .active > a,
 .dropdown-menu .active > a:hover {
   text-decoration:none;
   font-weight: bold;
 }
+
 .dropdown.open { *z-index: 10; }
 
 .dropdown.open .dropdown-menu { display:block; }

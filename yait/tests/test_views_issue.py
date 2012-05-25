@@ -298,6 +298,7 @@ class TestUpdateIssue(TestCaseForViews):
         user = self._make_user(login, roles={p: ROLE_PROJECT_PARTICIPANT})
         matchdict = {'project_name': u'p1', 'issue_ref': str(issue.ref)}
         post = {'text': u'comment',
+                'title': issue.title,
                 'status': unicode(p.statuses[0].id),
                 'assignee': unicode(user.id)}
         request = self._make_request(user=login, matchdict=matchdict,

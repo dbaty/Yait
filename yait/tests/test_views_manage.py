@@ -246,7 +246,7 @@ class TestListUserRoles(TestCaseForViews):
 
     def test_list_user_roles_allow_admin(self):
         from yait.auth import ROLE_LABELS
-        from yait.auth import ROLE_PROJECT_INTERNAL_PARTICIPANT 
+        from yait.auth import ROLE_PROJECT_INTERNAL_PARTICIPANT
         from yait.auth import ROLE_PROJECT_MANAGER
         from yait.auth import ROLE_PROJECT_PARTICIPANT
         from yait.auth import ROLE_PROJECT_VIEWER

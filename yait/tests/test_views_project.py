@@ -42,6 +42,87 @@ class TestProjectHome(TestCaseForViews):
         renderer.assert_(project=p)
 
 
+class TestProjectConfigureForm(TestCaseForViews):
+
+    template_under_test = '../templates/project_configure.pt'
+
+    def _call_fut(self, request):
+        from yait.views.project import configure_form
+        return configure_form(request)
+
+    def test_project_config_form_unknown_project(self):
+        from pyramid.httpexceptions import HTTPNotFound
+        matchdict = {'project_name': u'unknown'}
+        request = self._make_request(matchdict=matchdict)
+        self.assertRaises(HTTPNotFound, self._call_fut, request)
+
+    def test_project_config_form_not_manager(self):
+        from pyramid.httpexceptions import HTTPForbidden
+        self._make_project(name=u'p1')
+        matchdict = {'project_name': u'p1'}
+        request = self._make_request(matchdict=matchdict)
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
+
+    def test_project_config_form_manager(self):
+        from yait.auth import ROLE_PROJECT_MANAGER
+        project = self._make_project(name=u'project')
+        login = u'manager'
+        self._make_user(login, roles={project: ROLE_PROJECT_MANAGER})
+        self._make_user(u'admin', is_admin=True)
+        matchdict = {'project_name': project.name}
+        request = self._make_request(user=login, matchdict=matchdict)
+        renderer = self._make_renderer()
+        self._call_fut(request)
+        self.assertEqual(renderer.form.data['title'], project.title)
+
+
+class TestProjectConfigure(TestCaseForViews):
+
+    template_under_test = '../templates/project_configure.pt'
+
+    def _call_fut(self, request):
+        from yait.views.project import configure
+        return configure(request)
+
+    def test_project_config_unknown_project(self):
+        from pyramid.httpexceptions import HTTPNotFound
+        matchdict = {'project_name': u'unknown'}
+        request = self._make_request(matchdict=matchdict)
+        self.assertRaises(HTTPNotFound, self._call_fut, request)
+
+    def test_project_config_not_manager(self):
+        from pyramid.httpexceptions import HTTPForbidden
+        self._make_project(name=u'p1')
+        matchdict = {'project_name': u'p1'}
+        request = self._make_request(matchdict=matchdict)
+        self.assertRaises(HTTPForbidden, self._call_fut, request)
+
+    def test_project_config_manager(self):
+        from yait.auth import ROLE_PROJECT_MANAGER
+        project = self._make_project(name=u'project')
+        login = u'manager'
+        self._make_user(login, roles={project: ROLE_PROJECT_MANAGER})
+        self._make_user(u'admin', is_admin=True)
+        matchdict = {'project_name': project.name}
+        post = {'title': u'New title'}
+        request = self._make_request(user=login, matchdict=matchdict, post=post)
+        self._call_fut(request)
+        self.assertEqual(project.title, u'New title')
+
+    def test_project_config_manager_cannot_change_name(self):
+        # The name of a project cannot be changed.
+        from yait.auth import ROLE_PROJECT_MANAGER
+        project = self._make_project(name=u'project')
+        login = u'manager'
+        self._make_user(login, roles={project: ROLE_PROJECT_MANAGER})
+        self._make_user(u'admin', is_admin=True)
+        matchdict = {'project_name': project.name}
+        post = {'title': project.title, 'name': u'new-name'}
+        request = self._make_request(user=login, matchdict=matchdict, post=post)
+        self._call_fut(request)
+        self.assertEqual(project.name, u'project')
+
+
 class TestProjectConfigureRolesForm(TestCaseForViews):
 
     template_under_test = '../templates/project_roles.pt'
@@ -245,14 +326,15 @@ class TestProjectConfigureStatusesForm(TestCaseForViews):
     def test_project_config_statuses_form_manager(self):
         from yait.auth import ROLE_PROJECT_MANAGER
         project = self._make_project(name=u'p1')
+        used_status = project.statuses[0].id
+        self._make_issue(project, status=used_status)
         login = u'manager'
         self._make_user(login, roles={project: ROLE_PROJECT_MANAGER})
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, matchdict=matchdict)
         renderer = self._make_renderer()
         self._call_fut(request)
-        # FIXME: add issues and check that 'used' is correctly filled
-        renderer.assert_(used=[])
+        renderer.assert_(used=[used_status])
 
 
 class TestProjectConfigureStatuses(TestCaseForViews):
@@ -415,4 +497,3 @@ class TestProjectConfigureStatuses(TestCaseForViews):
         project = self.session.query(Project).one()
         label_of = lambda statuses: [s.label for s in statuses]
         self.assertEqual(label_of(project.statuses), ['open', 'closed'])
-
