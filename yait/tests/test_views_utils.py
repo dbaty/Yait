@@ -26,7 +26,6 @@ class TestTemplateAPI(TestCase):
         request.user.is_admin = is_admin
 
     def test_notifications(self):
-        from pyramid.testing import DummyRequest
         request = DummyRequest()
         request.session.flash(u'Success 1!', 'success')
         request.session.flash(u'Success 2!', 'success')
@@ -39,21 +38,18 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(api.notifications, expected)
 
     def test_login_link_for_unauthenticated_user(self):
-        from pyramid.testing import DummyRequest
         request = DummyRequest()
         self._set_request_user(request)
         api = self._make_one(request=request)
         self.assert_(api.show_login_link)
 
     def test_no_login_link_for_logged_in_user(self):
-        from pyramid.testing import DummyRequest
         request = DummyRequest()
         self._set_request_user(request, user_id=1)
         api = self._make_one(request=request)
         self.assert_(not api.show_login_link)
 
     def test_request_user_related(self):
-        from pyramid.testing import DummyRequest
         request = DummyRequest()
         self._set_request_user(request, user_id=1, is_admin=True)
         api = self._make_one(request=request)
@@ -61,7 +57,6 @@ class TestTemplateAPI(TestCase):
         self.assert_(api.is_admin)
 
     def test_route_url(self):
-        from pyramid.testing import DummyRequest
         request = DummyRequest()
         self._set_request_user(request)
         request.route_url = lambda route_name, *elements, **kwargs: (
@@ -72,7 +67,6 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(got, expected)
 
     def test_static_url(self):
-        from pyramid.testing import DummyRequest
         request = DummyRequest()
         self._set_request_user(request)
         request.static_url = lambda path, **kwargs: (path, kwargs)
@@ -82,7 +76,6 @@ class TestTemplateAPI(TestCase):
         self.assertEqual(got, expected)
 
     def test_static_url_implicit_package(self):
-        from pyramid.testing import DummyRequest
         request = DummyRequest()
         self._set_request_user(request)
         request.static_url = lambda path, **kwargs: (path, kwargs)
@@ -90,3 +83,7 @@ class TestTemplateAPI(TestCase):
         got = api.static_url('static/foo', bar=1, baz=2)
         expected = ('yait:static/foo', {'bar': 1, 'baz': 2})
         self.assertEqual(got, expected)
+
+
+class DummyRequest(testing.DummyRequest):
+    cache = 'dummy'

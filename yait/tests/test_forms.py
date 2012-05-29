@@ -70,7 +70,7 @@ class TestAddIssueForm(TestCase):
         project = self._make_project(u'project')
         form = self._make_one(project, post={'assignee': u''})
         # assert that no assignee has been selected
-        assert form.data['assignee'] == u''
+        assert form.data['assignee'] is None
         form.validate()
         self.assert_('assignee' not in form.errors)
 

@@ -412,6 +412,8 @@ class TestProjectConfigureStatuses(TestCaseForViews):
         project = self.session.query(Project).one()
         self.assertEqual(label_of(project.statuses),
                          [new_open_label, new_closed_label])
+        # FIXME: check that the 'statuses' cache has been refreshed
+        # (or at least invalidated).
 
     def test_project_config_statuses_manager_add_status(self):
         from yait.auth import ROLE_PROJECT_MANAGER

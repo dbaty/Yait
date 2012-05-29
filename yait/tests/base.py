@@ -24,6 +24,8 @@ def get_testing_db_session():
 
 
 class DummyRequest(BaseRequest):
+    cache = None
+
     # Override 'route_url()' because the one in 'testing.DummyRequest'
     # requires a route mapper to be registered.
     def route_url(self, route_name, *elements, **kwargs):

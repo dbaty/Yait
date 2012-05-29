@@ -11,6 +11,7 @@ CHANGES = open(os.path.join(HERE, 'CHANGES.rst')).read()
 
 REQUIRES = ('cryptacular',
             'docutils',
+            'dogpile.cache',
             'pyramid',
             'pyramid_tm',
             'sqlalchemy',
@@ -25,10 +26,10 @@ setup(name='Yait',
       classifiers=(
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
-        'Framework :: Pylons',
+        'Framework :: Pyramid',
         'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python',
         'Natural Language :: English',
+        'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
         'Topic :: Software Development :: Bug Tracking'

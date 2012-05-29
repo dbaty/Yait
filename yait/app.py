@@ -1,8 +1,11 @@
+import dogpile.cache
+
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.config import Configurator
 from pyramid.session import UnencryptedCookieSessionFactoryConfig
 
 from yait.auth import AuthorizationPolicy
+from yait.cache import register_cache_region
 from yait.models import initialize_sql
 
 
@@ -38,14 +41,20 @@ def make_app(global_settings, **settings):
 
     # Request properties
     config.set_request_property('yait.auth._get_user', name='user', reify=True)
+    config.set_request_property('yait.cache.cache', name='cache', reify=True)
 
     # Authentication and authorization policies
     _set_auth_policies(config, settings)
 
-    # Sessions
+    # Session
     session_secret = settings['yait.session.secret']
     session_factory = UnencryptedCookieSessionFactoryConfig(session_secret)
     config.set_session_factory(session_factory)
+
+    # Cache
+    cache_region = dogpile.cache.make_region()
+    cache_region.configure('dogpile.cache.memory')
+    register_cache_region(config.registry, cache_region)
 
     # Routes and views:
     # - site / general purpose views / login / static assets
@@ -112,6 +121,14 @@ def make_app(global_settings, **settings):
     config.add_view('.views.project.configure_statuses',
                     route_name='project_configure_statuses',
                     request_method='POST')
+    config.add_route('project_issues',
+                     '/p/{project_name}/issues')
+    config.add_view('.views.project.issues',
+                    route_name='project_issues')
+    config.add_route('project_recent_activity',
+                     '/p/{project_name}/recent-activity')
+    config.add_view('.views.project.recent_activity',
+                    route_name='project_recent_activity')
     config.add_route('project_search', '/p/{project_name}/search')
     config.add_view('.views.project.search_form', route_name='project_search')
 

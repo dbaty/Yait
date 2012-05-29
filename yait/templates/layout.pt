@@ -62,6 +62,7 @@
       </a>
       <ul class="dropdown-menu">
         <li><a tal:attributes="href api.route_url('project_home', project_name=project.name)">Home</a></li>
+        <li><a tal:attributes="href api.route_url('project_recent_activity', project_name=project.name)">Recent activity</a></li>
         <li class="divider"></li>
         <li><a tal:attributes="href api.route_url('project_search', project_name=project.name)">Search</a></li>
         <li class="divider"></li>

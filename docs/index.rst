@@ -4,7 +4,7 @@ YAIT
 FIXME: review
 
 Yait is an issue tracking software written in Python with
-`repoze.bfg`_. It is open source, fully tested (100% test coverage)
+`Pyramid`_. It is open source, fully tested (100% test coverage)
 and documented. It is fast. It has an attractive and straightforward
 user interface. It provides a very convenient feature that lets one
 create hierarchies of issues (tasks, sub-tasks and so on) that may
@@ -13,7 +13,7 @@ also be used to manage project milestones or software versions.
 FIXME: to be expanded/rewritten: i18n, relatively easy to install,
 etc.
 
-.. _repoze.bfg: http://bfg.repoze.org
+.. _Pyramid: http://www.pylonsproject.org/
 
 
 Features
@@ -43,12 +43,12 @@ FIXME: add other features.
 Why *another* issue tracker
 ===========================
 
-The author has used several different issue tracking systems and have
-been slightly disappointed by most of them. Some have an user
-interface that is too complex, some are shipping with too much
-unneeded features. And, more importantly, none had the possibility to
-create hierarchies of issues, which was a required feature. Also, they
-come with the wrong colors.
+The author has used different issue tracking systems and have been
+slightly disappointed by most of them. Some have an user interface
+that is too complex, some are shipping with too much unneeded
+features. And, more importantly, none had the possibility to create
+hierarchies of issues, which was a required feature. Also, they come
+with the wrong colors.
 
 
 Contribute
@@ -67,8 +67,8 @@ ideas were naturally picked up here and there in other issue tracking
 softwares.
 
 This software would not exist without the tremendous work deployed by
-Chris McDonough and others on `repoze.bfg`_, the web framework Yait is
-built with.
+Chris McDonough and others on `Pyramid`_, the web framework Yait is
+built upon.
 
 The following persons have contributed to Yait:
 
@@ -78,13 +78,11 @@ The following persons have contributed to Yait:
 
 .. _IssueTracker: http://www.issuetrackerproduct.com
 
-.. _repoze.bfg: http://bfg.repoze.org
-
 
 License
 =======
 
-Yait is copyright 2010 by Damien Baty.
+Yait is copyright 2012 by Damien Baty.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

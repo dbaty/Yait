@@ -98,6 +98,7 @@ class TestAddIssue(TestCaseForViews):
         issue = p.issues[0]
         self.assertEqual(issue.title, u'Issue title')
         self.assertEqual(issue.reporter, user.id)
+        self.assertEqual(issue.assignee, None)
         self.assertEqual(issue.ref, 1)
         self.assertEqual(len(issue.changes), 1)
         change = issue.changes[0]
@@ -126,7 +127,7 @@ class TestAddIssue(TestCaseForViews):
 
         post = {'title': u't',
                 'text': u't',
-                'status': unicode(p2.statuses[0].id),                
+                'status': unicode(p2.statuses[0].id),
                 'assignee': u''}
         matchdict = {'project_name': u'p2'}
         request = self._make_request(user=login, post=post,
@@ -300,7 +301,9 @@ class TestUpdateIssue(TestCaseForViews):
         post = {'text': u'comment',
                 'title': issue.title,
                 'status': unicode(p.statuses[0].id),
-                'assignee': unicode(user.id)}
+                'assignee': unicode(user.id),
+                'time_billed': u'',
+                'time_estimated': u''}
         request = self._make_request(user=login, matchdict=matchdict,
                                      post=post)
         self._call_fut(request)

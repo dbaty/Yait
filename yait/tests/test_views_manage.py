@@ -202,6 +202,8 @@ class TestEditUser(TestCaseForViews):
         self.assertEqual(admin.fullname, post['fullname'])
         self.assertEqual(admin.email, post['email'])
         self.assert_(admin.is_admin)
+        # FIXME: check that the 'fullnames' cache has been refreshed
+        # (or at least invalidated).
 
     def test_edit_user_cannot_revoke_own_s_admin_rights(self):
         from yait.models import User

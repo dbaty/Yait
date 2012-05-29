@@ -41,6 +41,7 @@ ROLE_LABELS = {ROLE_PROJECT_MANAGER: u'Project manager',
                ROLE_PROJECT_PARTICIPANT: u'Participant',
                ROLE_PROJECT_INTERNAL_PARTICIPANT: u'Internal participant'}
 
+
 class _AnonymousUser(object):
     def __init__(self):
         self.id = None

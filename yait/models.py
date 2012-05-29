@@ -1,7 +1,5 @@
 from cryptacular.bcrypt import BCRYPTPasswordManager
 
-from pyramid.decorator import reify
-
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import create_engine
@@ -125,8 +123,8 @@ statuses_table = Table(
 
 class Issue(Model):
     _ordered = (
-        ## List of attributes ordered as they should appear in
-        ## comments details.
+        # List of attributes ordered as they should appear in comment
+        # details.
         ('title', 'title'),
         ('kind', 'kind'),
         ('priority', 'priority'),
@@ -149,18 +147,6 @@ class Issue(Model):
 
     def get_priority(self):
         return ISSUE_PRIORITY_LABELS[self.priority - 1]
-
-    def get_parent(self):
-        pass  # FIXME
-
-    def get_children(self):
-        pass  # FIXME
-
-    def get_blocked_by(self):
-        pass  # FIXME
-
-    def get_blocking(self):
-        pass  # FIXME
 
     def get_time_info(self, include_private_info):
         """Return a dictionary of time-related information for this
@@ -230,7 +216,8 @@ class Change(Model):
     def get_rendered_text(self):
         return render(self.text, self.text_renderer)
 
-    def get_details(self, include_private_time_info=False):
+    # FIXME: the code below is verbose. Could we not do better?
+    def get_details(self, caches, include_private_time_info=False):
         """Return a list of changes as mappings."""
         details = []
         for attr, label in Issue._ordered:
@@ -241,10 +228,17 @@ class Change(Model):
                 before, after = self.changes[attr]
             except KeyError:
                 continue
-            ## FIXME: the code below is verbose. Could we not do better?
+            if attr == 'status':
+                cache = caches.statuses
+            elif attr == 'assignee':
+                cache = caches.fullnames
+            else:
+                cache = None
             if not before:
                 before = 'none'
             else:
+                if cache:
+                    before = cache[before]
                 if attr.startswith('time_'):
                     before = time_to_str(before)
                 elif attr == 'kind':
@@ -254,6 +248,8 @@ class Change(Model):
             if not after:
                 after = 'none'
             else:
+                if cache:
+                    after = cache[after]
                 if attr.startswith('time_'):
                     after = time_to_str(after)
                 elif attr == 'kind':
@@ -263,17 +259,6 @@ class Change(Model):
             details.append({'attr': attr, 'label': label,
                             'before': before, 'after': after})
         return details
-
-    @reify
-    def author_info(self):
-        # FIXME: we should use a global cache
-        # FIXME: check whether we could not use some kind of
-        # "automatic lazy join" feature from SQLAlchemy
-        # (file:///Users/damien/data/docs/sqlalchemy/0.7.2/orm/loading.html)
-        session = DBSession()
-        fullname = session.query(User).filter_by(id=self.author).one().fullname
-        return {'id': self.author,
-                'fullname': fullname}
 
 
 changes_table = Table(
@@ -374,9 +359,9 @@ issue_relationships_mapper = mapper(
 roles_mapper = mapper(
     Role, roles_table,
     primary_key=(roles_table.c.user_id, roles_table.c.project_id))
-users_mapper = mapper(User, users_table,
-                      properties={'password': synonym('_password',
-                                                      map_column=True)})
+users_mapper = mapper(
+    User, users_table,
+    properties={'password': synonym('_password', map_column=True)})
 #####################################################################
 
 

@@ -23,6 +23,7 @@ def render(src, renderer_name='rest'):
 
 PARAGRAPHS_SEPARATOR = re.compile('\n\n')
 
+
 def render_plain(text):
     """Render the given ``text`` as plain text.
 

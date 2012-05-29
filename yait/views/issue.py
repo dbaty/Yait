@@ -119,10 +119,8 @@ def view(request, form=None):
         raise HTTPNotFound()
     if form is None:
         data = {'assignee': issue.assignee,
-                'children': issue.get_children(),
                 'deadline': issue.deadline,
                 'kind': issue.kind,
-                'parent': issue.get_parent(),
                 'priority': issue.priority,
                 'status': issue.status,
                 'time_estimated': issue.time_estimated,
@@ -162,10 +160,10 @@ def update(request):
     except NoResultFound:
         raise HTTPNotFound()
 
+    # FIXME: move logic outside so that it can be more easily tested.
     form = make_add_change_form(project, session, request.POST)
     if not form.validate():
         return view(request, form)
-
     now = datetime.utcnow()
     userid = request.user.id
     changes = {}
@@ -174,24 +172,19 @@ def update(request):
         'time_estimated', 'time_billed'):
         old_v = getattr(issue, attr)
         new_v = getattr(form, attr).data
-        if attr.startswith('time_') and not new_v:
-            # FIXME: probably not the right way to do it
-            new_v = 0
         if old_v != new_v:
             changes[attr] = (old_v, new_v)
             setattr(issue, attr, new_v)
+    if form.time_spent_real.data and \
+            has_permission(request, PERM_SEE_PRIVATE_TIMING_INFO, project):
+        changes['time_spent_real'] = (None, form.time_spent_real.data)
+    if form.time_spent_public.data:
+        changes['time_spent_public'] = (None, form.time_spent_public.data)
 
-    # FIXME: to be implemented
-#     current_parent = issue.getParent()
-#     new_parent = form.values['parent']
-#     if current_parent != new_parent:
-#         changes['parent'] = (current_parent, new_parent)
-#         issue.setParent(new_parent)
-#     current_children = issue.getChidrenIds()
-#     new_children = sorted(form.values['children'])
-#     if current_children != new_children:
-#         changes['children'] = (current_children, new_children)
-#         issue.setChildren(new_children)
+    if not changes and not form.text.data:
+        error = _(u'You did not provide any comment or update.')
+        form.errors['form'] = [error]
+        return view(request, form)
 
     if form.status.data == ISSUE_STATUS_OPEN and \
             issue.status != ISSUE_STATUS_OPEN:
@@ -206,24 +199,13 @@ def update(request):
                     author=userid,
                     date=now,
                     text=form.text.data,
-                    text_renderer=form.text_renderer.data)
-    if form.time_spent_real.data and \
-            has_permission(request, PERM_SEE_PRIVATE_TIMING_INFO, project):
+                    text_renderer=form.text_renderer.data,
+                    changes=changes)
+    if 'time_spent_real' in changes:
         change.time_spent_real = form.time_spent_real.data
-        changes['time_spent_real'] = (None, change.time_spent_real)
-    if form.time_spent_public.data:
+    if 'time_spent_public' in changes:
         change.time_spent_public = form.time_spent_public.data
-        changes['time_spent_public'] = (None, change.time_spent_public)
-
-    if not changes and not form.text.data:
-        # FIXME: redisplay update form with an appropriate general
-        # error message.
-        # FIXME: and rollback changes made on 'issue' and 'change'!
-        raise NotImplementedError
-
-    change.changes = changes
     session.add(change)
-    session.flush()  # FIXME: why do we need to flush?
     route_args = {'project_name': project_name,
                   'issue_ref': issue.ref,
                   '_query': {'issue_updated': 1},

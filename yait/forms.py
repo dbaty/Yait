@@ -34,13 +34,9 @@ def int_or_none(value):
     This is used for selection fields that are mapped to numeric
     columns in the database, for which an empty value is accepted
     (stored as NULL in the database).
-
-    FIXME: the implementation differs from the doc above (and does not
-    correspond to the name of the function): it returns an empty
-    string (not None) if the given value is the empty string.
     """
     if value == '':
-        return ''
+        return None
     return int(value)
 
 
@@ -102,7 +98,9 @@ class ExtraFieldset:
         choices=(),  # is filled when instanced
         validators=[required()],
         coerce=int)
-    assignee = SelectField(label=u'Assign issue to', coerce=int_or_none)
+    assignee = SelectField(label=u'Assign issue to',
+                           validators=[optional()],
+                           coerce=int_or_none)
     time_estimated = TimeInfoField(label=u'Estimated time (internal)')
     time_billed = TimeInfoField(label=u'Time billed')
     time_spent_real = TimeInfoField(label=u'Time spent (real, internal)')

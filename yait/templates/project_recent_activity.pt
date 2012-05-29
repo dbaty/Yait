@@ -1,0 +1,24 @@
+<layout metal:use-macro="api.layout">
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <span class="separator">&rarr;</span>
+    <a tal:attributes="href api.route_url('project_home',
+                                          project_name=project.name)"
+       tal:content="project.title"/>
+  </li>
+</metal:breadcrumbs>
+
+<metal:content metal:fill-slot="content">
+
+<dl class="recent-activity">
+  <tal:loop tal:repeat="activity recent_activity">
+    <dt tal:content="structure activity['desc']"/>
+    <dd tal:condition="activity['text']">
+      <a tal:content="structure activity['text']"
+         href="#" onclick="expandChangeTextInRecentActivity(this)"></a>
+    </dd>
+  </tal:loop>
+</dl>
+
+</metal:content>
+</layout>

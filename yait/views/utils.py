@@ -51,6 +51,7 @@ class TemplateAPI(object, ActionBar):
         self.logged_in = request.user.id is not None
         self.show_login_link = not self.logged_in
         self.is_admin = request.user.is_admin
+        self.cache = request.cache
 
     def route_url(self, route_name, *elements, **kw):
         return self.request.route_url(route_name, *elements, **kw)

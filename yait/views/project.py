@@ -19,6 +19,7 @@ from yait.models import CHANGE_ACTIONS
 from yait.models import DBSession
 from yait.models import DEFAULT_STATUSES
 from yait.models import Issue
+from yait.models import ISSUE_STATUS_CLOSED
 from yait.models import Project
 from yait.models import Role
 from yait.models import Status
@@ -27,6 +28,7 @@ from yait.views.utils import TemplateAPI
 
 
 RECENT_ACTIVITY_LENGTH = 10
+
 
 def home(request):
     project_name = request.matchdict['project_name']
@@ -40,10 +42,11 @@ def home(request):
     can_participate = has_permission(
         request, PERM_PARTICIPATE_IN_PROJECT, project)
     can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
-    # FIXME
-    n_assigned = 5
-    n_watching = 3
-    n_not_assigned = 2
+    issues = session.query(Issue.id).filter_by(project_id=project.id).\
+        filter(Issue.status!=ISSUE_STATUS_CLOSED)
+    n_assigned = issues.filter_by(assignee=request.user.id).count()
+    n_watching = 0  # FIXME
+    n_not_assigned = issues.filter_by(assignee=None).count()
     search_form = make_simplified_search_form(project, session)
     recent_activity = get_recent_activity(session, project, request)
     bindings = {'api': TemplateAPI(request, project.title),
@@ -56,6 +59,28 @@ def home(request):
                 'search_form': search_form,
                 'recent_activity': recent_activity}
     return render_to_response('../templates/project.pt', bindings)
+
+
+def recent_activity(request):
+    project_name = request.matchdict['project_name']
+    session = DBSession()
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        raise HTTPNotFound()
+    if not has_permission(request, PERM_VIEW_PROJECT, project):
+        raise HTTPForbidden()
+    can_participate = has_permission(
+        request, PERM_PARTICIPATE_IN_PROJECT, project)
+    can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
+    recent_activity = get_recent_activity(session, project, request)
+    bindings = {'api': TemplateAPI(request, project.title),
+                'project': project,
+                'can_participate': can_participate,
+                'can_manage_project': can_manage_project,
+                'recent_activity': recent_activity}
+    return render_to_response(
+        '../templates/project_recent_activity.pt', bindings)
 
 
 def get_recent_activity(db_session, project, request):
@@ -72,7 +97,7 @@ def get_recent_activity(db_session, project, request):
         issue_url = request.route_url(
             'issue_view', project_name=project.name, issue_ref=issue.ref)
         change_url = '%s#change-%d' % (issue_url, change.id)
-        info = {'author': change.author_info['fullname'],
+        info = {'author': request.cache.fullnames[change.author],
                 'action': action,
                 'issue_ref': issue.ref,
                 'issue_url': issue_url,
@@ -82,6 +107,50 @@ def get_recent_activity(db_session, project, request):
                 '<a href="${issue_url}">#${issue_ref}: ${title}</a>.') % info
         activity.append({'desc': msg, 'text': change.get_rendered_text()})
     return activity
+
+
+def issues(request):
+    """A list of issues that correspond to the filter requested in the
+    GET parameters.
+    """
+    project_name = request.matchdict['project_name']
+    session = DBSession()
+    try:
+        project = session.query(Project).filter_by(name=project_name).one()
+    except NoResultFound:
+        raise HTTPNotFound()
+    if not has_permission(request, PERM_VIEW_PROJECT, project):
+        raise HTTPForbidden()
+    can_participate = has_permission(
+        request, PERM_PARTICIPATE_IN_PROJECT, project)
+    can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
+    issues = session.query(Issue).filter_by(project_id=project.id).\
+        filter(Issue.status!=ISSUE_STATUS_CLOSED)
+    filter = request.GET.get('filter')
+    if filter == 'assigned-to-me':
+        issues = issues.filter_by(assignee=request.user.id)
+        filter_label = _('Assigned to me')
+    elif filter == 'watching':
+        # FIXME: not implemented yet
+        filter_label = None
+    elif filter == 'not-assigned':
+        filter_label = _('Not assigned')
+        issues = issues.filter_by(assignee=None)
+    else:
+        filter_label = None
+        issues = ()
+    if issues:
+        issues = issues.all()
+    bindings = {'api': TemplateAPI(request, project.title),
+                'project': project,
+                'can_participate': can_participate,
+                'can_manage_project': can_manage_project,
+                'filter': filter,
+                'filter_label': filter_label,
+                'issues': issues,
+                'count': len(issues)}
+    return render_to_response(
+        '../templates/project_issues.pt', bindings)
 
 
 def configure_form(request, form=None):

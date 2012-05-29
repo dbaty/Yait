@@ -1,0 +1,47 @@
+<layout metal:use-macro="api.layout">
+<metal:breadcrumbs metal:fill-slot="breadcrumbs">
+  <li>
+    <span class="separator">&rarr;</span>
+    <a tal:attributes="href api.route_url('project_home',
+                                          project_name=project.name)"
+       tal:content="project.title"/>
+  </li>
+</metal:breadcrumbs>
+
+<metal:content metal:fill-slot="content">
+
+<tal:if tal:condition="filter_label">
+<h1 tal:content="filter_label"></h1>
+
+<p><span tal:replace="count"> issues match this filter.</p>
+
+<!--
+  FIXME: we may not show the same information (columns) in all
+  filters. For example, in the 'Assigned to me' filter, we don't want
+  the 'assignee' column.
+-->
+<table tal:condition="issues" class="listing">
+  <thead>
+    <th>Ref.</th>
+    <th>Title</th>
+  </thead>
+  <tbody>
+    <tr tal:repeat="issue issues"
+        tal:attributes="class repeat['issue'].odd and 'odd' or 'even'">
+      <td tal:content="issue.ref"/>
+      <td>
+        <a tal:content="issue.title"
+           tal:attributes="href api.route_url('issue_view', project_name=project.name, issue_ref=issue.ref)"/>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</tal:if>
+
+<div tal:condition="not filter_label"
+     class="notification-error">
+  The given filter ("<span tal:replace="filter">") could not be found.
+</div>
+
+</metal:content>
+</layout>

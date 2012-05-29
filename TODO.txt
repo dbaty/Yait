@@ -1,56 +1,44 @@
 Yait 0.2
 ========
 
-- experiment with CodeMirror (http://codemirror.net/)
+- benchmark the use of the 'load:' syntax in Chameleon
 
-- remove 'User.login' column. Users will log in with their email address.
+      <tal:layout tal:define="master load: project_configure_macros.pt"
+                  metal:use-macro="master">
 
-- in "control-panel/users/<user_id>/roles", allow admin to change
-  user's roles and add a role in other projects
+  If it is not a lot slower than defining 'api.layout', use it
+  everywhere.
 
-- complete the 'add issue' form: parent/children
+- speed up tests:
 
-- add a way to change the title: add a "title" field above the "text"
-  field in the add comment form.
+  - if we define the renderer in the view configuration (so that the
+    view only returns a dictionary), do the tests run faster? They may
+    be easier to write, too.
 
-- design:
+- relationships between issues : parent/child, blocks/requires
 
-  - review "Text renderer" field: we could move it to a hidden field
-    and have a custom drop-down menu on the right of the "Text label",
-    like this:
+  - make special forms that are submitted through AJAX.
 
-      Text (using reStructuredText v)
+- project configuration: ability to hide parent/child relationship for
+  projects/users that don't want the feature.
 
-    But this is too soon to spend time on this, as we have only one
-    renderer for now. We should rather find a half-way solution
+- date handling:
 
-- relationships between issues : parent/child, requires/is required by
+  - fix date display: detecting the timezone and adjusting to DST in
+    JavaScript is hard (to me). Do it server-side. This will also make
+    it easier to i18n-ize messages that contain dates.
 
-- command-line tool to add a new user (really?)
+    Look at http://momentjs.com
+
+  - when a user sets a deadline, she uses her own local time. Make
+    sure that the right time in stored in the database. To do so, we
+    could store the timezone in a hidden field (with the 'jstz'
+    Javascript package) and compute the UTC time server-side.
 
 - review permission system: turn it into a Pyramid authorization
   policy (?)
 
 - attachments
-
-- home page:
-
-  - list of issues assigned to me
-
-  - list of issues that I am watching
-
-  - recent activity (later?)
-
-- project home page:
-
-  - list of issues assigned to me
-
-  - list of issues that I am watching
-
-  - recent activity (later?)
-
-  - link to a graphical representation of tickets (down to a certain
-    depth) : later
 
 - project configuration : configure whether the public
   (customer-oriented) timing information is displayed ('time_billed'
@@ -60,7 +48,7 @@ Yait 0.2
   required. In this case, display the field below the text field (and
   not in the "extra" field set).
 
-- search form
+- search
 
 - e-mail notification:
 
@@ -80,38 +68,57 @@ Yait 0.2
 
   ProjectSubscription: project_id, user_id
 
+  deferred tasks: look at retools, RQ (http://python-rq.org) versus Celery
+
 - i18n (and update Trove classifier in 'setup.py'), including i18n of
   jQuery date picker (cf. http://www.kelvinluck.com/assets/jquery/datePicker/v2/demo/) and date displayed in the 'meta' block
 
 - sanitize user input comments (remove iframe, Javascript, etc.) :
-  https://github.com/jsocol/bleach ?
+  https://github.com/jsocol/bleach ? https://github.com/wichert/htmllaundry ?
+
+  http://ha.ckers.org/xss.html
 
 - anti-CSRF measures:
   http://wtforms.simplecodes.com/docs/dev/ext.html#module-wtforms.ext.csrf
 
-- add auto-complete widget for "assign issue to"
+- make priority and kind fields configurable (like statuses).
 
-- add auto-complete widget for "Parent issue"
-
-- remove "Child issue(s)" label from the extra fieldset (?)
-
-- make status, priority and kind fields configurable.
-
-- show a list of unassigned issues on the project home page (or on a
-  separate report page)
-
-
-
-Yait 0.3
-========
-
-- find a new name: obal, peri, prao, aster, noria, falgo, tern, tuit
+- add 'milestone' field. Should be configurable like statuses,
+  priorities and others. The field should not be required, though.
+  Also, if there are no milestones, the field should not appear at
+  all.
 
 
 Later
 =====
 
-- speed up tests
+- missing CSS for '.unassigned-issue' (in 'issue.pt')
+
+- add the possibility for users to create their own filters, which may
+  be private or public. Filters may be available for a particular
+  project or for all projects:
+
+  - filter_id
+  - user_id
+  - label: text label
+  - public: True if public, False if private
+  - project_id: may be NULL if available in all projects.
+  - definition: 'definition' column could be a pickled dictionary.
+
+  Warning here: If a filter is public and available in all projects,
+  we should make sure that it does not leak any information about its
+  creator in foreign projects that the creator does not know about. In
+  fact, I wonder if this feature is a good idea. Perhaps we could just
+  let the user copy one of its filter from a project to another, and
+  decide that a public filter is only usable in its project of origin.
+
+- check CASCADE ON DELETE between issues, projects, roles, etc.
+
+- add syntax highlighting in reStructuredText markup.
+
+- add auto-complete widget for "assign issue to"
+
+- experiment with CodeMirror (http://codemirror.net/)
 
 - ability to guess links to issues in comments, for example::
 
@@ -124,22 +131,12 @@ Later
   separate table that logs account creation, deactivation and
   reactivation.
 
-- allow other text formatting syntaxes:
+- add other text renderers (Markdown, at least):
 
-  - make the syntax configurable in the preferences (set in a cookie);
-
-  - call the right renderer when previewing;
-
-  - store the renderer in the Change model, alongside the text.
+- make the renderer configurable in the preferences (set in a cookie);
 
 - handle requests to "/robots.txt" (and possibly "/favicon.ico"
   if/when the layout template is not used)
-
-- display date in the user's timezone:
-
-  - http://www.onlineaspect.com/2007/06/08/auto-detect-a-time-zone-with-javascript
-
-  - http://www.csgnetwork.com/timezoneproginfo.html
 
 - document time-related details:
 
@@ -167,18 +164,16 @@ Later
 
 - add a way to delete an issue. Actually, it should not remove
   anything. It toggles the "deleted" marker in the Issue model and add
-  a change. The view page is specific and only indicates that this
-  issue has been deleted, the author of the deletion and the
-  date. Only project administrators are allowed to undelete an issue
-  (which also adds a "Change" entry).
+  a change. The view page then indicates that this issue has been
+  deleted, the author of the deletion and the date. Only project
+  administrators are allowed to undelete an issue (which also adds a
+  "Change" entry).
 
 - user preferences:
 
-  - markup syntax;
+  - text renderer;
 
   - preferred language;
-
-- show users' full name instead of their id.
 
 - optimize database
 
@@ -198,7 +193,11 @@ Later
 
   - calendar icon: Fam fam fam
 
-- remove unused assets from "static/img"
+  - JavaScript timezone (may be removed): http://www.pageloom.com/automatic-timezone-detection-with-javascript
+
+  - jQuery drag and drop plugin: http://dragsort.codeplex.com/
+
+- remove unused assets from "static/img" (if any)
 
 - when the text renderer gives an error, refuse to save the issue/comment;
 
@@ -215,9 +214,16 @@ Later
 - add settings so that the JSON calls are not cached:
   http://stackoverflow.com/questions/264216/getjson-returning-cached-data-in-ie8
 
+  Is this needed at all? Do we have JSON calls that are not POSTed?
+
 - user guide
 
 - automatically grow textareas: http://www.technoreply.com/autogrow-textarea-plugin-version-2-0/
 
 - handle localization of timing information: "1j" in French should be
-  turned into "1d" in English.
+  accepted and turned into "1d" in English.
+
+- look at ForgePlucker (http://home.gna.org/forgeplucker/) and/or
+  other formats to export bugs to other systems.
+
+- insert into users values(1, 'admin', '$2a$10$xU8/vh3drmwoCGUN.zcE.OYM54sKu0SbzOXXpOeosgNi2lCLMoLae', 'Joe Admin', 'joe.admin@exemple.com', 1);

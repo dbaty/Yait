@@ -2,7 +2,9 @@
 <metal:breadcrumbs metal:fill-slot="breadcrumbs">
   <li>
     <span class="separator">&rarr;</span>
-    <span tal:replace="project.title">
+    <a tal:attributes="href api.route_url('project_home',
+                                          project_name=project.name)"
+       tal:content="project.title"/>
   </li>
 </metal:breadcrumbs>
 
@@ -11,15 +13,22 @@
 <div class="project-dashboard">
 
   <div class="floatable-form-panel last-floatable-form-panel">
-    <ul class="reports">
-      <li tal:condition="n_assigned">
-        <a href="FIXME">Assigned to me (<span tal:replace="n_assigned"/>)</a>
+    <ul class="reports"
+        tal:define="filter_url lambda filter: api.route_url('project_issues', project_name=project.name, _query={'filter': filter})">
+      <li>
+        <a tal:condition="n_assigned"
+           tal:attributes="href filter_url('assigned-to-me')">Assigned to me (<span tal:replace="n_assigned"/>)</a>
+        <tal:if tal:condition="not n_assigned">Assigned to me (0)</tal:if>
       </li>
-      <li tal:condition="n_watching">
-        <a href="FIXME">Watching (<span tal:replace="n_watching"/>)</a>
+      <li>
+        <a tal:condition="n_watching"
+           tal:attributes="href filter_url('watching')">Watching (<span tal:replace="n_watching"/>)</a>
+        <tal:if tal:condition="not n_watching">Watching (0)</tal:if>
       </li>
-      <li tal:condition="n_assigned">
-        <a href="FIXME">Not assigned (<span tal:replace="n_not_assigned"/>)</a>
+      <li>
+        <a tal:condition="n_not_assigned"
+           tal:attributes="href filter_url('not-assigned')">Not assigned (<span tal:replace="n_not_assigned"/>)</a>
+        <tal:if tal:condition="not n_not_assigned">Not assigned (0)</tal:if>
       </li>
     </ul>
   </div>
@@ -47,18 +56,6 @@
     </form>
   </div>
 </div>
-
-<h1 class="clear">Recent activity</h1>
-
-<dl class="recent-activity">
-  <tal:loop tal:repeat="activity recent_activity">
-    <dt tal:content="structure activity['desc']"/>
-    <dd>
-      <a tal:content="structure activity['text']"
-         href="#" onclick="expandChangeTextInRecentActivity(this)"></a>
-    </dd>
-  </tal:loop>
-</dl>
 
 </metal:content>
 </layout>

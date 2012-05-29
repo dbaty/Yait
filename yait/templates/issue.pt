@@ -40,14 +40,14 @@
                title="scroll to the top of the page...">&uarr;</a>
           </div>
         </div>
-        <tal:defines tal:define="details change.get_details(
+        <tal:defines tal:define="details change.get_details(caches=api.cache,
                                  include_private_time_info=can_see_private_time_info)">
           <h2 class="change-header"
               tal:attributes="id 'change-%d' % change.id">
             <a tal:attributes="href '%s#change-%d' % (api.request.url, change.id)"
                title="permanent link to this comment"
                class="permalink">#</a>
-            Updated by <span tal:replace="change.author_info['fullname']"/>
+            Updated by <span tal:replace="api.cache.fullnames[change.author]"/>
             on <span class="date" tal:content="change.date.isoformat()"/>
           </h2>
           <div class="change-text"
@@ -75,7 +75,9 @@
           tal:attributes="action api.route_url('issue_update', project_name=project.name, issue_ref=issue.ref)"
           tal:define="renderField api.form_macros['renderField'];
                       field_options {}">
-      <div class="notification-error" tal:condition="form.errors">The form has errors.</div>
+      <div class="notification-error"
+           tal:condition="form.errors"
+           tal:content="form.errors.get('form', ['The form has errors.'])[0]"></div>
       <fieldset>
         <legend>Comment or update issue</legend>
         <metal:issue-text-field metal:use-macro="api.form_macros['issue-text-field']"/>
@@ -93,7 +95,7 @@
   </div>
 
   <div class="issue-meta">
-    <div class="status" tal:content="issue.status"></div>
+    <div class="status" tal:content="api.cache.statuses[issue.status]"></div>
 
     <h2>Details</h2>
     <ul>
@@ -103,11 +105,11 @@
 
     <h2>Participants</h2>
     <ul>
-      <li>Reported by <span tal:replace="issue.reporter"/></li>
+      <li>Reported by <span tal:replace="api.cache.fullnames[issue.reporter]"/></li>
       <li tal:condition="issue.assignee">
-        Assigned to <span tal:replace="issue.assignee"/>
+        Assigned to <span tal:replace="api.cache.fullnames[issue.assignee]"/>
       </li>
-      <li tal:condition="not issue.assignee" class="issueUnassigned">
+      <li tal:condition="not issue.assignee" class="unassigned-issue">
         Unassigned
       </li>
       <!-- FIXME: link shows a dialog form with the list of issue subscribers + buttons to add/remove subscribers  -->
