@@ -81,7 +81,7 @@ def make_app(global_settings, **settings):
                     renderer='templates/control_panel.pt')
     config.add_route('users', '/control-panel/users')
     config.add_view('.views.manage.list_users', route_name='users',
-                    renderer='users.pt')
+                    renderer='templates/users.pt')
     config.add_route('user_add', '/control-panel/user/add')
     config.add_view('.views.manage.add_user_form', route_name='user_add',
                     request_method='GET',
