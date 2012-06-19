@@ -1,13 +1,7 @@
 Yait 0.2
 ========
 
-- benchmark the use of the 'load:' syntax in Chameleon
-
-      <tal:layout tal:define="master load: project_configure_macros.pt"
-                  metal:use-macro="master">
-
-  If it is not a lot slower than defining 'api.layout', use it
-  everywhere.
+- update CSS: '&:hover' + color of hover-ed links in dropdowns
 
 - relationships between issues : parent/child, blocks/requires
 

@@ -1,6 +1,5 @@
-<layout tal:define="master load: project_configure_macros.pt;
-                    current_config_page python: 'statuses'"
-        metal:use-macro="master">
+<layout tal:define="current_config_page python: 'statuses'"
+        metal:use-macro="api.project_config_macros['master']">
 <metal:content metal:fill-slot="configuration-content">
 
 <form tal:attributes="action api.route_url('project_configure_statuses', project_name=project.name)"
@@ -18,10 +17,11 @@
                class="hidden"/>
         <input type="hidden" name="statuses" tal:attributes="value status.id"/>
         <span tal:content="status.label"/>
-        <a href="#" onclick="renameProjectPropertyItem(this)"
+        <a href="#" onclick="renameProjectPropertyItem(this)" title="edit label"
            ><img tal:attributes="src api.static_url('static/img/edit-label.png')"
                  width="16" height="16" alt="edit label"/></a>
         <a tal:condition="status.id not in used"
+           title="delete status"
            href="#" onclick="deleteProjectPropertyItem(this)"
            ><img tal:attributes="src api.static_url('static/img/delete.png')"
                  width="16" height="16" alt="delete status"/></a>

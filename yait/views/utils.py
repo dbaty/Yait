@@ -57,6 +57,11 @@ class TemplateAPI(object, ActionBar):
         return get_renderer(
             '../templates/form_macros.pt').implementation().macros
 
+    @reify
+    def project_config_macros(self):
+        return get_renderer(
+            '../templates/project_configure_macros.pt').implementation().macros
+
     def route_url(self, route_name, *elements, **kw):
         return self.request.route_url(route_name, *elements, **kw)
 

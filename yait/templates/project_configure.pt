@@ -1,6 +1,5 @@
-<layout tal:define="master load: project_configure_macros.pt;
-                    current_config_page python: 'general'"
-        metal:use-macro="master">
+<layout tal:define="current_config_page python: 'general'"
+        metal:use-macro="api.project_config_macros['master']">
 <metal:content metal:fill-slot="configuration-content">
 
 <form tal:attributes="action api.route_url('project_configure', project_name=project.name)"
