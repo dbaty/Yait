@@ -13,34 +13,28 @@ class DummyCallable(object):
 
 class TestLoginForm(TestCaseForViews):
 
-    template_under_test = '../templates/login.pt'
-
     def _call_fut(self, request):
         from yait.views.auth import login_form
         return login_form(request)
 
     def test_login_form(self):
-        renderer = self._make_renderer()
         request = self._make_request(get={'next': '/foo'})
-        self._call_fut(request)
-        renderer.assert_(login_failed=False)
-        renderer.assert_(needs_login=False)
-        renderer.assert_(next='/foo')
-        api = renderer.api
-        self.assert_(not api.show_login_link)
+        res = self._call_fut(request)
+        self.assertEqual(res['login_failed'], False)
+        self.assertEqual(res['needs_login'], False)
+        self.assertEqual(res['next'], '/foo')
+        self.assertEqual(res['api'].show_login_link, False)
 
     def test_login_form_after_forbidden_when_anonymous(self):
-        renderer = self._make_renderer()
+        next = '/restricted'
         request = self._make_request(get={'needs_login': '1',
-                                          'next': '/restricted'})
-        self._call_fut(request)
-        renderer.assert_(needs_login=True)
-        renderer.assert_(next='/restricted')
+                                          'next': next})
+        res = self._call_fut(request)
+        self.assertEqual(res['needs_login'], True)
+        self.assertEqual(res['next'], next)
 
 
 class TestLogin(TestCaseForViews):
-
-    template_under_test = '../templates/login.pt'
 
     def _call_fut(self, request, _remember, _check_password):
         from yait.views.auth import login
@@ -64,9 +58,8 @@ class TestLogin(TestCaseForViews):
         request = self._make_request(post=post)
         remember = DummyCallable()
         check_password = DummyCallable(None)
-        renderer = self._make_renderer()
-        self._call_fut(request, remember, check_password)
-        renderer.assert_(login_failed=True)
+        res = self._call_fut(request, remember, check_password)
+        self.assertEqual(res['login_failed'], True)
         self.assertEqual(len(remember.called), 0)
 
 
@@ -88,8 +81,6 @@ class TestLogout(TestCaseForViews):
 
 class TestForbidden(TestCaseForViews):
 
-    template_under_test = '../templates/forbidden.pt'
-
     def _call_fut(self, request):
         from yait.views.auth import forbidden
         return forbidden(request)
@@ -103,8 +94,7 @@ class TestForbidden(TestCaseForViews):
     def test_logged_in_return_forbidden(self):
         login = u'user1'
         self._make_user(login)
-        renderer = self._make_renderer()
         request = self._make_request(user=login)
         request.url = '/forbidden'
-        self._call_fut(request)
-        renderer.assert_(forbidden_url=request.url)
+        res = self._call_fut(request)
+        self.assertEqual(res['forbidden_url'], request.url)

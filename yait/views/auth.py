@@ -6,7 +6,6 @@ Policies are defined in the 'yait.auth' module, not here.
 from urllib import quote_plus
 
 from pyramid.httpexceptions import HTTPSeeOther
-from pyramid.renderers import render_to_response
 from pyramid.security import authenticated_userid
 from pyramid.security import forget
 from pyramid.security import remember
@@ -21,12 +20,11 @@ def login_form(request, login_failed=False):
         request.route_url('home')
     api = TemplateAPI(request, _(u'Log in'))
     api.show_login_link = False
-    bindings = {'api': api,
-                'next': next,
-                'login_failed': login_failed,
-                'needs_login': 'needs_login' in request.GET,
-                'login': request.POST.get('login', '')}
-    return render_to_response('../templates/login.pt', bindings)
+    return {'api': api,
+            'next': next,
+            'login_failed': login_failed,
+            'needs_login': 'needs_login' in request.GET,
+            'login': request.POST.get('login', '')}
 
 
 def login(request, _check_password=check_password, _remember=remember):
@@ -64,6 +62,5 @@ def forbidden(request):
                                         'needs_login': '1'})
         return HTTPSeeOther(location=url)
     # User is logged in but is not allowed to do what she tried.
-    bindings = {'api': TemplateAPI(request),
-                'forbidden_url': request.url}
-    return render_to_response('../templates/forbidden.pt', bindings)
+    return {'api': TemplateAPI(request),
+            'forbidden_url': request.url}

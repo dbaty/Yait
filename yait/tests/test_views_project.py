@@ -3,8 +3,6 @@ from yait.tests.base import TestCaseForViews
 
 class TestProjectHome(TestCaseForViews):
 
-    template_under_test = '../templates/project.pt'
-
     def _call_fut(self, request):
         from yait.views.project import home
         return home(request)
@@ -24,27 +22,23 @@ class TestProjectHome(TestCaseForViews):
 
     def test_project_view_public_project(self):
         p = self._make_project(name=u'p1', public=True)
-        renderer = self._make_renderer()
         matchdict = {'project_name': u'p1'}
         request = self._make_request(matchdict=matchdict)
-        self._call_fut(request)
-        renderer.assert_(project=p)
+        res = self._call_fut(request)
+        self.assertEqual(res['project'], p)
 
     def test_project_view_allowed_user(self):
         from yait.auth import ROLE_PROJECT_VIEWER
         p = self._make_project(name=u'p1')
         login = u'user1'
         self._make_user(login, roles={p: ROLE_PROJECT_VIEWER})
-        renderer = self._make_renderer()
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, matchdict=matchdict)
-        self._call_fut(request)
-        renderer.assert_(project=p)
+        res = self._call_fut(request)
+        self.assertEqual(res['project'], p)
 
 
 class TestProjectConfigureForm(TestCaseForViews):
-
-    template_under_test = '../templates/project_configure.pt'
 
     def _call_fut(self, request):
         from yait.views.project import configure_form
@@ -71,14 +65,11 @@ class TestProjectConfigureForm(TestCaseForViews):
         self._make_user(u'admin', is_admin=True)
         matchdict = {'project_name': project.name}
         request = self._make_request(user=login, matchdict=matchdict)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        self.assertEqual(renderer.form.data['title'], project.title)
+        res = self._call_fut(request)
+        self.assertEqual(res['form'].data['title'], project.title)
 
 
 class TestProjectConfigure(TestCaseForViews):
-
-    template_under_test = '../templates/project_configure.pt'
 
     def _call_fut(self, request):
         from yait.views.project import configure
@@ -125,8 +116,6 @@ class TestProjectConfigure(TestCaseForViews):
 
 class TestProjectConfigureRolesForm(TestCaseForViews):
 
-    template_under_test = '../templates/project_roles.pt'
-
     def _call_fut(self, request):
         from yait.views.project import configure_roles_form
         return configure_roles_form(request)
@@ -161,9 +150,8 @@ class TestProjectConfigureRolesForm(TestCaseForViews):
         self._make_user(u'admin', is_admin=True)
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, matchdict=matchdict)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        self.assertEqual(renderer.project, project1)
+        res = self._call_fut(request)
+        self.assertEqual(res['project'], project1)
         user_roles = [{'user_id': manager1.id,
                        'fullname': manager1.fullname,
                        'role': ROLE_PROJECT_MANAGER},
@@ -173,8 +161,8 @@ class TestProjectConfigureRolesForm(TestCaseForViews):
                       {'user_id': viewer.id,
                        'fullname': viewer.fullname,
                        'role': ROLE_PROJECT_VIEWER}]
-        self.assertEqual(renderer.user_roles, user_roles)
-        self.assertEqual(renderer.users_with_no_role, ())
+        self.assertEqual(res['user_roles'], user_roles)
+        self.assertEqual(res['users_with_no_role'], ())
 
     def test_project_config_roles_form_admin_sees_all_users_with_no_role(self):
         from yait.auth import ROLE_PROJECT_VIEWER
@@ -188,19 +176,16 @@ class TestProjectConfigureRolesForm(TestCaseForViews):
                                   roles={project2: ROLE_PROJECT_VIEWER})
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, matchdict=matchdict)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        self.assertEqual(renderer.project, project1)
+        res = self._call_fut(request)
+        self.assertEqual(res['project'], project1)
         users_with_no_role = [{'id': 0,
                                'fullname': u'Select a user...'},
                               {'id': no_role.id,
                                'fullname': no_role.fullname}]
-        self.assertEqual(renderer.users_with_no_role, users_with_no_role)
+        self.assertEqual(res['users_with_no_role'], users_with_no_role)
 
 
 class TestProjectConfigureRoles(TestCaseForViews):
-
-    template_under_test = '../templates/project_roles.pt'
 
     def _call_fut(self, request):
         from yait.views.project import configure_roles
@@ -232,7 +217,6 @@ class TestProjectConfigureRoles(TestCaseForViews):
         matchdict = {'project_name': u'p1'}
         post = {'role_%d' % user2.id: ROLE_PROJECT_VIEWER}
         request = self._make_request(user=login, matchdict=matchdict, post=post)
-        self._make_renderer()
         self._call_fut(request)
         self.assertEqual(len(request.get_flash('error')), 0)
         self.assertEqual(len(request.get_flash('success')), 1)
@@ -250,13 +234,12 @@ class TestProjectConfigureRoles(TestCaseForViews):
         matchdict = {'project_name': u'p1'}
         post = {'role_%d' % manager.id: ROLE_PROJECT_VIEWER}
         request = self._make_request(user=login, matchdict=matchdict, post=post)
-        renderer = self._make_renderer()
-        self._call_fut(request)
+        res = self._call_fut(request)
         # The 'configure_form' view is called, which creates a
         # TemplateAPI, which in turns pulls the notification from the
         # session. This is why we cannot use 'request.get_flash()'.
-        self.assertEqual(len(renderer.api.notifications['error']), 1)
-        self.assertEqual(len(renderer.api.notifications['success']), 0)
+        self.assertEqual(len(res['api'].notifications['error']), 1)
+        self.assertEqual(len(res['api'].notifications['success']), 0)
         role = self.session.query(Role).filter_by(user_id=manager.id).one()
         self.assertEqual(role.role, ROLE_PROJECT_MANAGER)
 
@@ -271,13 +254,12 @@ class TestProjectConfigureRoles(TestCaseForViews):
         matchdict = {'project_name': u'p1'}
         post = {'role_%d' % user.id: ROLE_PROJECT_VIEWER}
         request = self._make_request(user=login, matchdict=matchdict, post=post)
-        renderer = self._make_renderer()
-        self._call_fut(request)
+        res = self._call_fut(request)
         # The 'configure_form' view is called, which creates a
         # TemplateAPI, which in turns pulls the notification from the
         # session. This is why we cannot use 'request.get_flash()'.
-        self.assertEqual(len(renderer.api.notifications['error']), 1)
-        self.assertEqual(len(renderer.api.notifications['success']), 0)
+        self.assertEqual(len(res['api'].notifications['error']), 1)
+        self.assertEqual(len(res['api'].notifications['success']), 0)
         role = self.session.query(Role).filter_by().one()
         self.assertEqual(role.role, ROLE_PROJECT_MANAGER)
 
@@ -303,8 +285,6 @@ class TestProjectConfigureRoles(TestCaseForViews):
 
 
 class TestProjectConfigureStatusesForm(TestCaseForViews):
-
-    template_under_test = '../templates/project_statuses.pt'
 
     def _call_fut(self, request):
         from yait.views.project import configure_statuses_form
@@ -332,14 +312,11 @@ class TestProjectConfigureStatusesForm(TestCaseForViews):
         self._make_user(login, roles={project: ROLE_PROJECT_MANAGER})
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, matchdict=matchdict)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        renderer.assert_(used=[used_status])
+        res = self._call_fut(request)
+        self.assertEqual(res['used'], [used_status])
 
 
 class TestProjectConfigureStatuses(TestCaseForViews):
-
-    template_under_test = '../templates/project_statuses.pt'
 
     def _call_fut(self, request):
         from yait.views.project import configure_statuses
@@ -489,9 +466,8 @@ class TestProjectConfigureStatuses(TestCaseForViews):
         post = (('statuses', unicode(ISSUE_STATUS_CLOSED)),
                 ('labels', ISSUE_STATUS_CLOSED_LABEL))
         request = self._make_request(user=login, post=post, matchdict=matchdict)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        self.assertEqual(len(renderer.api.notifications['error']), 1)
+        res = self._call_fut(request)
+        self.assertEqual(len(res['api'].notifications['error']), 1)
         # We need to detach 'project' from the session, otherwise
         # SQLAlchemy does not retrieve statuses again when we access
         # 'p.statuses'.

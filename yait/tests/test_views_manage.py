@@ -3,8 +3,6 @@ from yait.tests.base import TestCaseForViews
 
 class TestControlPanelHome(TestCaseForViews):
 
-    template_under_test = '../templates/control_panel.pt'
-
     def _call_fut(self, request):
         from yait.views.manage import control_panel
         return control_panel(request)
@@ -17,15 +15,12 @@ class TestControlPanelHome(TestCaseForViews):
     def test_control_panel_allow_admin(self):
         login = u'admin'
         self._make_user(login, is_admin=True)
-        self._make_renderer()
         request = self._make_request(user=login)
-        response = self._call_fut(request)
-        self.assertEqual(response.status, '200 OK')
+        self._call_fut(request)
+        self.assertEqual(request.response.status, '200 OK')
 
 
 class TestListUsers(TestCaseForViews):
-
-    template_under_test = '../templates/users.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import list_users
@@ -41,15 +36,12 @@ class TestListUsers(TestCaseForViews):
         admin = self._make_user(login, u'Admin One', is_admin=True)
         a2 = self._make_user(u'admin2', u'Admin Two', is_admin=True)
         u3 = self._make_user(u'user3', u'User Three')
-        renderer = self._make_renderer()
         request = self._make_request(user=login)
-        self._call_fut(request)
-        renderer.assert_(users=[admin, a2, u3])
+        res = self._call_fut(request)
+        self.assertEqual(res['users'], [admin, a2, u3])
 
 
 class TestAddUserForm(TestCaseForViews):
-
-    template_under_test = '../templates/user_add.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import add_user_form
@@ -65,14 +57,11 @@ class TestAddUserForm(TestCaseForViews):
         login = u'admin'
         self._make_user(login, is_admin=True)
         request = self._make_request(user=login)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        self.assertIsInstance(renderer.form, AddUserForm)
+        res = self._call_fut(request)
+        self.assertIsInstance(res['form'], AddUserForm)
 
 
 class TestAddUser(TestCaseForViews):
-
-    template_under_test = '../templates/user_add.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import add_user
@@ -104,6 +93,7 @@ class TestAddUser(TestCaseForViews):
         self.assert_(not user.is_admin)
 
     def test_add_user_invalid_form(self):
+        from yait.forms import AddUserForm
         from yait.models import User
         login = u'admin'
         self._make_user(login, is_admin=True)
@@ -112,15 +102,13 @@ class TestAddUser(TestCaseForViews):
                 'password_confirm': u'',
                 'fullname': u'',
                 'email': u''}
-        self._make_renderer()
         request = self._make_request(user=login, post=post)
-        self._call_fut(request)
+        res = self._call_fut(request)
+        self.assertIsInstance(res['form'], AddUserForm)
         self.assertEqual(self.session.query(User).count(), 1)
 
 
 class TestEditUserForm(TestCaseForViews):
-
-    template_under_test = '../templates/user_edit.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import edit_user_form
@@ -145,14 +133,11 @@ class TestEditUserForm(TestCaseForViews):
         admin = self._make_user(login, is_admin=True)
         matchdict = {'user_id': str(admin.id)}
         request = self._make_request(user=login, matchdict=matchdict)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        self.assertIsInstance(renderer.form, EditUserForm)
+        res = self._call_fut(request)
+        self.assertIsInstance(res['form'], EditUserForm)
 
 
 class TestEditUser(TestCaseForViews):
-
-    template_under_test = '../templates/user_edit.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import edit_user
@@ -175,13 +160,12 @@ class TestEditUser(TestCaseForViews):
         from yait.forms import EditUserForm
         login = u'admin'
         admin = self._make_user(login, is_admin=True)
-        renderer = self._make_renderer()
         post = {}
         matchdict = {'user_id': str(admin.id)}
         request = self._make_request(user=login, matchdict=matchdict, post=post)
-        self._call_fut(request)
-        self.assertIsInstance(renderer.form, EditUserForm)
-        self.assert_(len(renderer.form.errors))
+        res = self._call_fut(request)
+        self.assertIsInstance(res['form'], EditUserForm)
+        self.assertTrue(len(res['form'].errors) >= 1)
 
     def test_edit_user_allow_admin(self):
         from yait.models import User
@@ -214,20 +198,17 @@ class TestEditUser(TestCaseForViews):
                 'email': u'jsmith@exemple.com'}
         matchdict = {'user_id': str(admin.id)}
         request = self._make_request(user=login, matchdict=matchdict, post=post)
-        renderer = self._make_renderer()
-        self._call_fut(request)
+        res = self._call_fut(request)
         # The 'edit_form' view is called, which creates a TemplateAPI,
         # which in turns pulls the notification from the session. This
         # is why we cannot use 'request.get_flash()'.
-        self.assertEqual(len(renderer.api.notifications['error']), 1)
-        self.assertEqual(len(renderer.api.notifications['success']), 0)
+        self.assertEqual(len(res['api'].notifications['error']), 1)
+        self.assertEqual(len(res['api'].notifications['success']), 0)
         admin = self.session.query(User).filter_by(login=login).one()
         self.assert_(admin.is_admin)
 
 
 class TestListUserRoles(TestCaseForViews):
-
-    template_under_test = '../templates/user_roles.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import list_user_roles
@@ -263,21 +244,18 @@ class TestListUserRoles(TestCaseForViews):
                                       p2: ROLE_PROJECT_MANAGER,
                                       p3: ROLE_PROJECT_PARTICIPANT,
                                       p4: ROLE_PROJECT_VIEWER})
-        renderer = self._make_renderer()
         matchdict = {'user_id': str(user.id)}
         request = self._make_request(user=login, matchdict=matchdict)
-        self._call_fut(request)
-        renderer.assert_(user=user)
+        res = self._call_fut(request)
+        self.assertEqual(res['user'], user)
         expected_roles = [(p1, ROLE_LABELS[ROLE_PROJECT_INTERNAL_PARTICIPANT]),
                           (p2, ROLE_LABELS[ROLE_PROJECT_MANAGER]),
                           (p3, ROLE_LABELS[ROLE_PROJECT_PARTICIPANT]),
                           (p4, ROLE_LABELS[ROLE_PROJECT_VIEWER])]
-        renderer.assert_(roles=expected_roles)
+        self.assertEqual(res['roles'], expected_roles)
 
 
 class TestListProjects(TestCaseForViews):
-
-    template_under_test = '../templates/projects.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import list_projects
@@ -294,15 +272,12 @@ class TestListProjects(TestCaseForViews):
         p1 = self._make_project(u'p1', u'p1')
         p3 = self._make_project(u'p3', u'p3')
         p2 = self._make_project(u'p2', u'p2')
-        renderer = self._make_renderer()
         request = self._make_request(user=login)
-        self._call_fut(request)
-        renderer.assert_(projects=[p1, p2, p3])
+        res = self._call_fut(request)
+        self.assertEqual(res['projects'], [p1, p2, p3])
 
 
 class TestProjectAddForm(TestCaseForViews):
-
-    template_under_test = '../templates/project_add.pt'
 
     def _call_fut(self, request):
         from yait.views.manage import add_project_form
@@ -317,15 +292,12 @@ class TestProjectAddForm(TestCaseForViews):
         from yait.forms import AddProjectForm
         login = u'admin'
         self._make_user(login, is_admin=True)
-        renderer = self._make_renderer()
         request = self._make_request(user=login)
-        self._call_fut(request)
-        self.assertIsInstance(renderer.form, AddProjectForm)
+        res = self._call_fut(request)
+        self.assertIsInstance(res['form'], AddProjectForm)
 
 
 class TestAddProject(TestCaseForViews):
-
-    template_under_test = '../templates/project_add.pt'
 
     def _call_fut(self, *args, **kwargs):
         from yait.views.manage import add_project
@@ -340,24 +312,22 @@ class TestAddProject(TestCaseForViews):
         from yait.forms import AddProjectForm
         login = u'admin'
         self._make_user(login, is_admin=True)
-        renderer = self._make_renderer()
         post = {'name': u'p1', 'title': u''}
         request = self._make_request(user=login, post=post)
-        self._call_fut(request)
-        self.assertIsInstance(renderer.form, AddProjectForm)
-        self.assert_(len(renderer.form.errors))
+        res = self._call_fut(request)
+        self.assertIsInstance(res['form'], AddProjectForm)
+        self.assertTrue(len(res['form'].errors) >= 1)
 
     def test_add_project_name_already_taken(self):
         from yait.forms import AddProjectForm
         login = u'admin'
         self._make_user(login, is_admin=True)
-        renderer = self._make_renderer()
         self._make_project(name=u'p1')
         post = {'name': u'p1', 'title': u'Project 1', 'public': ''}
         request = self._make_request(user=login, post=post)
-        self._call_fut(request)
-        self.assertIsInstance(renderer.form, AddProjectForm)
-        self.assert_(len(renderer.form.errors.get('name')))
+        res = self._call_fut(request)
+        self.assertIsInstance(res['form'], AddProjectForm)
+        self.assertIn('name', res['form'].errors)
 
     def test_add_project_allow_admin(self):
         from yait.models import Project

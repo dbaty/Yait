@@ -76,9 +76,6 @@ class TestCaseForViews(TestCase):
         testing.tearDown()
         self.session.remove()
 
-    def _make_renderer(self):
-        return self.config.testing_add_renderer(self.template_under_test)
-
     def _make_request(self, user=None, post=None, get=None, matchdict=None):
         from webob.multidict import MultiDict
         from yait.auth import _get_user

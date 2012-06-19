@@ -5,8 +5,6 @@ from yait.tests.base import TestCaseForViews
 
 class TestIssueAddForm(TestCaseForViews):
 
-    template_under_test = '../templates/issue_add.pt'
-
     def _call_fut(self, request):
         from yait.views.issue import add_form
         return add_form(request)
@@ -33,16 +31,13 @@ class TestIssueAddForm(TestCaseForViews):
         p = self._make_project(name=u'p1')
         login = u'user1'
         self._make_user(login, roles={p: ROLE_PROJECT_PARTICIPANT})
-        renderer = self._make_renderer()
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, matchdict=matchdict)
-        self._call_fut(request)
-        self.assertIsInstance(renderer.form, AddIssueForm)
+        res = self._call_fut(request)
+        self.assertIsInstance(res['form'], AddIssueForm)
 
 
 class TestAddIssue(TestCaseForViews):
-
-    template_under_test = '../templates/issue_add.pt'
 
     def _call_fut(self, request):
         from yait.views.issue import add
@@ -76,9 +71,8 @@ class TestAddIssue(TestCaseForViews):
         matchdict = {'project_name': u'p1'}
         request = self._make_request(user=login, post=post,
                                     matchdict=matchdict)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        self.assertEqual(renderer.form.errors.keys(), ['text'])
+        res = self._call_fut(request)
+        self.assertEqual(res['form'].errors.keys(), ['text'])
         self.assertEqual(len(p.issues), 0)
 
     def test_add_issue_allow_participant(self):
@@ -186,15 +180,12 @@ class TestAddIssue(TestCaseForViews):
         matchdict = {'project_name': u'p'}
         request = self._make_request(user=login, post=post,
                                      matchdict=matchdict)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        self.assertEqual(renderer.form.errors.keys(), ['assignee'])
+        res = self._call_fut(request)
+        self.assertEqual(res['form'].errors.keys(), ['assignee'])
         self.assertEqual(len(p.issues), 0)
 
 
 class TestViewIssue(TestCaseForViews):
-
-    template_under_test = '../templates/issue.pt'
 
     def _call_fut(self, request):
         from yait.views.issue import view
@@ -240,17 +231,14 @@ class TestViewIssue(TestCaseForViews):
         self._make_user(login, roles={p: ROLE_PROJECT_VIEWER})
         matchdict = {'project_name': u'p1', 'issue_ref': str(issue.ref)}
         request = self._make_request(user=login, matchdict=matchdict)
-        renderer = self._make_renderer()
-        self._call_fut(request)
-        renderer.assert_(project=p)
-        renderer.assert_(issue=issue)
-        self.assertIsInstance(renderer.form, AddChangeForm)
-        self.assertEqual(renderer.form.errors, {})
+        res = self._call_fut(request)
+        self.assertEqual(res['project'], p)
+        self.assertEqual(res['issue'], issue)
+        self.assertIsInstance(res['form'], AddChangeForm)
+        self.assertEqual(res['form'].errors, {})
 
 
 class TestUpdateIssue(TestCaseForViews):
-
-    template_under_test = '../templates/issue.pt'
 
     def _call_fut(self, request):
         from yait.views.issue import update

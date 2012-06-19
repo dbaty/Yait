@@ -9,12 +9,6 @@ Yait 0.2
   If it is not a lot slower than defining 'api.layout', use it
   everywhere.
 
-- speed up tests:
-
-  - if we define the renderer in the view configuration (so that the
-    view only returns a dictionary), do the tests run faster? They may
-    be easier to write, too.
-
 - relationships between issues : parent/child, blocks/requires
 
   - make special forms that are submitted through AJAX.
@@ -206,7 +200,7 @@ Later
 
 - add favicon
 
-- add tags
+- add tags (see http://ivaynberg.github.com/select2/)
 
 - show priority and deadline in different colors: orange if imminent,
   red if past.
@@ -227,3 +221,6 @@ Later
   other formats to export bugs to other systems.
 
 - insert into users values(1, 'admin', '$2a$10$xU8/vh3drmwoCGUN.zcE.OYM54sKu0SbzOXXpOeosgNi2lCLMoLae', 'Joe Admin', 'joe.admin@exemple.com', 1);
+
+- provide a WYSIWYG HTML editor in addition to markup renderers. See
+  for example: http://xing.github.com/wysihtml5/

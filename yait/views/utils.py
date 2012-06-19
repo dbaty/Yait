@@ -39,6 +39,8 @@ class TemplateAPI(object, ActionBar):
     def __init__(self, request, html_title=''):
         self.request = request
         self.layout = get_renderer('../templates/layout.pt').implementation()
+        # FIXME: we do not always need 'form_macros'. Make it a
+        # reified property instead.
         self.form_macros = get_renderer(
             '../templates/form_macros.pt').implementation().macros
         if html_title:

@@ -1,7 +1,6 @@
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPSeeOther
-from pyramid.renderers import render_to_response
 
 from sqlalchemy import distinct
 from sqlalchemy.orm.exc import NoResultFound
@@ -49,16 +48,15 @@ def home(request):
     n_not_assigned = issues.filter_by(assignee=None).count()
     search_form = make_simplified_search_form(project, session)
     recent_activity = get_recent_activity(session, project, request)
-    bindings = {'api': TemplateAPI(request, project.title),
-                'project': project,
-                'can_participate': can_participate,
-                'can_manage_project': can_manage_project,
-                'n_assigned': n_assigned,
-                'n_watching': n_watching,
-                'n_not_assigned': n_not_assigned,
-                'search_form': search_form,
-                'recent_activity': recent_activity}
-    return render_to_response('../templates/project.pt', bindings)
+    return {'api': TemplateAPI(request, project.title),
+            'project': project,
+            'can_participate': can_participate,
+            'can_manage_project': can_manage_project,
+            'n_assigned': n_assigned,
+            'n_watching': n_watching,
+            'n_not_assigned': n_not_assigned,
+            'search_form': search_form,
+            'recent_activity': recent_activity}
 
 
 def recent_activity(request):
@@ -74,13 +72,11 @@ def recent_activity(request):
         request, PERM_PARTICIPATE_IN_PROJECT, project)
     can_manage_project = has_permission(request, PERM_MANAGE_PROJECT, project)
     recent_activity = get_recent_activity(session, project, request)
-    bindings = {'api': TemplateAPI(request, project.title),
-                'project': project,
-                'can_participate': can_participate,
-                'can_manage_project': can_manage_project,
-                'recent_activity': recent_activity}
-    return render_to_response(
-        '../templates/project_recent_activity.pt', bindings)
+    return {'api': TemplateAPI(request, project.title),
+            'project': project,
+            'can_participate': can_participate,
+            'can_manage_project': can_manage_project,
+            'recent_activity': recent_activity}
 
 
 def get_recent_activity(db_session, project, request):
@@ -141,16 +137,14 @@ def issues(request):
         issues = ()
     if issues:
         issues = issues.all()
-    bindings = {'api': TemplateAPI(request, project.title),
-                'project': project,
-                'can_participate': can_participate,
-                'can_manage_project': can_manage_project,
-                'filter': filter,
-                'filter_label': filter_label,
-                'issues': issues,
-                'count': len(issues)}
-    return render_to_response(
-        '../templates/project_issues.pt', bindings)
+    return {'api': TemplateAPI(request, project.title),
+            'project': project,
+            'can_participate': can_participate,
+            'can_manage_project': can_manage_project,
+            'filter': filter,
+            'filter_label': filter_label,
+            'issues': issues,
+            'count': len(issues)}
 
 
 def configure_form(request, form=None):
@@ -166,11 +160,10 @@ def configure_form(request, form=None):
         data = {'title': project.title,
                 'public': project.public}
         form = make_edit_project_form(**data)
-    bindings = {'api': TemplateAPI(request, project.title),
-                'project': project,
-                'can_manage_project': True,
-                'form': form}
-    return render_to_response('../templates/project_configure.pt', bindings)
+    return {'api': TemplateAPI(request, project.title),
+            'project': project,
+            'can_manage_project': True,
+            'form': form}
 
 
 def configure(request):
@@ -232,13 +225,12 @@ def configure_roles_form(request):
         # Project managers are not allowed to grant a role to users
         # who do not have a prior role in the project.
         users_with_no_role = ()
-    bindings = {'api': TemplateAPI(request, project.title),
-                'can_manage_project': True,
-                'project': project,
-                'roles': roles,
-                'user_roles': user_roles,
-                'users_with_no_role': users_with_no_role}
-    return render_to_response('../templates/project_roles.pt', bindings)
+    return {'api': TemplateAPI(request, project.title),
+            'can_manage_project': True,
+            'project': project,
+            'roles': roles,
+            'user_roles': user_roles,
+            'users_with_no_role': users_with_no_role}
 
 
 def configure_roles(request):
@@ -299,11 +291,10 @@ def configure_statuses_form(request):
     used = [s[0] for s in session.query(distinct(Issue.status)).\
         filter_by(project_id=project.id).all()]
     # FIXME: We may want to include default statuses in 'used' as well.
-    bindings = {'api': TemplateAPI(request, project.title),
-                'project': project,
-                'can_manage_project': True,
-                'used': used}
-    return render_to_response('../templates/project_statuses.pt', bindings)
+    return {'api': TemplateAPI(request, project.title),
+            'project': project,
+            'can_manage_project': True,
+            'used': used}
 
 
 def configure_statuses(request):

@@ -1,9 +1,6 @@
-"""Global management interfaces."""
-
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPSeeOther
-from pyramid.renderers import render_to_response
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -24,8 +21,7 @@ from yait.views.utils import TemplateAPI
 def control_panel(request):
     if not request.user.is_admin:
         raise HTTPForbidden()
-    bindings = {'api': TemplateAPI(request, _(u'Control panel'))}
-    return render_to_response('../templates/control_panel.pt', bindings)
+    return {'api': TemplateAPI(request, _(u'Control panel'))}
 
 
 def list_users(request):
@@ -35,9 +31,8 @@ def list_users(request):
     session = DBSession()
     # FIXME: paginate
     users = session.query(User).order_by(User.fullname).all()
-    bindings = {'api': TemplateAPI(request, _(u'Users')),
-                'users': users}
-    return render_to_response('../templates/users.pt', bindings)
+    return {'api': TemplateAPI(request, _(u'Users')),
+            'users': users}
 
 
 def add_user_form(request, form=None):
@@ -45,9 +40,8 @@ def add_user_form(request, form=None):
         raise HTTPForbidden()
     if form is None:
         form = AddUserForm()
-    bindings = {'api': TemplateAPI(request, _(u'Add a new user')),
-                'form': form}
-    return render_to_response('../templates/user_add.pt', bindings)
+    return {'api': TemplateAPI(request, _(u'Add a new user')),
+            'form': form}
 
 
 def add_user(request):
@@ -77,10 +71,9 @@ def edit_user_form(request, form=None):
         raise HTTPNotFound()
     if form is None:
         form = EditUserForm(obj=user)
-    bindings = {'api': TemplateAPI(request, user.fullname),
-                'user': user,
-                'form': form}
-    return render_to_response('../templates/user_edit.pt', bindings)
+    return {'api': TemplateAPI(request, user.fullname),
+            'user': user,
+            'form': form}
 
 
 def edit_user(request):
@@ -121,10 +114,9 @@ def list_user_roles(request):
             filter(Role.project_id==Project.id).\
             order_by(Project.title):
         roles.append((project, _(ROLE_LABELS[role.role])))
-    bindings = {'api': TemplateAPI(request, user.fullname),
-                'user': user,
-                'roles': roles}
-    return render_to_response('../templates/user_roles.pt', bindings)
+    return {'api': TemplateAPI(request, user.fullname),
+            'user': user,
+            'roles': roles}
 
 
 def list_projects(request):
@@ -132,9 +124,8 @@ def list_projects(request):
         raise HTTPForbidden()
     session = DBSession()
     projects = session.query(Project).order_by(Project.title).all()
-    bindings = {'api': TemplateAPI(request, _(u'Projects')),
-                'projects': projects}
-    return render_to_response('../templates/projects.pt', bindings)
+    return {'api': TemplateAPI(request, _(u'Projects')),
+            'projects': projects}
 
 
 def add_project_form(request, form=None):
@@ -142,9 +133,8 @@ def add_project_form(request, form=None):
         raise HTTPForbidden()
     if form is None:
         form = AddProjectForm()
-    bindings = {'api': TemplateAPI(request, _(u'Add project')),
-                'form': form}
-    return render_to_response('../templates/project_add.pt', bindings)
+    return {'api': TemplateAPI(request, _(u'Add project')),
+            'form': form}
 
 
 def _add_project(db_session, project):
