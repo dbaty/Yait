@@ -7,10 +7,10 @@
         padding: 0.2em 1em;
         text-align: center;
         font-weight: bold;
-    }
 
-    th:last-child {
-        border-right: 0;
+        &:last-child {
+            border-right: 0;
+        }
     }
 
     tr.odd {
@@ -21,13 +21,13 @@
         border-bottom: 1px solid #eee;
         border-right: 1px solid #eee;
         padding: 0.5em;
+
+        &:last-child {
+        border-right: 0;
+        }
     }
 
     tfoot td {
         border:0;
-    }
-
-    td:last-child {
-        border-right: 0;
     }
 }
