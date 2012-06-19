@@ -39,10 +39,6 @@ class TemplateAPI(object, ActionBar):
     def __init__(self, request, html_title=''):
         self.request = request
         self.layout = get_renderer('../templates/layout.pt').implementation()
-        # FIXME: we do not always need 'form_macros'. Make it a
-        # reified property instead.
-        self.form_macros = get_renderer(
-            '../templates/form_macros.pt').implementation().macros
         if html_title:
             self.html_title = u'Yait - %s' % html_title
         else:
@@ -54,6 +50,10 @@ class TemplateAPI(object, ActionBar):
         self.show_login_link = not self.logged_in
         self.is_admin = request.user.is_admin
         self.cache = request.cache
+
+    @reify
+    def form_macros(self):
+        return get_renderer('../templates/form_macros.pt').implementation().macros
 
     def route_url(self, route_name, *elements, **kw):
         return self.request.route_url(route_name, *elements, **kw)
