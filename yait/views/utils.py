@@ -36,6 +36,7 @@ class TemplateAPI(object, ActionBar):
     """Provide a master template and various information and utilities
     that can be used in any template.
     """
+
     def __init__(self, request, html_title=''):
         self.request = request
         self.layout = get_renderer('../templates/layout.pt').implementation()
@@ -53,7 +54,8 @@ class TemplateAPI(object, ActionBar):
 
     @reify
     def form_macros(self):
-        return get_renderer('../templates/form_macros.pt').implementation().macros
+        return get_renderer(
+            '../templates/form_macros.pt').implementation().macros
 
     def route_url(self, route_name, *elements, **kw):
         return self.request.route_url(route_name, *elements, **kw)
