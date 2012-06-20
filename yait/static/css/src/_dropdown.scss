@@ -80,13 +80,15 @@
   font-weight:normal;
   line-height: 1em;
   white-space:nowrap;
+  width: 100%;
 }
 
 .dropdown-menu li > a:hover,
 .dropdown-menu .active > a,
 .dropdown-menu .active > a:hover {
   text-decoration:none;
-  color: #1B5C11;
+  color: white;
+  background-color: #1B5C11;
 }
 
 .dropdown.open { *z-index: 10; }
