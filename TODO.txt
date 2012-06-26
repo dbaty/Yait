@@ -1,8 +1,6 @@
 Yait 0.2
 ========
 
-- update CSS: '&:hover' + color of hover-ed links in dropdowns
-
 - relationships between issues : parent/child, blocks/requires
 
   - make special forms that are submitted through AJAX.

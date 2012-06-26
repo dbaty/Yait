@@ -1,15 +1,14 @@
-/* reset CSS */
+$base-font-size: 14px;
+
 @import "reset";
 /* style for basic elements (body, p, table, etc.) and generic classes
    (hidden, centered, etc.) */
 @import "base";
-/* notifications */
 @import "notifications";
-/* dropdown menus */
 @import "dropdown";
+@import "dropdown_custom";
 /* form, field, fieldset, buttons, etc. */
 @import "forms";
-/* tables (duh!) */
 @import "tables";
 /* date picker JavaScript widget */
 @import "date_picker";

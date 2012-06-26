@@ -1,0 +1,33 @@
+/*
+** Customizations of Bootstrap dropdown menus.
+*/
+
+.caret {
+    margin-right: $base-font-size / -2;
+    border-top-color: white;
+}
+
+.dropdown .caret {
+    margin-top: $base-font-size / 1.5;
+}
+
+.dropdown-menu {
+    background-color: #3e8d33;
+}
+
+.dropdown-menu li > a:hover,
+.dropdown-menu .active > a,
+.dropdown-menu .active > a:hover {
+    background-color: #1b5c11;
+    color: white;
+}
+
+.dropdown-menu .divider {
+  background-color: lighten(#3e8d33, 2%);
+  border: 0;
+}
+
+.actions .dropdown-menu li {
+    float: none;
+    padding-right: 0;
+}
