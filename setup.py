@@ -20,7 +20,7 @@ REQUIRES = ('cryptacular',
 
 
 setup(name='Yait',
-      version='0.1',
+      version='0.1.0',
       description='Yait is an issue tracker.',
       long_description='\n\n'.join((README, CHANGES)),
       classifiers=(

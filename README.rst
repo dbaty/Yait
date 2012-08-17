@@ -1,3 +1,3 @@
 Yait is an issue tracker.
 
-FIXME: expand a bit.
+FIXME: expand a bit. ;)
